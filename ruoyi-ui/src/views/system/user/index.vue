@@ -324,6 +324,19 @@
           <em>点击上传</em>
         </div>
         <div class="el-upload__tip" slot="tip">
+          <el-cascader
+            v-model="upload.dept"
+            placeholder="请选择机构名称"
+            :options="deptidOptions"
+            size="small"
+            :show-all-levels="false"
+            @change="handleZong"
+            ref="cascaderUser"
+            clearable
+          >
+          </el-cascader>
+        </div>
+        <div class="el-upload__tip" slot="tip">
           <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据
           <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
         </div>
@@ -340,7 +353,7 @@
 <script>
 import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus, importTemplate } from "@/api/system/user";
 import { getToken } from "@/utils/auth";
-import { treeselect } from "@/api/system/dept";
+import { treeselect,Cascadeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -399,6 +412,10 @@ export default {
         isUploading: false,
         // 是否更新已经存在的用户数据
         updateSupport: 0,
+        //部门名称
+        dept:null,
+        //部门id
+        deptId:null,
         // 设置上传的请求头部
         headers: { Authorization: "Bearer " + getToken() },
         // 上传的地址
@@ -455,6 +472,7 @@ export default {
   created() {
     this.getList();
     this.getTreeselect();
+    this.getCascadeselect();
     this.getDicts("sys_normal_disable").then(response => {
       this.statusOptions = response.data;
     });
@@ -476,10 +494,33 @@ export default {
         }
       );
     },
+    /** 上传时选择机构 */
+    handleZong(value){
+      var labelList = [];
+      var checkLabels = this.$refs['cascaderUser'].getCheckedNodes();
+      checkLabels.forEach(function(item) {
+        if(!item.hasChildren) {
+          labelList.push(item.label);
+        }
+      })
+      console.log(labelList.join(","))
+      if(value&&labelList){
+        this.upload.dept =value[2];
+        this.upload.deptId =labelList[2]
+      }else {
+        this.upload.dept =null;
+        this.upload.deptId = null;
+      }
+    },
     /** 查询部门下拉树结构 */
     getTreeselect() {
       treeselect().then(response => {
         this.deptOptions = response.data;
+      });
+    },
+    getCascadeselect(){
+      Cascadeselect().then(response => {
+        this.deptidOptions = response.data;
       });
     },
     // 筛选节点

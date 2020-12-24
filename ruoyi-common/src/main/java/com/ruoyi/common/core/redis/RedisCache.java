@@ -224,4 +224,13 @@ public class RedisCache
     {
         return redisTemplate.keys(pattern);
     }
+
+    /**
+     * 判断是否有值
+     * @param key
+     * @return
+     */
+    public boolean hasKey(String key){
+        return redisTemplate.hasKey(key);
+    }
 }

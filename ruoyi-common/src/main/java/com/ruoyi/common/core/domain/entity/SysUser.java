@@ -17,7 +17,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 用户对象 sys_user
- * 
+ *
  * @author ruoyi
  */
 public class SysUser extends BaseEntity
@@ -39,6 +39,10 @@ public class SysUser extends BaseEntity
     /** 用户昵称 */
     @Excel(name = "用户名称")
     private String nickName;
+
+    /** 用户身份证号 */
+    @Excel(name = "用户身份证")
+    private String idcard;
 
     /** 用户邮箱 */
     @Excel(name = "用户邮箱")
@@ -300,6 +304,14 @@ public class SysUser extends BaseEntity
         this.postIds = postIds;
     }
 
+    public String getIdcard() {
+        return idcard;
+    }
+
+    public void setIdcard(String idcard) {
+        this.idcard = idcard;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -307,6 +319,7 @@ public class SysUser extends BaseEntity
             .append("deptId", getDeptId())
             .append("userName", getUserName())
             .append("nickName", getNickName())
+            .append("idcard", getIdcard())
             .append("email", getEmail())
             .append("phonenumber", getPhonenumber())
             .append("sex", getSex())

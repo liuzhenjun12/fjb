@@ -82,3 +82,16 @@
 .el-range-separator {
   box-sizing: content-box;
 }
+.el-cascader--medium{
+  width: 300px;
+}
+.el-cascader--small {
+  width: 100%;
+}
+
+.el-cascader-menu {
+  height: 350px;
+}
+.el-cascader-menu__wrap {
+  height: 366px;
+}

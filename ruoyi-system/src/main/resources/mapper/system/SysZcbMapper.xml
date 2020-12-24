@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysZcbMapper">
+    
+    <resultMap type="SysZcb" id="SysZcbResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="sfz"    column="sfz"    />
+        <result property="zonghang"    column="zonghang"    />
+        <result property="kaoshiType"    column="kaoshi_type"    />
+        <result property="kaoshiDate"    column="kaoshi_date"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+    </resultMap>
+
+    <sql id="selectSysZcbVo">
+        select id, name, sfz, zonghang, kaoshi_type, kaoshi_date, create_time, update_time, create_by, update_by from sys_zcb
+    </sql>
+
+    <select id="selectSysZcbList" parameterType="SysZcb" resultMap="SysZcbResult">
+        <include refid="selectSysZcbVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="sfz != null  and sfz != ''"> and sfz = #{sfz}</if>
+            <if test="zonghang != null  and zonghang != ''"> and zonghang = #{zonghang}</if>
+            <if test="kaoshiType != null  and kaoshiType != ''"> and kaoshi_type = #{kaoshiType}</if>
+            <if test="kaoshiDate != null  and kaoshiDate != ''"> and kaoshi_date = #{kaoshiDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysZcbById" parameterType="Long" resultMap="SysZcbResult">
+        <include refid="selectSysZcbVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysZcb" parameterType="SysZcb" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_zcb
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="sfz != null">sfz,</if>
+            <if test="zonghang != null">zonghang,</if>
+            <if test="kaoshiType != null">kaoshi_type,</if>
+            <if test="kaoshiDate != null">kaoshi_date,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="sfz != null">#{sfz},</if>
+            <if test="zonghang != null">#{zonghang},</if>
+            <if test="kaoshiType != null">#{kaoshiType},</if>
+            <if test="kaoshiDate != null">#{kaoshiDate},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysZcb" parameterType="SysZcb">
+        update sys_zcb
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="sfz != null">sfz = #{sfz},</if>
+            <if test="zonghang != null">zonghang = #{zonghang},</if>
+            <if test="kaoshiType != null">kaoshi_type = #{kaoshiType},</if>
+            <if test="kaoshiDate != null">kaoshi_date = #{kaoshiDate},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysZcbById" parameterType="Long">
+        delete from sys_zcb where id = #{id}
+    </delete>
+
+    <delete id="deleteSysZcbByIds" parameterType="String">
+        delete from sys_zcb where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

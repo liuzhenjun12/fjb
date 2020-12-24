@@ -65,6 +65,7 @@ service.interceptors.response.use(res => {
     }
     else if (message.includes("timeout")) {
       message = "系统接口请求超时";
+      return message;
     }
     else if (message.includes("Request failed with status code")) {
       message = "系统接口" + message.substr(message.length - 3) + "异常";

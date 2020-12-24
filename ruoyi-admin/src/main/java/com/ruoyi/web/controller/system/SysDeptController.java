@@ -26,7 +26,7 @@ import com.ruoyi.system.service.ISysDeptService;
 
 /**
  * 部门信息
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -86,6 +86,16 @@ public class SysDeptController extends BaseController
     {
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(deptService.buildDeptTreeSelect(depts));
+    }
+
+    /**
+     * 获取部门级联下拉列表
+     */
+    @GetMapping("/cascadeselect")
+    public AjaxResult cascadeselect(SysDept dept)
+    {
+        List<SysDept> depts = deptService.selectDeptList(dept);
+        return AjaxResult.success(deptService.buildCascadeselect(depts));
     }
 
     /**

@@ -1,14 +1,25 @@
 package com.ruoyi.common.utils.bean;
 
+
+
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.StringUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.StringBody;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Bean 工具类
- * 
+ *
  * @author ruoyi
  */
 public class BeanUtils extends org.springframework.beans.BeanUtils
@@ -24,7 +35,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils
 
     /**
      * Bean属性复制工具方法。
-     * 
+     *
      * @param dest 目标对象
      * @param src 源对象
      */
@@ -42,7 +53,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils
 
     /**
      * 获取对象的setter方法。
-     * 
+     *
      * @param obj 对象
      * @return 对象的setter方法列表
      */
@@ -70,7 +81,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils
 
     /**
      * 获取对象的getter方法。
-     * 
+     *
      * @param obj 对象
      * @return 对象的getter方法列表
      */
@@ -97,7 +108,7 @@ public class BeanUtils extends org.springframework.beans.BeanUtils
     /**
      * 检查Bean方法名中的属性名是否相等。<br>
      * 如getName()和setName()属性名一样，getName()和setAge()属性名不一样。
-     * 
+     *
      * @param m1 方法名1
      * @param m2 方法名2
      * @return 属性名一样返回true，否则返回false
@@ -106,5 +117,32 @@ public class BeanUtils extends org.springframework.beans.BeanUtils
     public static boolean isMethodPropEquals(String m1, String m2)
     {
         return m1.substring(BEAN_METHOD_PROP_INDEX).equals(m2.substring(BEAN_METHOD_PROP_INDEX));
+    }
+
+    /**
+     * 将Object对象里面的属性和值转化成Map对象
+     *
+     * @param obj
+     * @return
+     * @throws IllegalAccessException
+     */
+    public static Map<String, String> objectToMap(Object obj) throws IllegalAccessException {
+        Map<String, String> map = new HashMap<String,String>();
+        Class<?> clazz = obj.getClass();
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            Object value = StringUtils.nvl(field.get(obj),"");
+            System.out.println(fieldName+","+value);
+            map.put(fieldName, value.toString());
+        }
+        return map;
+    }
+
+    public static void main(String[] args) throws IllegalAccessException {
+        SysUser user=new SysUser();
+        user.setUserName("刘震军");
+        user.setPassword("123456");
+        System.out.println(objectToMap(user));
     }
 }

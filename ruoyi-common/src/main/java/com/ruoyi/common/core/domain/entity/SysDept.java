@@ -11,7 +11,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
  * 部门表 sys_dept
- * 
+ *
  * @author ruoyi
  */
 public class SysDept extends BaseEntity
@@ -50,7 +50,10 @@ public class SysDept extends BaseEntity
 
     /** 父部门名称 */
     private String parentName;
-    
+
+    /*** 机构代码*/
+    private String jigouCode;
+
     /** 子部门 */
     private List<SysDept> children = new ArrayList<SysDept>();
 
@@ -180,6 +183,10 @@ public class SysDept extends BaseEntity
         this.children = children;
     }
 
+    public String getJigouCode() { return jigouCode; }
+
+    public void setJigouCode(String jigouCode) { this.jigouCode = jigouCode; }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -197,6 +204,7 @@ public class SysDept extends BaseEntity
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
+                .append("jigouCode", getJigouCode())
             .toString();
     }
 }

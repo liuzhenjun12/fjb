@@ -3,18 +3,18 @@
     <transition name="sidebarLogoFade">
       <router-link v-if="collapse" key="collapse" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 v-else class="sidebar-title">{{ title }} </h1>
+        <span v-else class="sidebar-title">{{ title }} </span>
       </router-link>
       <router-link v-else key="expand" class="sidebar-logo-link" to="/">
         <img v-if="logo" :src="logo" class="sidebar-logo">
-        <h1 class="sidebar-title">{{ title }} </h1>
+        <span class="sidebar-title">{{ title }} </span>
       </router-link>
     </transition>
   </div>
 </template>
 
 <script>
-import logoImg from '@/assets/logo/logo.png'
+import logoImg from '@/assets/logo/youjian.png'
 
 export default {
   name: 'SidebarLogo',
@@ -26,7 +26,7 @@ export default {
   },
   data() {
     return {
-      title: '若依管理系统',
+      title: '自动化报名系统',
       logo: logoImg
     }
   }
@@ -49,7 +49,6 @@ export default {
   height: 50px;
   line-height: 50px;
   background: #2b2f3a;
-  text-align: center;
   overflow: hidden;
 
   & .sidebar-logo-link {
@@ -58,18 +57,18 @@ export default {
 
     & .sidebar-logo {
       width: 32px;
-      height: 32px;
+      height: 30px;
       vertical-align: middle;
-      margin-right: 12px;
+      margin-right: 5px;
+      margin-left: 10px;
     }
 
     & .sidebar-title {
       display: inline-block;
       margin: 0;
-      color: #fff;
-      font-weight: 600;
+      color: #ccc;
       line-height: 50px;
-      font-size: 14px;
+      font-size: 17px;
       font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
       vertical-align: middle;
     }

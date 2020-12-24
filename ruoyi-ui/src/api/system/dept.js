@@ -33,6 +33,14 @@ export function treeselect() {
   })
 }
 
+// 查询部门级联下拉结构
+export function Cascadeselect() {
+  return request({
+    url: '/system/dept/cascadeselect',
+    method: 'get'
+  })
+}
+
 // 根据角色ID查询部门树结构
 export function roleDeptTreeselect(roleId) {
   return request({

@@ -115,6 +115,14 @@
 .el-tree-node__content > .el-checkbox {
 	margin-right: 8px;
 }
+ .el-tree-node__content:hover {
+   background-color: #1ab394;
+   color: #1e1e1e;
+ }
+ .el-tree-node:focus>.el-tree-node__content{
+   background-color: #1ab394;
+   color: white;
+ }
 
 .list-group-striped > .list-group-item {
 	border-left: 0;
