@@ -25,6 +25,8 @@
         <result property="remark"    column="remark"    />
         <result property="delFlag"    column="del_flag"    />
         <result property="avatarUrl"    column="avatar_url"    />
+        <result property="examType"    column="exam_type"    />
+        <result property="examId"    column="exam_id"    />
         <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
     </resultMap>
 
@@ -39,7 +41,7 @@
 
     <sql id="selectSysBmbVo">
         select b.id, b.name, b.idcard, b.kaoshi_time,  b.dept_id, b.bukao, b.sfwc, b.fucha, b.liluen, b.shichao, b.pici, b.create_time,
-         b.update_time, b.create_by, b.update_by, b.remark, b.del_flag, b.avatar_url,b.kaoshi_type,b.ancestors,
+         b.update_time, b.create_by, b.update_by, b.remark, b.del_flag, b.avatar_url,b.kaoshi_type,b.ancestors,b.exam_type,b.exam_id,
          d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status
         from sys_bmb b left join sys_dept d on b.dept_id = d.dept_id
     </sql>
@@ -85,7 +87,9 @@
             <if test="updateBy != null">update_by,</if>
             <if test="remark != null">remark,</if>
             <if test="delFlag != null">del_flag,</if>
-            <if test="avatarUrl != null">avatar_url,</if>
+            <if test="avatarUrl != null and avatarUrl != ''">avatar_url,</if>
+            <if test="examType != null and examType != ''">exam_type,</if>
+            <if test="examId != null and examId != ''">exam_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null and name != ''">#{name},</if>
@@ -106,7 +110,9 @@
             <if test="updateBy != null">#{updateBy},</if>
             <if test="remark != null">#{remark},</if>
             <if test="delFlag != null">#{delFlag},</if>
-            <if test="avatarUrl != null">#{avatarUrl},</if>
+            <if test="avatarUrl != null and avatarUrl != ''">#{avatarUrl},</if>
+            <if test="examType != null and examType != ''">#{examType},</if>
+            <if test="examId != null and examId != ''">#{examId},</if>
         </trim>
     </insert>
 
@@ -132,6 +138,8 @@
             <if test="remark != null">remark = #{remark},</if>
             <if test="delFlag != null">del_flag = #{delFlag},</if>
             <if test="avatarUrl != null">avatar_url = #{avatarUrl},</if>
+            <if test="examType != null">exam_type = #{examType},</if>
+            <if test="examId != null">exam_id = #{examId},</if>
         </trim>
         where id = #{id}
     </update>

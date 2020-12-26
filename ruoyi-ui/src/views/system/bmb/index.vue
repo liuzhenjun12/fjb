@@ -139,6 +139,18 @@
           <span v-else>录入中</span>
         </el-button>
       </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="info"
+          icon="el-icon-user"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdateAvatar"
+          v-hasPermi="['system:bmb:luru']"
+        >
+          照片
+        </el-button>
+      </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -148,6 +160,7 @@
       <el-table-column label="姓名" min-width="10%" align="center" prop="name" />
       <el-table-column label="身份证" min-width="20%" align="center" prop="idcard" />
       <el-table-column label="类型" min-width="10%" align="center" prop="kaoshiType" :formatter="ikashilx" />
+      <el-table-column label="岗位" min-width="10%" align="center" prop="examType" />
       <el-table-column label="理论成绩"  min-width="10%"align="center" prop="liluen" :formatter="ifendcase" />
       <el-table-column label="实操成绩"  min-width="10%" align="center" prop="shichao" :formatter="ifendcase" />
       <el-table-column label="补考" min-width="10%" align="center"  >
@@ -170,7 +183,7 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="复查情况" min-width="35%" align="left" prop="fucha" />
+      <el-table-column label="录入结果" min-width="35%" align="left" prop="fucha" />
 <!--      <el-table-column label="批次" align="center" prop="pici" :formatter="piciFormat" />-->
       <el-table-column label="操作" min-width="15%" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -238,6 +251,16 @@
               :key="dict.dictValue"
               :label="dict.dictLabel"
               :value="dict.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="岗位类型" prop="examType">
+          <el-select v-model="form.examType" placeholder="请选择岗位类型" style="width: 100%">
+            <el-option
+              v-for="item in gangOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -362,7 +385,7 @@
 </template>
 
 <script>
-  import { listBmb, getBmb, delBmb, addBmb, updateBmb, exportBmb,importTemplate,luruBmb,changeSfwc,changeBukao } from "@/api/system/bmb";
+  import { listBmb, getBmb, delBmb, addBmb, updateBmb, exportBmb,importTemplate,luruBmb,changeSfwc,changeBukao,updateAvatar } from "@/api/system/bmb";
   import { getToken } from "@/utils/auth";
   import { Cascadeselect } from "@/api/system/dept";
   export default {
@@ -392,19 +415,28 @@
         open: false,
         // 部门树选项
         deptOptions: undefined,
-        // 部门名称
-        deptName: undefined,
         defaultProps: {
           children: "children",
           label: "label"
         },
         loadzai: false,
+        zaopian:false,
         // 是否补考字典
         bukaoOptions: [],
         // 批次字典
         piciOptions: [],
         //理论字典
         liluenOptions:[],
+        gangOptions:[
+          {
+            value: '临柜',
+            label: '临柜'
+          },
+          {
+            value: '清分',
+            label: '清分'
+          }
+        ],
         // 用户导入参数
         upload: {
           // 是否显示弹出层（用户导入）
@@ -450,12 +482,12 @@
         // 表单校验
         rules: {
           name: [
-            { required: true, message: "姓名不能为空", trigger: "blur" }
+            { required: true, message: "姓名不能为空", trigger: "blur" },{ min: 2, max: 5, message: '长度在 2 到 5 个字符', trigger: 'blur' }
           ],
           idcard: [
-            { required: true, message: "身份证不能为空", trigger: "blur" }
+            { required: true, message: "身份证不能为空", trigger: "blur" },{ min: 9, max: 19, message: '长度在 9 到 19 个字符', trigger: 'blur' }
           ],
-          deptId: [
+          ancestors: [
             { required: true, message: "机构不能为空", trigger: "blur" }
           ],
           pici: [
@@ -464,14 +496,17 @@
           kaoshiTime: [
             { required: true, message: "考试日期不能为空", trigger: "blur" }
           ],
+          examType: [
+            { required: true, message: "岗位类型不能为空", trigger: "blur" }
+          ],
+          avatarUrl: [
+            { required: true, message: "照片地址不能为空", trigger: "blur" }
+          ],
         }
       };
     },
     watch: {
-      // 根据名称筛选部门树
-      deptName(val) {
-        this.$refs.tree.filter(val);
-      }
+
     },
     created() {
       this.getList();
@@ -527,7 +562,7 @@
       ikashilx(row){
         if(row.kaoshiType=='1'){
           return '首次'
-        }else if(row.kaoshiType=='Y'){
+        }else if(row.kaoshiType=='2'){
           return '证书'
         }else {
           return '未知'
@@ -750,6 +785,25 @@
             this.msgSuccess(response.msg);
           }
           this.loadzai = false;
+          this.getList();
+        }).catch(()=> {
+        });
+      },
+      /*** 修改照片* @param row*/
+      handleUpdateAvatar(row){
+        const id = row.id || this.ids
+        this.$confirm('是否确认要修改照片?', "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(res=>{
+          return updateAvatar(id);
+        }).then(response => {
+          if(response=='系统接口请求超时'){
+            this.msgError("系统接口请求超时");
+          }else {
+            this.msgSuccess(response.msg);
+          }
           this.getList();
         }).catch(()=> {
         });

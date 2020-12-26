@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.system;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -168,6 +169,19 @@ public class SysBmbController extends BaseController
         String operName = loginUser.getUsername();
         String message = sysBmbService.luru(list,operName,loginUser.getUser().getUserId());
         return AjaxResult.success(message);
+    }
+
+    /**
+     * 修改照片
+     */
+    @PreAuthorize("@ss.hasPermi('system:bmb:luru')")
+    @Log(title = "修改照片", businessType = BusinessType.UPDATE)
+    @GetMapping("/updateAvatar/{id}")
+    public AjaxResult updateAvatar(@PathVariable Long id) throws IOException {
+        SysBmb bmb = sysBmbService.selectSysBmbById(id);
+        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
+        String operName = loginUser.getUsername();
+        return sysBmbService.updateAvatar(bmb,operName,loginUser.getUser().getUserId());
     }
 
     /**

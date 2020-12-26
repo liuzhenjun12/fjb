@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +12,12 @@ import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ruoyi.common.constant.Constants;
-import com.ruoyi.common.core.domain.PhoteSubmitVo;
-import com.ruoyi.common.core.domain.PostResult;
+import com.ruoyi.common.core.domain.*;
 import com.ruoyi.common.core.domain.entity.SysDept;
+import com.ruoyi.common.core.domain.result.Re;
+import com.ruoyi.common.core.domain.result.Ree;
+import com.ruoyi.common.core.domain.result.Row;
+import com.ruoyi.common.core.domain.result.Rows;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.*;
@@ -23,16 +25,11 @@ import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.common.utils.http.OkHttpUtils;
 import com.ruoyi.system.domain.vo.BankExamVo;
 import com.ruoyi.system.domain.vo.IdcardVo;
-import com.ruoyi.system.domain.vo.SubmitVo;
 import com.ruoyi.system.mapper.SysDeptMapper;
-import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -75,7 +72,7 @@ public class SysBmbServiceImpl implements ISysBmbService
 
     /**
      * 查询报名列表
-     *
+     *JSESSIONID=BB9E1A372D9191F45284800C259FD84E; Path=/examinationRY; HttpOnly
      * @param sysBmb 报名
      * @return 报名
      */
@@ -170,12 +167,20 @@ public class SysBmbServiceImpl implements ISysBmbService
         SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd" );
         for (SysBmb bmb : bmbList)
         {
-            System.out.println(bmb.toString());
             try
             {
-                if(StringUtils.isEmpty(bmb.getName())||StringUtils.isEmpty(bmb.getIdcard())){
+                if(StringUtils.isEmpty(bmb.getIdcard())){
                     {
-                        throw new CustomException("姓名或者身份证号不能为空！");
+                        failureNum++;
+                        failureMsg.append("<br/>" + failureNum + "、身份证号是空的 " );
+                        continue;
+                    }
+                }
+                if(StringUtils.isEmpty(bmb.getName())){
+                    {
+                        failureNum++;
+                        failureMsg.append("<br/>" + failureNum + "、姓名是空的 " );
+                        continue;
                     }
                 }
                 SysBmb bmb1=new SysBmb();
@@ -187,6 +192,9 @@ public class SysBmbServiceImpl implements ISysBmbService
                 List<SysBmb> u = sysBmbMapper.selectSysBmbList(bmb1);
                 if (u.isEmpty())
                 {
+                    if(StringUtils.isEmpty(bmb.getExamType())){
+                      bmb.setExamType("临柜");
+                    }
                     bmb.setKaoshiTime(sdf.parse(kaoshirq));
                     bmb.setPici(pici);
                     bmb.setDeptId(deptId);
@@ -245,13 +253,6 @@ public class SysBmbServiceImpl implements ISysBmbService
         StringBuilder successMsg = new StringBuilder();
         IdentityCodeUtils idcard = new IdentityCodeUtils();
         SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd" );
-        String session="";
-        if (redisCache.hasKey(Constants.SYS_SESSION+userid)){
-            session=redisCache.getCacheObject(Constants.SYS_SESSION+userid);
-        }else {
-            session=HttpUtils.getSession("http://221.226.21.180/examinationRY/register.jsp");
-            redisCache.setCacheObject(Constants.SYS_SESSION+userid,session,300, TimeUnit.MINUTES);
-        }
         for(SysBmb t:list){
             if("Y".equals(t.getSfwc())){
                 continue;
@@ -307,7 +308,7 @@ public class SysBmbServiceImpl implements ISysBmbService
                         }else {
                             s.setSex("男");
                         }
-                        s.setExamtype("临柜");
+                        s.setExamtype(t.getExamType());
                         s.setSessionText("该测评不需要选择场次");
                         s.setSessionID("0");
                         s.setCity(diqu.getDeptName());
@@ -342,20 +343,23 @@ public class SysBmbServiceImpl implements ISysBmbService
                             t.setFucha(t.getFucha()+";没有相片，需要登录上传");
                             s.setImgShow("/examinationRY/upload/default.jpg");
                         }
-                        String submit =submitZhengshu(s);
-                        if(submit=="Y"){
-                            t.setSfwc("Y");
-                            t.setFucha(t.getFucha()+";录入成功");
-                            t.setUpdateBy(operName);
-                            this.updateSysBmb(t);
-                            successNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 证书审验录入成功");
-                        }else {
-                            t.setFucha(submit);
+                        PostResult result =OkHttpUtils.submitZhengshu(s);
+                        if("failed".equals(result.getResult())){
+                            t.setFucha(result.getReason());
                             t.setUpdateBy(operName);
                             this.updateSysBmb(t);
                             failureNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 证书审验录入失败:"+submit);
+                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":"+result.getReason());
+                            continue;
+                        }else {
+                            t.setSfwc("Y");
+                            t.setFucha("报名成功");
+                            t.setExamId(s.getExamdate().toString());
+                            t.setUpdateBy(operName);
+                            this.updateSysBmb(t);
+                            successNum++;
+                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
+                            continue;
                         }
                     }else {
                         t.setFucha("证书审验没有机位");
@@ -409,10 +413,25 @@ public class SysBmbServiceImpl implements ISysBmbService
                     }else {
                         p.setSex("男");
                     }
-                    p.setExamtype("临柜");
-
-                    File folder = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+t.getIdcard()+".jpg");
-                    if(folder.exists()){
+                    p.setExamtype(t.getExamType());
+                    File folder =null;
+                    folder = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+t.getIdcard()+".jpg");
+                    if(!folder.exists()){
+                        String sfjxm=t.getName()+t.getIdcard();
+                        folder = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+sfjxm+".jpg");
+                        if(!folder.exists()){
+                            String sfjxm1=t.getName()+"+"+t.getIdcard();
+                            folder = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+sfjxm1+".jpg");
+                        }
+                    }
+                    if(!folder.exists()){
+                        t.setFucha("没有相片,无法注册");
+                        t.setUpdateBy(operName);
+                        this.updateSysBmb(t);
+                        failureNum++;
+                        successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 没有相片,无法注册");
+                        continue;
+                    }else {
                         PostResult result= OkHttpUtils.OkHttpOpst(p,folder);
                         if("failed".equals(result.getResult())){
                             t.setFucha(result.getReason());
@@ -422,58 +441,13 @@ public class SysBmbServiceImpl implements ISysBmbService
                             successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":"+result.getReason());
                             continue;
                         }else {
+                            t.setSfwc("Y");
                             t.setFucha("报名成功");
+                            t.setExamId(p.getExamdate());
                             t.setUpdateBy(operName);
                             this.updateSysBmb(t);
                             successNum++;
                             successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
-                            continue;
-                        }
-                    }else {
-                        String sfjxm=t.getName()+t.getIdcard();
-                        String sfjxm1=t.getName()+"+"+t.getIdcard();
-                        File folder1 = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+sfjxm+".jpg");
-                        File folder2 = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+sfjxm1+".jpg");
-                        if(folder1.exists()){
-                            PostResult result= OkHttpUtils.OkHttpOpst(p,folder1);
-                            if("failed".equals(result.getResult())){
-                                t.setFucha(result.getReason());
-                                t.setUpdateBy(operName);
-                                this.updateSysBmb(t);
-                                failureNum++;
-                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":"+result.getReason());
-                                continue;
-                            }else {
-                                t.setFucha("报名成功");
-                                t.setUpdateBy(operName);
-                                this.updateSysBmb(t);
-                                successNum++;
-                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
-                                continue;
-                            }
-                        }else if(folder2.exists()){
-                            PostResult result= OkHttpUtils.OkHttpOpst(p,folder2);
-                            if("failed".equals(result.getResult())){
-                                t.setFucha(result.getReason());
-                                t.setUpdateBy(operName);
-                                this.updateSysBmb(t);
-                                failureNum++;
-                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":"+result.getReason());
-                                continue;
-                            }else {
-                                t.setFucha("报名成功");
-                                t.setUpdateBy(operName);
-                                this.updateSysBmb(t);
-                                successNum++;
-                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
-                                continue;
-                            }
-                        }else {
-                            t.setFucha("没有相片,无法注册");
-                            t.setUpdateBy(operName);
-                            this.updateSysBmb(t);
-                            failureNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 没有相片,无法注册");
                             continue;
                         }
                     }
@@ -498,8 +472,6 @@ public class SysBmbServiceImpl implements ISysBmbService
         return successMsg.toString();
     }
 
-
-
     /**
      * 是否完成状态修改npk
      * @param sysBmb
@@ -510,219 +482,93 @@ public class SysBmbServiceImpl implements ISysBmbService
         return sysBmbMapper.updateSysBmb(sysBmb);
     }
 
-    private String submitShouCi(PhoteSubmitVo p, String filePath) throws IOException{
-        System.out.println(p.toString());
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setCharset(Charset.forName("UTF-8"));
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        builder.addTextBody("parentId", "");
-        builder.addTextBody("parentIds", "");
-        builder.addTextBody("cardtype", p.getCardtype());
-        builder.addTextBody("idcard", p.getIdcard());
-        builder.addTextBody("bankname", "");
-        builder.addTextBody("username", p.getName());
-        builder.addTextBody("name", p.getName());
-        builder.addTextBody("province", p.getProvince());
-        builder.addTextBody("city", p.getCity());
-        builder.addTextBody("jigou", p.getJigou());
-        builder.addTextBody("peopleBankNo","");
-        builder.addTextBody("peopleBankName", "");
-        builder.addTextBody("bank",p.getBank());
-        builder.addTextBody("bankNumber", p.getBank());
-        builder.addTextBody("bankno",p.getBankno());
-        builder.addTextBody("examdate",p.getExamdate().toString());
-        builder.addTextBody("pbexamdate",p.getExamdate().toString());
-        builder.addTextBody("session", "0");
-        builder.addTextBody("examtype", p.getExamtype());
-        builder.addTextBody("sex", p.getSex());
-        builder.addTextBody("email",p.getEmail());
-        builder.addTextBody("qq", p.getQq());
-        builder.addTextBody("phone", p.getPhone());
-        builder.addTextBody("certificateID","");
-        builder.addTextBody("targetImg",p.getIdcard());
-        ContentType contentType2 = ContentType.create("multipart/form-data", Charset.forName("utf-8"));
-        InputStream inputStream  = new FileInputStream(new File(filePath));
-
-        builder.addBinaryBody("cultural", inputStream, contentType2, filePath);
-        HttpEntity entity = builder.build();
-        HttpPost httpPost = new HttpPost("http://221.226.21.180/examinationRY/photeSubmit.action");
-
-        httpPost.setEntity(entity);
-        httpPost.addHeader("UTOKEN", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmYWlyeWxhbmQiLCJleHAiOjE1ODgwODEzOTE3MDYsInR5cGUiOiJvdXRzaWRlIiwidXNlcklkIjoiMTI0OTQ5NjQ4Mzc0NzEzNTQ4OSIsImlhdCI6MTU4NzQ3NjU5MTcwNn0.EBqIx8WVsoFHz94bF2fy9T2R1nichhHCO8_GQ0Coa6Q");
-
-        System.out.println("创建post请求并装载好打包数据");
-        // 4. 创建HttpClient对象，传入httpPost执行发送网络请求的动作
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-        System.out.println("发送post请求并获取结果");
-        // 5. 获取返回的实体内容对象并解析内容
-        HttpEntity resultEntity = response.getEntity();
-        String responseMessage = "";
-        try{
-            System.out.println("开始解析结果");
-            if(resultEntity!=null){
-                InputStream is = resultEntity.getContent();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                StringBuffer sb = new StringBuffer();
-                String line = "";
-                while((line = br.readLine()) != null){
-                    sb.append(line);
-                }
-                responseMessage = sb.toString();
-                System.out.println("解析完成，解析内容为"+ responseMessage);
-            }
-            EntityUtils.consume(resultEntity);
-        }finally{
-            if (null != response){
-                response.close();
+    @Override
+    public AjaxResult updateAvatar(SysBmb bmb, String operName, Long userId) throws IOException {
+        if(StringUtils.isEmpty(bmb.getExamId())){
+            return AjaxResult.error("只有录入成功后才能修改照片");
+        }
+        File folder =null;
+        folder = new File("D:/jinchu/uploadPath/avatar/"+bmb.getAvatarUrl()+"/"+bmb.getIdcard()+".jpg");
+        if(!folder.exists()){
+            String sfjxm=bmb.getName()+bmb.getIdcard();
+            folder = new File("D:/jinchu/uploadPath/avatar/"+bmb.getAvatarUrl()+"/"+sfjxm+".jpg");
+            if(!folder.exists()){
+                String sfjxm1=bmb.getName()+"+"+bmb.getIdcard();
+                folder = new File("D:/jinchu/uploadPath/avatar/"+bmb.getAvatarUrl()+"/"+sfjxm1+".jpg");
             }
         }
-        return responseMessage;
-    }
-
-    /**
-     * 证书审验提交注册
-     * @param s
-     * @return
-     * @throws IOException
-     */
-    private String submitZhengshu(SubmitVo s) throws IOException {
-        System.out.println(s.toString());
-        Map<String, String> map = new HashMap<>();
-        map.put("imgShow", s.getImgShow());
-        map.put("jigou", s.getJigou());
-        map.put("username", s.getUsername());
-        map.put("sex", s.getSex());
-        map.put("examtype", s.getExamtype());
-        map.put("cardtype", s.getCardtype());
-        map.put("idcard", s.getIdcard());
-        map.put("examdateText", s.getExamdateText());
-        map.put("examdate", s.getExamdate().toString());
-        map.put("pbexamdateText", s.getPbexamdateText());
-        map.put("sessionText", s.getSessionText());
-        map.put("sessionID", s.getSessionID());
-        map.put("certificateType",s.getCertificateType());
-        map.put("certificateID", s.getCertificateID());
-        map.put("bankno", s.getBankno());
-        map.put("province", s.getProvince());
-        map.put("city", s.getCity());
-        map.put("peopleBankName", s.getPeopleBankName());
-        map.put("bank", s.getBank());
-        map.put("email",s.getEmail());
-        map.put("qq", s.getQq());
-        map.put("phone", s.getPhone());
-        CloseableHttpResponse response = null;
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            String encoding = "utf-8";
-            //创建post请求对象
-            HttpPost httpPost = new HttpPost("http://221.226.21.180/examinationRY/register.action");
-            //装填请求参数
-            List<NameValuePair> list = new ArrayList<>();
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-            }
-            //设置参数到请求对象中
-            httpPost.setEntity(new UrlEncodedFormEntity(list, encoding));
-            httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
-            httpPost.setHeader("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
-            response = httpClient.execute(httpPost);
-            System.out.println(response.getStatusLine()+"===============");
-            String result = EntityUtils.toString(response.getEntity(), "utf-8");
-            System.out.println(result+"------------");
-            if(result.indexOf("success")>-1){
-                return "Y";
-            }else {
-                if(result.indexOf("无法在该机构注册此考试")>-1){
-                    return "报名通道已关闭";
-                }
-                if(result.length()>100){
-                    return result.substring(0,100);
-                }
-                return result;
-            }
-        } catch (IOException e) {
-            log.error("POST请求发出失败，请求的地址为{}，参数为{}，错误信息为{}", "", JSON.toJSON(map), e.getMessage(), e);
-        } finally {
-            try {
-                if (response != null) {
-                    response.close();
-                }else {
-                    return "N";
-                }
-            } catch (IOException e) {
-                log.error("POST请求response关闭异常，错误信息为{}", e.getMessage(), e);
-            }
+        if(!folder.exists()){
+            return AjaxResult.error("未找到照片");
         }
-        return null;
-    }
-
-
-    private String submitZhengshu_1(SubmitVo s,String filePath) throws IOException {
-        System.out.println(s.toString());
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setCharset(Charset.forName("UTF-8"));
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-        ContentType contentType = ContentType.create("application/json", Charset.forName("utf-8"));
-        builder.addTextBody("jigou", s.getJigou());
-        builder.addTextBody("username", s.getUsername());
-        builder.addTextBody("sex", s.getSex());
-        builder.addTextBody("examtype", s.getExamtype());
-        builder.addTextBody("cardtype", s.getCardtype());
-        builder.addTextBody("idcard", s.getIdcard());
-        builder.addTextBody("examdateText", s.getExamdateText());
-        builder.addTextBody("examdate", s.getExamdate().toString());
-        builder.addTextBody("pbexamdateText", s.getPbexamdateText());
-        builder.addTextBody("sessionText", s.getSessionText());
-        builder.addTextBody("sessionID", s.getSessionID());
-        builder.addTextBody("certificateType",s.getCertificateType());
-        builder.addTextBody("certificateID", "");
-        builder.addTextBody("bankno", s.getBankno());
-        builder.addTextBody("province", s.getProvince());
-        builder.addTextBody("city", s.getCity());
-        builder.addTextBody("peopleBankName", s.getPeopleBankName());
-        builder.addTextBody("bank", s.getBank());
-        builder.addTextBody("email",s.getEmail());
-        builder.addTextBody("qq", s.getQq());
-        builder.addTextBody("phone", s.getPhone());
-        ContentType contentType2 = ContentType.create("multipart/form-data", Charset.forName("utf-8"));
-        InputStream inputStream  = new FileInputStream(new File(filePath));
-
-        builder.addBinaryBody("img", inputStream, contentType2, filePath);
-        HttpEntity entity = builder.build();
-        HttpPost httpPost = new HttpPost("http://221.226.21.180/examinationRY/register.action");
-        httpPost.setEntity(entity);
-        httpPost.addHeader("UTOKEN", "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmYWlyeWxhbmQiLCJleHAiOjE1ODgwODEzOTE3MDYsInR5cGUiOiJvdXRzaWRlIiwidXNlcklkIjoiMTI0OTQ5NjQ4Mzc0NzEzNTQ4OSIsImlhdCI6MTU4NzQ3NjU5MTcwNn0.EBqIx8WVsoFHz94bF2fy9T2R1nichhHCO8_GQ0Coa6Q");
-//        httpPost.addHeader("Content-Type", "application/json;charset=UTF-8");
-
-        System.out.println("创建post请求并装载好打包数据");
-        // 4. 创建HttpClient对象，传入httpPost执行发送网络请求的动作
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-        System.out.println("发送post请求并获取结果");
-        // 5. 获取返回的实体内容对象并解析内容
-        HttpEntity resultEntity = response.getEntity();
-        String responseMessage = "";
-        try{
-            System.out.println("开始解析结果");
-            if(resultEntity!=null){
-                InputStream is = resultEntity.getContent();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                StringBuffer sb = new StringBuffer();
-                String line = "";
-                while((line = br.readLine()) != null){
-                    sb.append(line);
-                }
-                responseMessage = sb.toString();
-                System.out.println("解析完成，解析内容为"+ responseMessage);
-            }
-            EntityUtils.consume(resultEntity);
-        }finally{
-            if (null != response){
-                response.close();
-            }
+        String session="";
+        if (redisCache.hasKey(Constants.SYS_SESSION+userId)){
+            session=redisCache.getCacheObject(Constants.SYS_SESSION+userId);
+        }else {
+            session=HttpUtils.getSession("http://221.226.21.180/examinationRY/");
+            redisCache.setCacheObject(Constants.SYS_SESSION+userId,session,5, TimeUnit.MINUTES);
         }
-        return responseMessage;
+        /*** 登录*/
+        String args="operatoraccount="+bmb.getName()+"&password="+bmb.getIdcard()+"&roleID=8&sessionUserID=0";
+        String url="http://221.226.21.180/examinationRY/userLogin.action";
+        String su=OkHttpUtils.wwwFormPost(args,url,session,"POST");
+        if(StringUtils.isEmpty(su)){
+            return AjaxResult.error("登录访问失败");
+        }
+        Re json = JSON.parseObject(su,Re.class);
+        if(!"success".equals(json.getResp().getResultMsg())){
+            return AjaxResult.error("用户名或者密码错误");
+        }
+        /*** 获取场次列表*/
+//        String cc=OkHttpUtils.formHtml("http://221.226.21.180/examinationRY/examManage.html?serviceType=queryExamineeExam",session,"POST");
+//        if(StringUtils.isEmpty(cc)){
+//            throw new CustomException("访问失败！");
+//        }
+//        Ree ee=JSON.parseObject(cc,Ree.class);
+        /*** 通过场次id获取信息*/
+        String exid="examID="+bmb.getExamId();
+        String cs=OkHttpUtils.wwwFormPost(exid,"http://221.226.21.180/examinationRY/exam.html?serviceType=getExamineeInfo",session,"POST");
+        if(StringUtils.isEmpty(cs)){
+            return AjaxResult.error("访问场次信息失败");
+        }
+        Rows rows=JSON.parseObject(cs,Rows.class);
+         if("已分配".equals(rows.getRows().get(0).getState())){
+             return AjaxResult.error("已分配状态下不能修改");
+         }
+        Row row=rows.getRows().get(0);
+        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd" );
+        UpdateResult u=new UpdateResult();
+        u.setId(row.getId().toString());
+        u.setExamDateOld(sdf.format(bmb.getKaoshiTime()));
+        u.setExamIDOld(bmb.getExamId());
+        u.setUsername(bmb.getName());
+        u.setSex(row.getSex());
+        u.setExamtype(row.getCertificateType());
+        u.setIdcardType("居民身份证");
+        u.setParentId(row.getParentId());
+        u.setCid(row.getCid());
+        u.setBankNO(row.getBankNO());
+        u.setBankNOShow(row.getBankNO());
+        u.setProvince(row.getProvince());
+        u.setCity(row.getCity());
+        u.setCityNew(row.getCity());
+        u.setJigou(row.getJigou());
+        u.setJigous(row.getParentId());
+        u.setBankNew(row.getBankNO());
+        u.setExamdate(bmb.getExamId());
+        u.setPbexamdate(bmb.getExamId());
+        u.setEmail(row.getEmail());
+        u.setPhone(row.getPhone());
+        String sult=OkHttpUtils.updateTu(u,folder,session);
+        if(StringUtils.isEmpty(sult)){
+            return AjaxResult.error("修改失败");
+        }
+        if(sult.indexOf("success")==-1){
+            return AjaxResult.error("修改失败");
+        }
+        bmb.setFucha("录入成功");
+        bmb.setUpdateBy(operName);
+        sysBmbMapper.updateSysBmb(bmb);
+        return AjaxResult.success("修改成功");
     }
 
 }

@@ -1,6 +1,9 @@
 package com.ruoyi.system.service;
 
+import java.io.IOException;
 import java.util.List;
+
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.domain.SysBmb;
 
 /**
@@ -89,4 +92,13 @@ public interface ISysBmbService
      * @return
      */
     int updateSfwcStatus(SysBmb sysBmb);
+
+    /**
+     * 修改照片
+     * @param bmb
+     * @param operName
+     * @param userId
+     * @return
+     */
+    AjaxResult updateAvatar(SysBmb bmb, String operName, Long userId) throws IOException;
 }

@@ -57,8 +57,6 @@ public class HttpUtils
     }
 
     public static String requestGet(String url) throws IOException {
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8888");
         String  str = Request.Get(url)
                 .execute()
                 .returnContent()
@@ -83,8 +81,8 @@ public class HttpUtils
         {
             String urlNameString = url + "?" + param;
             log.info("sendGet - {}", urlNameString);
-            System.setProperty("http.proxyHost", "127.0.0.1");
-            System.setProperty("http.proxyPort", "8888");
+//            System.setProperty("http.proxyHost", "127.0.0.1");
+//            System.setProperty("http.proxyPort", "8888");
             URL realUrl = new URL(urlNameString);
             URLConnection connection = realUrl.openConnection();
             connection.setRequestProperty("accept", "*/*");
@@ -475,10 +473,11 @@ public class HttpUtils
                 }
                 System.out.println();
             }
-            System.out.println("-----------------------");
             String cookieValue=con.getHeaderField("Set-Cookie");
             System.out.println("cookie value:"+cookieValue);
-            String sessionId=cookieValue.substring(0, cookieValue.indexOf(";"));
+            int i=cookieValue.indexOf(";");
+            String sessionId=cookieValue.substring(0, i);
+            System.out.println("cookie value:"+sessionId);
             return sessionId;
     }   catch (Exception e) {
     e.printStackTrace();
@@ -499,6 +498,10 @@ public class HttpUtils
         //sendGet("http://221.226.21.180/examinationRY/loadExamineeInfo.action","idcard=441521199604278541");
        // requestGet("http://221.226.21.180/examinationRY/checkQualification.action?Name=何海玲&IdNumber=350181199701271968");
         //sendGet("http://221.226.21.180/examinationRY/loadPeopleBankExamList.action","bankNO=B0017B235010001&type=2");
-      getSession("http://221.226.21.180/examinationRY/register.jsp");
+      getSession("http://221.226.21.180/examinationRY/");
+//      String S="JSESSIONID=5BDEE54F9BD92B8EB92FD5CA624D96C7; Path=/examinationRY; HttpOnly";
+//      int i=S.indexOf(";");
+//      System.out.println(i);
+//        System.out.println(S.substring(0,i));
     }
 }

@@ -68,6 +68,13 @@ public class SysBmb extends BaseEntity
     @Excel(name = "批次", width = 30,type = Excel.Type.EXPORT)
     private String pici;
 
+    /** 岗位类型 */
+    @Excel(name = "岗位类型")
+    private String examType;
+
+    /** 日期id */
+    private String examId;
+
     /** 删除标记 */
     private String delFlag;
 
@@ -213,6 +220,15 @@ public class SysBmb extends BaseEntity
     public void setDept(SysDept dept) {
         this.dept = dept;
     }
+
+    public String getExamType() { return examType; }
+
+    public void setExamType(String examType) { this.examType = examType; }
+
+    public String getExamId() { return examId; }
+
+    public void setExamId(String examId) { this.examId = examId; }
+
     public SysBmb() { }
     @Override
     public String toString() {
@@ -238,6 +254,8 @@ public class SysBmb extends BaseEntity
                 .append("avatarUrl", getAvatarUrl())
                 .append("dept", getDept())
                 .append("kaoshiType", getKaoshiType())
+                .append("examType", getExamType())
+                .append("examId", getExamId())
                 .toString();
     }
 }

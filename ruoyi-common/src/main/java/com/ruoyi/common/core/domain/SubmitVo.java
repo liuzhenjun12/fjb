@@ -1,4 +1,4 @@
-package com.ruoyi.system.domain.vo;
+package com.ruoyi.common.core.domain;
 
 /**
  * 提交测评中心注册内容

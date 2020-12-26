@@ -68,6 +68,14 @@ export function luruBmb(id) {
   })
 }
 
+// 修改照片
+export function updateAvatar(id) {
+  return request({
+    url: '/system/bmb/updateAvatar/'+id,
+    method: 'get'
+  })
+}
+
 // 是否完成状态修改
 export function changeSfwc(id, sfwc) {
   const data = {
