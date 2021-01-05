@@ -48,7 +48,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="批次" prop="pici">
-        <el-select v-model="queryParams.pici" placeholder="请选择批次" clearable size="small">
+        <el-select v-model="queryParams.pici" placeholder="请选择批次" clearable @change="handleChangePici" size="small">
           <el-option
             v-for="dict in piciOptions"
             :key="dict.dictValue"
@@ -121,34 +121,44 @@
           type="warning"
           icon="el-icon-download"
           size="mini"
+          :disabled="queryParams.pici==null&&queryParams.deptId==null"
           @click="handleExport"
           v-hasPermi="['system:bmb:export']"
         >导出</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          :loading="loadzai"
           type="success"
           icon="el-icon-edit-outline"
           size="mini"
           :disabled="multiple"
           @click="handleLuru"
           v-hasPermi="['system:bmb:luru']"
-        >
-          <span v-if="!loadzai">录入</span>
-          <span v-else>录入中</span>
+        >录入
         </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="info"
-          icon="el-icon-user"
+          type="primary"
+          icon="el-icon-folder-checked"
           size="mini"
           :disabled="single"
           @click="handleUpdateAvatar"
           v-hasPermi="['system:bmb:luru']"
         >
-          照片
+          调错
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-finished"
+          size="mini"
+          :disabled="queryParams.pici==null"
+          @click="handleCount"
+          v-hasPermi="['system:bmb:luru']"
+        >
+          统计
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -385,7 +395,7 @@
 </template>
 
 <script>
-  import { listBmb, getBmb, delBmb, addBmb, updateBmb, exportBmb,importTemplate,luruBmb,changeSfwc,changeBukao,updateAvatar } from "@/api/system/bmb";
+  import { listBmb, getBmb, delBmb, addBmb, updateBmb, exportBmb,importTemplate,luruBmb,changeSfwc,changeBukao,updateAvatar,exportCount } from "@/api/system/bmb";
   import { getToken } from "@/utils/auth";
   import { Cascadeselect } from "@/api/system/dept";
   export default {
@@ -419,8 +429,6 @@
           children: "children",
           label: "label"
         },
-        loadzai: false,
-        zaopian:false,
         // 是否补考字典
         bukaoOptions: [],
         // 批次字典
@@ -437,7 +445,8 @@
             label: '清分'
           }
         ],
-        // 用户导入参数
+        res:{msg:'',code:200},
+        // 导入参数
         upload: {
           // 是否显示弹出层（用户导入）
           open: false,
@@ -472,9 +481,6 @@
           deptId: null,
           bukao: null,
           sfwc: null,
-          fucha: null,
-          liluen: null,
-          shichao: null,
           pici: null,
         },
         // 表单参数
@@ -632,6 +638,14 @@
           this.queryParams.deptId = null;
         }
       },
+      //批次发生变化时
+      handleChangePici(value){
+        if(value){
+          this.queryParams.pici =value
+        }else {
+          this.queryParams.pici = null;
+        }
+      },
       /** 新增修改选择机构 */
       changDept(value){
         if(value){
@@ -730,16 +744,41 @@
       /** 导出按钮操作 */
       handleExport() {
         const queryParams = this.queryParams;
-        this.$confirm('是否确认导出所有报名数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function () {
-          return exportBmb(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        }).catch(function () {
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '消息',
+          message: h('p', null, [
+            h('span', null, '是否确认导出报名数据项?')
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          beforeClose: (action, instance, done) => {
+            if (action === 'confirm') {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = '执行中...';
+              exportBmb(queryParams).then(res=>{
+                this.res.msg=res.msg;
+                this.res.code=res.code;
+                setTimeout(() => {
+                  done();
+                  setTimeout(() => {
+                    instance.confirmButtonLoading = false;
+                  }, 300);
+                }, 500);
+              })
+            } else {
+              done();
+            }
+          }
+        }).then(action => {
+          if(this.res.code==200){
+            this.download(this.res.msg);
+          }else {
+            this.msgError(this.res.msg);
+          }
         });
+
       },
       /** 导入按钮操作 */
       handleImport() {
@@ -771,41 +810,116 @@
       //录入按钮
       handleLuru(row) {
         const ids = row.id || this.ids;
-        this.$confirm('是否确认要录入?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(res=>{
-          this.loadzai = true;
-          return luruBmb(ids);
-        }).then(response => {
-          if(response=='系统接口请求超时'){
-            this.msgError("系统接口请求超时");
-          }else {
-            this.msgSuccess(response.msg);
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '消息',
+          message: h('p', null, [
+            h('span', null, '是否确认要录入?')
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          beforeClose: (action, instance, done) => {
+            if (action === 'confirm') {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = '执行中...';
+              luruBmb(ids).then(res=>{
+                this.res.msg=res.msg;
+                this.res.code=res.code;
+                setTimeout(() => {
+                  done();
+                  setTimeout(() => {
+                    instance.confirmButtonLoading = false;
+                  }, 300);
+                }, 500);
+              })
+            } else {
+              done();
+            }
           }
-          this.loadzai = false;
-          this.getList();
-        }).catch(()=> {
+        }).then(action => {
+          if(this.res.code==200){
+            this.msgSuccess(this.res.msg);
+            this.getList();
+          }else {
+            this.msgError(this.res.msg);
+          }
         });
       },
       /*** 修改照片* @param row*/
-      handleUpdateAvatar(row){
+      handleUpdateAvatar(row) {
         const id = row.id || this.ids
-        this.$confirm('是否确认要修改照片?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(res=>{
-          return updateAvatar(id);
-        }).then(response => {
-          if(response=='系统接口请求超时'){
-            this.msgError("系统接口请求超时");
-          }else {
-            this.msgSuccess(response.msg);
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '消息',
+          message: h('p', null, [
+            h('span', null, '是否确认要修改照片?')
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          beforeClose: (action, instance, done) => {
+            if (action === 'confirm') {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = '执行中...';
+             updateAvatar(id).then(res=>{
+               this.res.msg=res.msg;
+               this.res.code=res.code;
+               setTimeout(() => {
+                 done();
+                 setTimeout(() => {
+                   instance.confirmButtonLoading = false;
+                 }, 300);
+               }, 500);
+             })
+            } else {
+              done();
+            }
           }
-          this.getList();
-        }).catch(()=> {
+        }).then(action => {
+          if(this.res.code==200){
+            this.msgSuccess(this.res.msg);
+            this.getList();
+          }else {
+            this.msgError(this.res.msg);
+          }
+        });
+      },
+      /*** 导出统计报表*/
+      handleCount(){
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '消息',
+          message: h('p', null, [
+            h('span', null, '是否确认要导出统计报表?')
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          beforeClose: (action, instance, done) => {
+            if (action === 'confirm') {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = '执行中...';
+              exportCount(this.queryParams.pici).then(res=>{
+                this.res.msg=res.msg;
+                this.res.code=res.code;
+                setTimeout(() => {
+                  done();
+                  setTimeout(() => {
+                    instance.confirmButtonLoading = false;
+                  }, 300);
+                }, 500);
+              })
+            } else {
+              done();
+            }
+          }
+        }).then(action => {
+          if(this.res.code==200){
+            this.download(this.res.msg);
+          }else {
+            this.msgError(this.res.msg);
+          }
         });
       }
     }

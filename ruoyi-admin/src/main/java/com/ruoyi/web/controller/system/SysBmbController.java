@@ -58,7 +58,6 @@ public class SysBmbController extends BaseController
         sysBmb.getKaoshiTime()==null&&StringUtils.isBlank(sysBmb.getPici())&&sysBmb.getDeptId()==null){
             return getDataTable(list);
         }
-        System.out.println(sysBmb.toString());
         startPage();
         list = sysBmbService.selectSysBmbList(sysBmb);
         return getDataTable(list);
@@ -74,7 +73,18 @@ public class SysBmbController extends BaseController
     {
         List<SysBmb> list = sysBmbService.selectSysBmbList(sysBmb);
         ExcelUtil<SysBmb> util = new ExcelUtil<SysBmb>(SysBmb.class);
-        return util.exportExcel(list, "bmb");
+        return util.exportExcel(list, "报名表");
+    }
+
+    /**
+     * 导出统计报表
+     */
+    @PreAuthorize("@ss.hasPermi('system:bmb:export')")
+    @Log(title = "导出统计报表", businessType = BusinessType.EXPORT)
+    @GetMapping("/exportCount")
+    public AjaxResult exportCount(String pici)
+    {
+        return sysBmbService.exportCount(pici);
     }
 
     @Log(title = "报名表导入", businessType = BusinessType.IMPORT)
@@ -82,7 +92,7 @@ public class SysBmbController extends BaseController
     @PostMapping("/importData")
     public AjaxResult importData(MultipartFile file, boolean updateSupport, String kaoshiTime,  Long deptId, String pici,String avatarUrl,String ancestors) throws Exception
     {
-       System.out.println(updateSupport+","+kaoshiTime+","+deptId+","+pici+","+pici+","+avatarUrl+","+ancestors);
+       //System.out.println(updateSupport+","+kaoshiTime+","+deptId+","+pici+","+pici+","+avatarUrl+","+ancestors);
         if(!updateSupport){
             if(StringUtils.isBlank(kaoshiTime)||StringUtils.isBlank(pici)||StringUtils.isBlank(avatarUrl)||deptId==null){
                 return AjaxResult.error("提交数据不全");

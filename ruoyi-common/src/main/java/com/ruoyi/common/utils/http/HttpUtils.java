@@ -15,6 +15,9 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.core.domain.entity.SysZhuce;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.bean.BeanUtils;
 import okhttp3.*;
 import org.apache.http.HttpEntity;
@@ -455,8 +458,6 @@ public class HttpUtils
         OutputStream out=null;
         InputStream in=null;
         try {
-            System.setProperty("http.proxyHost", "127.0.0.1");
-            System.setProperty("http.proxyPort", "8888");
             url = new URL(urlStr);
             HttpURLConnection con=(HttpURLConnection)url.openConnection();
             con.setRequestMethod("GET");
@@ -469,15 +470,11 @@ public class HttpUtils
                 List<String> vs=(List)hfs.get(str);
                 System.out.print(str+":");
                 for(String v:vs){
-                    System.out.print(v+"/t");
                 }
-                System.out.println();
             }
             String cookieValue=con.getHeaderField("Set-Cookie");
-            System.out.println("cookie value:"+cookieValue);
             int i=cookieValue.indexOf(";");
             String sessionId=cookieValue.substring(0, i);
-            System.out.println("cookie value:"+sessionId);
             return sessionId;
     }   catch (Exception e) {
     e.printStackTrace();
@@ -498,10 +495,16 @@ public class HttpUtils
         //sendGet("http://221.226.21.180/examinationRY/loadExamineeInfo.action","idcard=441521199604278541");
        // requestGet("http://221.226.21.180/examinationRY/checkQualification.action?Name=何海玲&IdNumber=350181199701271968");
         //sendGet("http://221.226.21.180/examinationRY/loadPeopleBankExamList.action","bankNO=B0017B235010001&type=2");
-      getSession("http://221.226.21.180/examinationRY/");
-//      String S="JSESSIONID=5BDEE54F9BD92B8EB92FD5CA624D96C7; Path=/examinationRY; HttpOnly";
+       getSession("http://221.226.21.180/examinationRY/manager.jsp");
+//        String S="JSESSIONID=5BDEE54F9BD92B8EB92FD5CA624D96C7; Path=/examinationRY; HttpOnly";
 //      int i=S.indexOf(";");
 //      System.out.println(i);
 //        System.out.println(S.substring(0,i));
+        String S="{\"rows\":[{\"alternateName\":\"平安银行股份有限公司福州分行\",\"cid\":\"350103199409143521\",\"email\":\"532125082@qq.com\",\"examName\":\"2021年01月08日临柜-首次考试\",\"fileName\":\"350103199409143521.jpg\",\"id\":3181347,\"idcardType\":\"居民身份证\",\"phone\":\"18899859112\",\"qq\":\"\",\"sex\":\"女\",\"username\":\"潘晓灵\"}],\"total\":1}";
+        TableDataInfo info= JSON.parseObject(S,TableDataInfo.class);
+        List<SysZhuce> zc= (List<SysZhuce>) info.getRows();
+        for(SysZhuce s:zc){
+            System.out.println(s);
+        }
     }
 }

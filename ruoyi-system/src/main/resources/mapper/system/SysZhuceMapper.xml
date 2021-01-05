@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysZhuceMapper">
+
+    <resultMap type="SysZhuce" id="SysZhuceResult">
+        <result property="zcId"    column="zc_id"    />
+        <result property="id"    column="id"    />
+        <result property="username"    column="username"    />
+        <result property="idcardtype"    column="idcardType"    />
+        <result property="cid"    column="cid"    />
+        <result property="sex"    column="sex"    />
+        <result property="phone"    column="phone"    />
+        <result property="filename"    column="fileName"    />
+        <result property="examname"    column="examName"    />
+        <result property="email"    column="email"    />
+        <result property="alternatename"    column="alternateName"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="remark"    column="remark"    />
+        <result property="pici"    column="pici"    />
+        <result property="status"    column="status"    />
+        <result property="kaoshiTime"    column="kaoshi_time"    />
+        <result property="kaoshiType"    column="kaoshi_type"    />
+        <result property="daoTime"    column="dao_time"    />
+    </resultMap>
+
+    <sql id="selectSysZhuceVo">
+        select zc_id, id, username, idcardType, cid, sex, phone, fileName, examName, email, alternateName, create_time, update_time, create_by, update_by, dept_id, del_flag, ancestors, remark, pici, status, kaoshi_time, kaoshi_type,dao_time from sys_zhuce
+    </sql>
+
+    <select id="selectSysZhuceList" parameterType="SysZhuce" resultMap="SysZhuceResult">
+        <include refid="selectSysZhuceVo"/>
+        <where>
+            <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+            <if test="cid != null  and cid != ''"> and cid = #{cid}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="pici != null  and pici != ''"> and pici = #{pici}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="kaoshiType != null and kaoshiType != ''"> and kaoshi_type = #{kaoshiType}</if>
+            <if test="kaoshiTime != null "> and kaoshi_time = #{kaoshiTime}</if>
+        </where>
+    </select>
+
+    <select id="selectSysZhuceById" parameterType="Long" resultMap="SysZhuceResult">
+        <include refid="selectSysZhuceVo"/>
+        where zc_id = #{zcId}
+    </select>
+
+    <insert id="insertSysZhuce" parameterType="SysZhuce">
+        insert into sys_zhuce
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="zcId != null">zc_id,</if>
+            <if test="id != null">id,</if>
+            <if test="username != null">username,</if>
+            <if test="idcardtype != null">idcardType,</if>
+            <if test="cid != null">cid,</if>
+            <if test="sex != null">sex,</if>
+            <if test="phone != null">phone,</if>
+            <if test="filename != null">fileName,</if>
+            <if test="examname != null">examName,</if>
+            <if test="email != null">email,</if>
+            <if test="alternatename != null">alternateName,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="ancestors != null">ancestors,</if>
+            <if test="remark != null">remark,</if>
+            <if test="pici != null">pici,</if>
+            <if test="status != null">status,</if>
+            <if test="kaoshiTime != null">kaoshi_time,</if>
+            <if test="kaoshiType != null">kaoshi_type,</if>
+            <if test="daoTime != null">dao_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="zcId != null">#{zcId},</if>
+            <if test="id != null">#{id},</if>
+            <if test="username != null">#{username},</if>
+            <if test="idcardtype != null">#{idcardtype},</if>
+            <if test="cid != null">#{cid},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="filename != null">#{filename},</if>
+            <if test="examname != null">#{examname},</if>
+            <if test="email != null">#{email},</if>
+            <if test="alternatename != null">#{alternatename},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="ancestors != null">#{ancestors},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="pici != null">#{pici},</if>
+            <if test="status != null">#{status},</if>
+            <if test="kaoshiTime != null">#{kaoshiTime},</if>
+            <if test="kaoshiType != null">#{kaoshiType},</if>
+            <if test="daoTime != null">#{daoTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysZhuce" parameterType="SysZhuce">
+        update sys_zhuce
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="id != null">id = #{id},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="idcardtype != null">idcardType = #{idcardtype},</if>
+            <if test="cid != null">cid = #{cid},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="filename != null">fileName = #{filename},</if>
+            <if test="examname != null">examName = #{examname},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="alternatename != null">alternateName = #{alternatename},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="ancestors != null">ancestors = #{ancestors},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="pici != null">pici = #{pici},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="kaoshiTime != null">kaoshi_time = #{kaoshiTime},</if>
+            <if test="kaoshiType != null">kaoshi_type = #{kaoshiType},</if>
+            <if test="daoTime != null">dao_time = #{daoTime},</if>
+        </trim>
+        where zc_id = #{zcId}
+    </update>
+
+    <delete id="deleteSysZhuceById" parameterType="Long">
+        delete from sys_zhuce where zc_id = #{zcId}
+    </delete>
+
+    <delete id="deleteSysZhuceByIds" parameterType="String">
+        delete from sys_zhuce where zc_id in
+        <foreach item="zcId" collection="array" open="(" separator="," close=")">
+            #{zcId}
+        </foreach>
+    </delete>
+
+    <select id="selectSysZhuceByIds" parameterType="String" resultMap="SysZhuceResult">
+        <include refid="selectSysZhuceVo"/>
+         where zc_id in
+        <foreach item="zcId" collection="array" open="(" separator="," close=")">
+            #{zcId}
+        </foreach>
+    </select>
+
+</mapper>

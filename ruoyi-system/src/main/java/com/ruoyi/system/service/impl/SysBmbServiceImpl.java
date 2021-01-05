@@ -2,20 +2,18 @@ package com.ruoyi.system.service.impl;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ruoyi.common.annotation.Excel;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.*;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.result.Re;
-import com.ruoyi.common.core.domain.result.Ree;
 import com.ruoyi.common.core.domain.result.Row;
 import com.ruoyi.common.core.domain.result.Rows;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -23,17 +21,16 @@ import com.ruoyi.common.exception.CustomException;
 import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.http.HttpUtils;
 import com.ruoyi.common.utils.http.OkHttpUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.utils.poi.Excel_Utils;
 import com.ruoyi.system.domain.vo.BankExamVo;
+import com.ruoyi.system.domain.vo.CountUserVo;
 import com.ruoyi.system.domain.vo.IdcardVo;
 import com.ruoyi.system.mapper.SysDeptMapper;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +38,6 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.SysBmbMapper;
 import com.ruoyi.system.domain.SysBmb;
 import com.ruoyi.system.service.ISysBmbService;
-
 /**
  * 报名Service业务层处理
  *
@@ -58,6 +54,11 @@ public class SysBmbServiceImpl implements ISysBmbService
     private SysDeptMapper sysDeptMapper;
     @Autowired
     private RedisCache redisCache;
+    /**
+     * 样式列表
+     */
+    private Map<String, CellStyle> styles;
+
     /**
      * 查询报名
      *
@@ -80,6 +81,11 @@ public class SysBmbServiceImpl implements ISysBmbService
     public List<SysBmb> selectSysBmbList(SysBmb sysBmb)
     {
         return sysBmbMapper.selectSysBmbList(sysBmb);
+    }
+
+    @Override
+    public List<SysBmb> selectSysBmbListGroup(String pici) {
+        return sysBmbMapper.selectSysBmbListGroup(pici);
     }
 
     /**
@@ -340,7 +346,11 @@ public class SysBmbServiceImpl implements ISysBmbService
                         if(ImageUtils.isImagesTrue(gFilePath)){
                             s.setImgShow("/examinationRY/upload/"+t.getIdcard()+".jpg");
                         }else {
-                            t.setFucha(t.getFucha()+";没有相片，需要登录上传");
+                            if(StringUtils.isEmpty(t.getFucha())){
+                                t.setFucha("没有相片，需要登录上传");
+                            }else {
+                                t.setFucha(t.getFucha()+";没有相片，需要登录上传");
+                            }
                             s.setImgShow("/examinationRY/upload/default.jpg");
                         }
                         PostResult result =OkHttpUtils.submitZhengshu(s);
@@ -353,7 +363,11 @@ public class SysBmbServiceImpl implements ISysBmbService
                             continue;
                         }else {
                             t.setSfwc("Y");
-                            t.setFucha("报名成功");
+                            if(StringUtils.isEmpty(t.getFucha())){
+                                t.setFucha("报名成功");
+                            }else {
+                                t.setFucha(t.getFucha()+";报名成功");
+                            }
                             t.setExamId(s.getExamdate().toString());
                             t.setUpdateBy(operName);
                             this.updateSysBmb(t);
@@ -414,33 +428,18 @@ public class SysBmbServiceImpl implements ISysBmbService
                         p.setSex("男");
                     }
                     p.setExamtype(t.getExamType());
+                    String sfz= HttpUtils.sendGet("http://221.226.21.180/examinationRY/loadExamineeInfo.action","idcard="+t.getIdcard()+"&type=1");
                     File folder =null;
-                    folder = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+t.getIdcard()+".jpg");
-                    if(!folder.exists()){
-                        String sfjxm=t.getName()+t.getIdcard();
-                        folder = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+sfjxm+".jpg");
-                        if(!folder.exists()){
-                            String sfjxm1=t.getName()+"+"+t.getIdcard();
-                            folder = new File("D:/jinchu/uploadPath/avatar/"+t.getAvatarUrl()+"/"+sfjxm1+".jpg");
-                        }
-                    }
-                    if(!folder.exists()){
-                        t.setFucha("没有相片,无法注册");
-                        t.setUpdateBy(operName);
-                        this.updateSysBmb(t);
-                        failureNum++;
-                        successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 没有相片,无法注册");
-                        continue;
-                    }else {
-                        PostResult result= OkHttpUtils.OkHttpOpst(p,folder);
-                        if("failed".equals(result.getResult())){
+                    if(sfz.length()>2){
+                        PostResult result = OkHttpUtils.OkHttpOpst(p, folder);
+                        if ("failed".equals(result.getResult())) {
                             t.setFucha(result.getReason());
                             t.setUpdateBy(operName);
                             this.updateSysBmb(t);
                             failureNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":"+result.getReason());
+                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":" + result.getReason());
                             continue;
-                        }else {
+                        } else {
                             t.setSfwc("Y");
                             t.setFucha("报名成功");
                             t.setExamId(p.getExamdate());
@@ -449,6 +448,43 @@ public class SysBmbServiceImpl implements ISysBmbService
                             successNum++;
                             successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
                             continue;
+                        }
+                    }else {
+                        folder = new File("D:/jinchu/uploadPath/avatar/" + t.getAvatarUrl() + "/" + t.getIdcard() + ".jpg");
+                        if (!folder.exists()) {
+                            String sfjxm = t.getName() + t.getIdcard();
+                            folder = new File("D:/jinchu/uploadPath/avatar/" + t.getAvatarUrl() + "/" + sfjxm + ".jpg");
+                            if (!folder.exists()) {
+                                String sfjxm1 = t.getName() + "+" + t.getIdcard();
+                                folder = new File("D:/jinchu/uploadPath/avatar/" + t.getAvatarUrl() + "/" + sfjxm1 + ".jpg");
+                            }
+                        }
+                        if (!folder.exists()) {
+                            t.setFucha("没有相片,无法注册");
+                            t.setUpdateBy(operName);
+                            this.updateSysBmb(t);
+                            failureNum++;
+                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 没有相片,无法注册");
+                            continue;
+                        } else {
+                            PostResult result = OkHttpUtils.OkHttpOpst(p, folder);
+                            if ("failed".equals(result.getResult())) {
+                                t.setFucha(result.getReason());
+                                t.setUpdateBy(operName);
+                                this.updateSysBmb(t);
+                                failureNum++;
+                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":" + result.getReason());
+                                continue;
+                            } else {
+                                t.setSfwc("Y");
+                                t.setFucha("报名成功");
+                                t.setExamId(p.getExamdate());
+                                t.setUpdateBy(operName);
+                                this.updateSysBmb(t);
+                                successNum++;
+                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
+                                continue;
+                            }
                         }
                     }
                 }else {
@@ -468,7 +504,11 @@ public class SysBmbServiceImpl implements ISysBmbService
                     log.error(msg, e);
                 }
         }
-        successMsg.insert(0, "恭喜您，数据已全部录入完毕！共 成功" + successNum + " 条，失败"+failureNum+" 条，数据如下：");
+        if(successNum==0&&failureNum==0){
+            successMsg.insert(0,"没有数据需要录入");
+        }else {
+            successMsg.insert(0, "恭喜您，数据已全部录入完毕！共 成功" + successNum + " 条，失败" + failureNum + " 条，数据如下：");
+        }
         return successMsg.toString();
     }
 
@@ -482,9 +522,17 @@ public class SysBmbServiceImpl implements ISysBmbService
         return sysBmbMapper.updateSysBmb(sysBmb);
     }
 
+    /**
+     * 修改照片
+     * @param bmb
+     * @param operName
+     * @param userId
+     * @return
+     * @throws IOException
+     */
     @Override
     public AjaxResult updateAvatar(SysBmb bmb, String operName, Long userId) throws IOException {
-        if(StringUtils.isEmpty(bmb.getExamId())){
+        if(!StringUtils.isEmpty(bmb.getExamId())){
             return AjaxResult.error("只有录入成功后才能修改照片");
         }
         File folder =null;
@@ -505,7 +553,7 @@ public class SysBmbServiceImpl implements ISysBmbService
             session=redisCache.getCacheObject(Constants.SYS_SESSION+userId);
         }else {
             session=HttpUtils.getSession("http://221.226.21.180/examinationRY/");
-            redisCache.setCacheObject(Constants.SYS_SESSION+userId,session,5, TimeUnit.MINUTES);
+            redisCache.setCacheObject(Constants.SYS_SESSION+userId,session,50, TimeUnit.MINUTES);
         }
         /*** 登录*/
         String args="operatoraccount="+bmb.getName()+"&password="+bmb.getIdcard()+"&roleID=8&sessionUserID=0";
@@ -518,15 +566,10 @@ public class SysBmbServiceImpl implements ISysBmbService
         if(!"success".equals(json.getResp().getResultMsg())){
             return AjaxResult.error("用户名或者密码错误");
         }
-        /*** 获取场次列表*/
-//        String cc=OkHttpUtils.formHtml("http://221.226.21.180/examinationRY/examManage.html?serviceType=queryExamineeExam",session,"POST");
-//        if(StringUtils.isEmpty(cc)){
-//            throw new CustomException("访问失败！");
-//        }
-//        Ree ee=JSON.parseObject(cc,Ree.class);
         /*** 通过场次id获取信息*/
         String exid="examID="+bmb.getExamId();
         String cs=OkHttpUtils.wwwFormPost(exid,"http://221.226.21.180/examinationRY/exam.html?serviceType=getExamineeInfo",session,"POST");
+        System.out.println(cs);
         if(StringUtils.isEmpty(cs)){
             return AjaxResult.error("访问场次信息失败");
         }
@@ -570,5 +613,62 @@ public class SysBmbServiceImpl implements ISysBmbService
         sysBmbMapper.updateSysBmb(bmb);
         return AjaxResult.success("修改成功");
     }
+
+    @Override
+    public AjaxResult exportCount(String pici) {
+        List<CountUserVo> userVos=sysBmbMapper.coutsBypici(pici);
+        if(userVos.isEmpty()){
+            return AjaxResult.error("没有查询到统计数据");
+        }
+        OutputStream out = null;
+        Workbook wb = new SXSSFWorkbook(500); //创建Excel文件(Workbook)
+        this.styles = Excel_Utils.createStyles(wb);
+        try {
+            for (int i = 0; i < userVos.size(); i++) {
+                if (i == -1) {
+                    List<Object[]> fields= Excel_Utils.createExcelField(CountUserVo.class, Excel.Type.EXPORT);
+                    Sheet sheet=wb.createSheet(pici+"统计");
+                    // 产生一行
+                    org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
+                    int column = 0;
+                    // 写入各个字段的列头名称
+                    for (Object[] os : fields)
+                    {
+                        Excel excel = (Excel) os[1];
+                        Excel_Utils.createCell(excel,row,column++,sheet,styles);
+                    }
+                    Excel_Utils.fillExcelData(0, row,userVos,sheet,fields,styles);
+                }else {
+                    List<Object[]> fields= Excel_Utils.createExcelField(SysBmb.class, Excel.Type.EXPORT);
+                    Sheet sheet=wb.createSheet(userVos.get(i).getJigou());
+                    // 产生一行
+                    org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
+                    int column = 0;
+                    // 写入各个字段的列头名称
+                    for (Object[] os : fields)
+                    {
+                        Excel excel = (Excel) os[1];
+                        Excel_Utils.createCell(excel,row,column++,sheet,styles);
+                    }
+                    SysBmb bmb=new SysBmb();
+                    bmb.setPici(pici);
+                    bmb.setDeptId(userVos.get(i).getId());
+                    List<SysBmb> sysBmbs=sysBmbMapper.selectSysBmbList(bmb);
+                    Excel_Utils.fillExcelData(0, row,sysBmbs,sheet,fields,styles);
+                }
+            }
+            String filename = Excel_Utils.encodingFilename("统计明细表");
+            out = new FileOutputStream(Excel_Utils.getAbsoluteFile(filename));
+            wb.write(out);
+            return AjaxResult.success(filename);
+        }catch (Exception e){
+            log.error("导出Excel异常{}", e.getMessage());
+            throw new CustomException("导出Excel失败，请联系网站管理员！");
+        } finally
+        {
+            Excel_Utils.closeOut(wb,out);
+        }
+    }
+
 
 }

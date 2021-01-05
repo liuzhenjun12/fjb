@@ -122,8 +122,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="邮箱" prop="email">
-              <el-input v-model="form.email" placeholder="请输入邮箱" maxlength="50" />
+            <el-form-item label="机构简称" prop="email">
+              <el-input v-model="form.jianCheng" placeholder="请输入机构简称" maxlength="50" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -194,12 +194,8 @@ export default {
         orderNum: [
           { required: true, message: "菜单顺序不能为空", trigger: "blur" }
         ],
-        email: [
-          {
-            type: "email",
-            message: "'请输入正确的邮箱地址",
-            trigger: ["blur", "change"]
-          }
+        jianCheng: [
+          { required: true, message: "机构简称不能为空", trigger: "blur" }
         ],
         phone: [
           {
@@ -255,7 +251,7 @@ export default {
         orderNum: undefined,
         leader: undefined,
         phone: undefined,
-        email: undefined,
+        jianCheng: undefined,
         status: "0"
       };
       this.resetForm("form");

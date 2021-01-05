@@ -31,6 +31,13 @@ public interface ISysBmbService
     public List<SysBmb> selectSysBmbList(SysBmb sysBmb);
 
     /**
+     * 分组查询列表
+     * @param pici
+     * @return
+     */
+    public List<SysBmb> selectSysBmbListGroup(String pici);
+
+    /**
      * 新增报名
      *
      * @param sysBmb 报名
@@ -101,4 +108,6 @@ public interface ISysBmbService
      * @return
      */
     AjaxResult updateAvatar(SysBmb bmb, String operName, Long userId) throws IOException;
+
+    AjaxResult exportCount(String pici);
 }

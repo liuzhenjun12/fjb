@@ -37,33 +37,60 @@ public class OkHttpUtils {
     public static PostResult OkHttpOpst(PhoteSubmitVo v, File file){
         PostResult result=new PostResult();
         result.setResult("failed");
-//        System.setProperty("http.proxyHost", "127.0.0.1");
-//        System.setProperty("http.proxyPort", "8888");
+        System.setProperty("http.proxyHost", "127.0.0.1");
+        System.setProperty("http.proxyPort", "8888");
+        RequestBody body=null;
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                .addFormDataPart("cardtype"," 居民身份证")
-                .addFormDataPart("idcard",v.getIdcard())
-                .addFormDataPart("bankname","")
-                .addFormDataPart("username",v.getName())
-                .addFormDataPart("name",v.getName())
-                .addFormDataPart("province",v.getProvince())
-                .addFormDataPart("city",v.getCity())
-                .addFormDataPart("jigou",v.getJigou())
-                .addFormDataPart("peopleBankNo","")
-                .addFormDataPart("bank",v.getBank())
-                .addFormDataPart("bankno",v.getBankno())
-                .addFormDataPart("examdate",v.getExamdate())
-                .addFormDataPart("pbexamdate",v.getPbexamdate())
-                .addFormDataPart("session","0")
-                .addFormDataPart("sex",v.getSex())
-                .addFormDataPart("certificateID","")
-                .addFormDataPart("examtype",v.getExamtype())
-                .addFormDataPart("email","532125082@qq.com")
-                .addFormDataPart("qq","")
-                .addFormDataPart("phone","18899859112")
-                .addFormDataPart("cultural",v.getIdcard()+".jpg",
-                        RequestBody.create(MediaType.parse("application/octet-stream"), file)).build();
+        if(file==null) {
+            body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("cardtype", " 居民身份证")
+                    .addFormDataPart("idcard", v.getIdcard())
+                    .addFormDataPart("bankname", "")
+                    .addFormDataPart("username", v.getName())
+                    .addFormDataPart("name", v.getName())
+                    .addFormDataPart("province", v.getProvince())
+                    .addFormDataPart("city", v.getCity())
+                    .addFormDataPart("jigou", v.getJigou())
+                    .addFormDataPart("peopleBankNo", "")
+                    .addFormDataPart("bank", v.getBank())
+                    .addFormDataPart("bankno", v.getBankno())
+                    .addFormDataPart("examdate", v.getExamdate())
+                    .addFormDataPart("pbexamdate", v.getPbexamdate())
+                    .addFormDataPart("session", "0")
+                    .addFormDataPart("sex", v.getSex())
+                    .addFormDataPart("certificateID", "")
+                    .addFormDataPart("examtype", v.getExamtype())
+                    .addFormDataPart("email", "532125082@qq.com")
+                    .addFormDataPart("qq", "")
+                    .addFormDataPart("phone", "18899859112")
+                    .addFormDataPart("cultural", "" ,
+                            RequestBody.create(MediaType.parse("application/octet-stream"), "")).build();
+        }else {
+            body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("cardtype", " 居民身份证")
+                    .addFormDataPart("idcard", v.getIdcard())
+                    .addFormDataPart("bankname", "")
+                    .addFormDataPart("username", v.getName())
+                    .addFormDataPart("name", v.getName())
+                    .addFormDataPart("province", v.getProvince())
+                    .addFormDataPart("city", v.getCity())
+                    .addFormDataPart("jigou", v.getJigou())
+                    .addFormDataPart("peopleBankNo", "")
+                    .addFormDataPart("bank", v.getBank())
+                    .addFormDataPart("bankno", v.getBankno())
+                    .addFormDataPart("examdate", v.getExamdate())
+                    .addFormDataPart("pbexamdate", v.getPbexamdate())
+                    .addFormDataPart("session", "0")
+                    .addFormDataPart("sex", v.getSex())
+                    .addFormDataPart("certificateID", "")
+                    .addFormDataPart("examtype", v.getExamtype())
+                    .addFormDataPart("email", "532125082@qq.com")
+                    .addFormDataPart("qq", "")
+                    .addFormDataPart("phone", "18899859112")
+                    .addFormDataPart("cultural",  v.getIdcard() + ".jpg",
+                            RequestBody.create(MediaType.parse("application/octet-stream"), file)).build();
+        }
         Request request = new Request.Builder()
                 .url("http://221.226.21.180/examinationRY/register.action")
                 .method("POST", body)
@@ -281,8 +308,10 @@ public class OkHttpUtils {
     }
 
     public static void main(String[] args) throws IOException {
-        String jsonStr="{\"resp\":{\"result\":{\"token\":null,\"user\":{\"account\":\"潘晓灵\",\"branchid\":null,\"id\":\"140540\",\"idnumber\":\"350103199409143521\",\"latestlogintime\":\"0\",\"loginStatus\":\"1\",\"password\":\"3d49e8a7819bdbf64a596d8e49342a60\",\"retrylogin\":\"0\",\"roledesc\":\"考生\",\"roleid\":\"8\",\"rolename\":\"考生\",\"status\":\"0\",\"updatetime\":\"1543305243963\",\"userArea\":null,\"userBank\":\"B0014B235010001\",\"username\":\"潘晓灵\",\"userno\":\"1543305243963\"}},\"resultCode\":\"10000\",\"resultList\":null,\"resultMsg\":\"success\"},\"roleID\":\"8\"}";
-        Re json = JSON.parseObject(jsonStr,Re.class);
-        System.out.println(json.getResp().getResultMsg());
+//        String jsonStr="{\"resp\":{\"result\":{\"token\":null,\"user\":{\"account\":\"潘晓灵\",\"branchid\":null,\"id\":\"140540\",\"idnumber\":\"350103199409143521\",\"latestlogintime\":\"0\",\"loginStatus\":\"1\",\"password\":\"3d49e8a7819bdbf64a596d8e49342a60\",\"retrylogin\":\"0\",\"roledesc\":\"考生\",\"roleid\":\"8\",\"rolename\":\"考生\",\"status\":\"0\",\"updatetime\":\"1543305243963\",\"userArea\":null,\"userBank\":\"B0014B235010001\",\"username\":\"潘晓灵\",\"userno\":\"1543305243963\"}},\"resultCode\":\"10000\",\"resultList\":null,\"resultMsg\":\"success\"},\"roleID\":\"8\"}";
+//        Re json = JSON.parseObject(jsonStr,Re.class);
+//        System.out.println(json.getResp().getResultMsg());
+        File file=new File("http://221.226.21.180/examinationRY/upload/440682198601202122.jpg");
+        System.out.println(file.exists());
     }
 }

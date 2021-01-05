@@ -54,6 +54,9 @@ public class SysDept extends BaseEntity
     /*** 机构代码*/
     private String jigouCode;
 
+    /*** 机构简称*/
+    private String  jianCheng;
+
     /** 子部门 */
     private List<SysDept> children = new ArrayList<SysDept>();
 
@@ -187,6 +190,10 @@ public class SysDept extends BaseEntity
 
     public void setJigouCode(String jigouCode) { this.jigouCode = jigouCode; }
 
+    public String getJianCheng() { return jianCheng; }
+
+    public void setJianCheng(String jianCheng) { this.jianCheng = jianCheng; }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -204,7 +211,8 @@ public class SysDept extends BaseEntity
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
-                .append("jigouCode", getJigouCode())
+            .append("jigouCode", getJigouCode())
+            .append("jianCheng", getJianCheng())
             .toString();
     }
 }

@@ -101,3 +101,11 @@ export function changeBukao(id, bukao) {
     data: data
   })
 }
+
+// 导出统计报表
+export function exportCount(data) {
+  return request({
+    url: '/system/bmb/exportCount?pici='+data,
+    method: 'get'
+  })
+}

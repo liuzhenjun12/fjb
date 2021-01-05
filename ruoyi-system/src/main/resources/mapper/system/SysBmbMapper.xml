@@ -37,12 +37,13 @@
         <result property="orderNum" column="order_num"   />
         <result property="leader"   column="leader"      />
         <result property="status"   column="dept_status" />
+        <result property="jianCheng"   column="jian_cheng" />
     </resultMap>
 
     <sql id="selectSysBmbVo">
         select b.id, b.name, b.idcard, b.kaoshi_time,  b.dept_id, b.bukao, b.sfwc, b.fucha, b.liluen, b.shichao, b.pici, b.create_time,
          b.update_time, b.create_by, b.update_by, b.remark, b.del_flag, b.avatar_url,b.kaoshi_type,b.ancestors,b.exam_type,b.exam_id,
-         d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status
+         d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status,d.jian_cheng
         from sys_bmb b left join sys_dept d on b.dept_id = d.dept_id
     </sql>
 
@@ -59,6 +60,10 @@
                 AND b.dept_id = #{deptId}
             </if>
         </where>
+    </select>
+
+    <select id="selectSysBmbListGroup" parameterType="String" resultMap="SysBmbResult">
+       select * from sys_bmb b where b.pici=#{pici} group by b.dept_id
     </select>
 
     <select id="selectSysBmbById" parameterType="Long" resultMap="SysBmbResult">
