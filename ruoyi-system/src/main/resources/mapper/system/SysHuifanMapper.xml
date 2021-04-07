@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysHuifanMapper">
+
+    <resultMap type="SysHuifan" id="SysHuifanResult">
+        <result property="id"    column="id"    />
+        <result property="cuId"    column="cu_id"    />
+        <result property="cname"    column="cname"    />
+        <result property="yaoMai"    column="yao_mai"    />
+        <result property="tongDao"    column="tong_dao"    />
+        <result property="taiDu"    column="tai_du"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectSysHuifanVo">
+        select id, cu_id,cname, yao_mai, tong_dao, tai_du, create_time, update_time, create_by, update_by, remark, del_flag from sys_huifan
+    </sql>
+
+    <select id="selectSysHuifanList" parameterType="SysHuifan" resultMap="SysHuifanResult">
+        <include refid="selectSysHuifanVo"/>
+        <where>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="cuId != null "> and cu_id = #{cuId}</if>
+        </where>
+    </select>
+
+    <select id="selectSysHuifanById" parameterType="Long" resultMap="SysHuifanResult">
+        <include refid="selectSysHuifanVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysHuifan" parameterType="SysHuifan" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_huifan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cuId != null">cu_id,</if>
+            <if test="cname != null">cname,</if>
+            <if test="yaoMai != null">yao_mai,</if>
+            <if test="tongDao != null">tong_dao,</if>
+            <if test="taiDu != null">tai_du,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cuId != null">#{cuId},</if>
+            <if test="cname != null">#{cname},</if>
+            <if test="yaoMai != null">#{yaoMai},</if>
+            <if test="tongDao != null">#{tongDao},</if>
+            <if test="taiDu != null">#{taiDu},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysHuifan" parameterType="SysHuifan">
+        update sys_huifan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cuId != null">cu_id = #{cuId},</if>
+            <if test="cname != null">cname = #{cname},</if>
+            <if test="yaoMai != null">yao_mai = #{yaoMai},</if>
+            <if test="tongDao != null">tong_dao = #{tongDao},</if>
+            <if test="taiDu != null">tai_du = #{taiDu},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysHuifanById" parameterType="Long">
+        delete from sys_huifan where id = #{id}
+    </delete>
+
+    <delete id="deleteSysHuifanByIds" parameterType="String">
+        delete from sys_huifan where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

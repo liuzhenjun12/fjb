@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <div style="height: calc(70vh);margin-bottom: 20px;overflow-y: scroll;">
     <el-row>
       <el-col :span="12" class="card-box">
         <el-card>

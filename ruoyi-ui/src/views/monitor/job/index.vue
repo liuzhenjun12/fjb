@@ -31,8 +31,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="cyan" icon="el-icon-search"  @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh"  @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -87,14 +87,12 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="jobList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="任务编号" align="center" prop="jobId" />
-      <el-table-column label="任务名称" align="center" prop="jobName" :show-overflow-tooltip="true" />
-      <el-table-column label="任务组名" align="center" prop="jobGroup" :formatter="jobGroupFormat" />
-      <el-table-column label="调用目标字符串" align="center" prop="invokeTarget" :show-overflow-tooltip="true" />
-      <el-table-column label="cron执行表达式" align="center" prop="cronExpression" :show-overflow-tooltip="true" />
-      <el-table-column label="状态" align="center">
+    <el-table v-loading="loading" :data="jobList"  @selection-change="handleSelectionChange">
+      <el-table-column type="selection" min-width="5%" align="center" />
+      <el-table-column label="任务名称" min-width="10%"align="center" prop="jobName" :show-overflow-tooltip="true" />
+      <el-table-column label="调用目标字符串" min-width="40%" align="center" prop="invokeTarget" :show-overflow-tooltip="true" />
+      <el-table-column label="cron执行表达式" min-width="15%" align="center" prop="cronExpression" :show-overflow-tooltip="true" />
+      <el-table-column label="状态" min-width="10%" align="center">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -104,7 +102,7 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" min-width="20%" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"

@@ -43,6 +43,7 @@ public class SysDeptController extends BaseController
     @GetMapping("/list")
     public AjaxResult list(SysDept dept)
     {
+        dept.setSizeId(100);
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(depts);
     }
@@ -54,7 +55,9 @@ public class SysDeptController extends BaseController
     @GetMapping("/list/exclude/{deptId}")
     public AjaxResult excludeChild(@PathVariable(value = "deptId", required = false) Long deptId)
     {
-        List<SysDept> depts = deptService.selectDeptList(new SysDept());
+        SysDept dept=new SysDept();
+        dept.setSizeId(100);
+        List<SysDept> depts = deptService.selectDeptList(dept);
         Iterator<SysDept> it = depts.iterator();
         while (it.hasNext())
         {
@@ -84,6 +87,7 @@ public class SysDeptController extends BaseController
     @GetMapping("/treeselect")
     public AjaxResult treeselect(SysDept dept)
     {
+        dept.setSizeId(100);
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(deptService.buildDeptTreeSelect(depts));
     }
@@ -94,6 +98,7 @@ public class SysDeptController extends BaseController
     @GetMapping("/cascadeselect")
     public AjaxResult cascadeselect(SysDept dept)
     {
+        dept.setSizeId(110);
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(deptService.buildCascadeselect(depts));
     }
@@ -104,7 +109,9 @@ public class SysDeptController extends BaseController
     @GetMapping(value = "/roleDeptTreeselect/{roleId}")
     public AjaxResult roleDeptTreeselect(@PathVariable("roleId") Long roleId)
     {
-        List<SysDept> depts = deptService.selectDeptList(new SysDept());
+        SysDept dept=new SysDept();
+        dept.setSizeId(100);
+        List<SysDept> depts = deptService.selectDeptList(dept);
         AjaxResult ajax = AjaxResult.success();
         ajax.put("checkedKeys", deptService.selectDeptListByRoleId(roleId));
         ajax.put("depts", deptService.buildDeptTreeSelect(depts));

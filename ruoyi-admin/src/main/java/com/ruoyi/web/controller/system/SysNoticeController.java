@@ -23,7 +23,7 @@ import com.ruoyi.system.service.ISysNoticeService;
 
 /**
  * 公告 信息操作处理
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -63,6 +63,7 @@ public class SysNoticeController extends BaseController
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysNotice notice)
     {
+        System.out.println(notice.toString());
         notice.setCreateBy(SecurityUtils.getUsername());
         return toAjax(noticeService.insertNotice(notice));
     }

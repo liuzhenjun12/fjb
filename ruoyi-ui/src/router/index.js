@@ -43,6 +43,11 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/table',
+    component: (resolve) => require(['@/views/table'], resolve),
+    hidden: true
+  },
+  {
     path: '/404',
     component: (resolve) => require(['@/views/error/404'], resolve),
     hidden: true
@@ -61,7 +66,7 @@ export const constantRoutes = [
         path: 'index',
         component: (resolve) => require(['@/views/index'], resolve),
         name: '首页',
-        meta: { title: '首页', icon: 'dashboard', noCache: true, affix: true }
+        meta: { title: '首页', icon: 'home', noCache: true, affix: true }
       }
     ]
   },
@@ -89,6 +94,31 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/system/dict/data'], resolve),
         name: 'Data',
         meta: { title: '字典数据', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/customer',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'product/data/:id(\\d+)',
+        component: (resolve) => require(['@/views/system/product/index'], resolve),
+        name: 'product',
+        meta: { title: '购买记录', icon: '' }
+      },
+      {
+        path: 'huifan/data/:id(\\d+)',
+        component: (resolve) => require(['@/views/system/huifan/data'], resolve),
+        name: 'huifan',
+        meta: { title: '回访详情', icon: '' }
+      },
+      {
+        path: 'huifan/table',
+        component: (resolve) => require(['@/views/system/huifan/table'], resolve),
+        name: 'table',
+        meta: { title: '运营图表', icon: '' }
       }
     ]
   },

@@ -5,13 +5,19 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import com.alibaba.fastjson.JSON;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.*;
+import com.ruoyi.common.core.domain.baoming.Jiwei;
+import com.ruoyi.common.core.domain.chengji.ChengjiList;
+import com.ruoyi.common.core.domain.chengji.Cj;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.result.Re;
 import com.ruoyi.common.core.domain.result.Row;
@@ -58,7 +64,10 @@ public class SysBmbServiceImpl implements ISysBmbService
      * 样式列表
      */
     private Map<String, CellStyle> styles;
-
+    /**
+     * 注解列表
+     */
+    private List<Object[]> fields;
     /**
      * 查询报名
      *
@@ -78,6 +87,7 @@ public class SysBmbServiceImpl implements ISysBmbService
      * @return 报名
      */
     @Override
+    @DataScope(deptAlias = "d")
     public List<SysBmb> selectSysBmbList(SysBmb sysBmb)
     {
         return sysBmbMapper.selectSysBmbList(sysBmb);
@@ -97,7 +107,10 @@ public class SysBmbServiceImpl implements ISysBmbService
     @Override
     public int insertSysBmb(SysBmb sysBmb)
     {
+        SysDept sheng=sysDeptMapper.selectDeptById(sysBmb.getShengId());
         sysBmb.setCreateTime(DateUtils.getNowDate());
+        sysBmb.setShengName(sheng.getDeptName());
+        sysBmb.setFucha("未报名");
         return sysBmbMapper.insertSysBmb(sysBmb);
     }
 
@@ -110,7 +123,9 @@ public class SysBmbServiceImpl implements ISysBmbService
     @Override
     public int updateSysBmb(SysBmb sysBmb)
     {
-        sysBmb.setUpdateTime(DateUtils.getNowDate());
+        SysDept sheng=sysDeptMapper.selectDeptById(sysBmb.getShengId());
+        sysBmb.setCreateTime(DateUtils.getNowDate());
+        sysBmb.setShengName(sheng.getDeptName());
         return sysBmbMapper.updateSysBmb(sysBmb);
     }
 
@@ -161,7 +176,7 @@ public class SysBmbServiceImpl implements ISysBmbService
      * @return
      */
     @Override
-    public String importBmb(List<SysBmb> bmbList, boolean isUpdateSupport, String operName, String kaoshirq, Long deptId, String pici, String avatarUrl, String ancestors) {
+    public String importBmb(List<SysBmb> bmbList, boolean isUpdateSupport, String operName, String kaoshirq, Long deptId, String pici, String avatarUrl, String ancestors,Long shengId) {
         if (StringUtils.isNull(bmbList) || bmbList.size() == 0)
         {
             throw new CustomException("导入报名表数据不能为空！");
@@ -190,7 +205,7 @@ public class SysBmbServiceImpl implements ISysBmbService
                     }
                 }
                 SysBmb bmb1=new SysBmb();
-                bmb1.setName(bmb.getName());
+                bmb1.setName(bmb.getName().replace(" ",""));
                 bmb1.setIdcard(bmb.getIdcard());
                 bmb1.setDeptId(deptId);
                 bmb1.setPici(pici);
@@ -201,15 +216,22 @@ public class SysBmbServiceImpl implements ISysBmbService
                     if(StringUtils.isEmpty(bmb.getExamType())){
                       bmb.setExamType("临柜");
                     }
+                    if(StringUtils.isBlank(bmb.getBukao())){
+                        bmb.setBukao("N");
+                    }
+                    SysDept sheng=sysDeptMapper.selectDeptById(shengId);
                     bmb.setKaoshiTime(sdf.parse(kaoshirq));
                     bmb.setPici(pici);
                     bmb.setDeptId(deptId);
+                    bmb.setShengId(shengId);
+                    bmb.setShengName(sheng.getDeptName());
                     bmb.setAvatarUrl(avatarUrl);
                     bmb.setAncestors(ancestors);
                     bmb.setShichao("W");
                     bmb.setLiluen("W");
                     bmb.setKaoshiType("3");
                     bmb.setCreateBy(operName);
+                    bmb.setFucha("未报名");
                     this.insertSysBmb(bmb);
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + bmb.getName() + " 导入成功");
@@ -249,14 +271,13 @@ public class SysBmbServiceImpl implements ISysBmbService
     }
 
     @Override
-    public String luru(List<SysBmb> list, String operName,Long userid) {
+    public AjaxResult luru(List<SysBmb> list, String operName,Long userid) {
         if (StringUtils.isNull(list) || list.size() == 0)
         {
-            throw new CustomException("没有数据需要录入！");
+            return AjaxResult.error("没有数据需要录入!");
         }
         int successNum = 0;
         int failureNum = 0;
-        StringBuilder successMsg = new StringBuilder();
         IdentityCodeUtils idcard = new IdentityCodeUtils();
         SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd" );
         for(SysBmb t:list){
@@ -272,9 +293,9 @@ public class SysBmbServiceImpl implements ISysBmbService
                     t.setUpdateBy(operName);
                     this.updateSysBmb(t);
                     failureNum++;
-                    successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 身份证号不合法");
                     continue;
                 }
+                t.setName(t.getName().replace(" ",""));
                 /**
                  * 2.通过身份证获取信息，如果获取不到，证明是首次
                  */
@@ -288,100 +309,102 @@ public class SysBmbServiceImpl implements ISysBmbService
                 SysDept diqu = sysDeptMapper.selectDeptById(shi.getParentId());
                 SysDept sheng=sysDeptMapper.selectDeptById(diqu.getParentId());
                 if(sfzGetName.length()>2){
-                    /**
-                     * 判断是否有机位
-                     */
                     t.setKaoshiType("2");
                     String jiwei=HttpUtils.sendGet("http://221.226.21.180/examinationRY/loadPeopleBankExamList.action","bankNO="+shi.getJigouCode()+"&type=2");
-                    if (jiwei.length()>2){
-                        if(jiwei.indexOf(kaoshidate)==-1){
-                            t.setFucha(kaoshidate+"没有机位");
-                            t.setUpdateBy(operName);
-                            this.updateSysBmb(t);
-                            failureNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 证书审验没有机位");
-                            break;
-                        }
-                        SubmitVo s = new SubmitVo();
-                        s.setProvince(sheng.getDeptName());
-                        s.setJigou(diqu.getJigouCode());
-                        s.setBankno(shi.getJigouCode());
-                        s.setUsername(t.getName());
-                        s.setIdcard(t.getIdcard());
-                        s.setCardtype("居民身份证");
-                        if(Integer.parseInt(cid_sex)%2==0){
-                            s.setSex("女");
-                        }else {
-                            s.setSex("男");
-                        }
-                        s.setExamtype(t.getExamType());
-                        s.setSessionText("该测评不需要选择场次");
-                        s.setSessionID("0");
-                        s.setCity(diqu.getDeptName());
-                        s.setBank(shi.getDeptName());
-                        s.setEmail("532125082@qq.com");
-                        s.setQq("532125082");
-                        s.setPhone("18899859112");
-                        s.setPeopleBankName("北京金储自动化技术有限公司（"+diqu.getDeptName()+"）");
-                        s.setPbexamdateText(kaoshidate);
-                        s.setExamdateText(kaoshidate);
-                        Gson gs = new Gson();
-                        List<BankExamVo> persons = gs.fromJson(jiwei, new TypeToken<List<BankExamVo>>() {}.getType());
-                        for(BankExamVo v:persons){
-                            if(kaoshidate.equals(v.getDate())){
-                                s.setExamdate(v.getId());
-                            }
-                        }
-                        Gson gson = new Gson();
-                        List<IdcardVo> depart =gson.fromJson(sfzGetName, new TypeToken<List<IdcardVo>>() {}.getType());
-                        if (!t.getName().equals(depart.get(0).getName())){
-                            t.setFucha("系统姓名为:"+depart.get(0).getName());
-                            s.setUsername(depart.get(0).getName());
-                        }
-                        if(StringUtils.isNotEmpty(depart.get(0).getCertificateCode())){
-                            s.setCertificateID(depart.get(0).getCertificateCode());
-                        }
-                        s.setCertificateType("证书审验集中考试");
-                        String gFilePath="http://221.226.21.180/examinationRY/upload/"+t.getIdcard()+".jpg";
-                        if(ImageUtils.isImagesTrue(gFilePath)){
-                            s.setImgShow("/examinationRY/upload/"+t.getIdcard()+".jpg");
-                        }else {
-                            if(StringUtils.isEmpty(t.getFucha())){
-                                t.setFucha("没有相片，需要登录上传");
-                            }else {
-                                t.setFucha(t.getFucha()+";没有相片，需要登录上传");
-                            }
-                            s.setImgShow("/examinationRY/upload/default.jpg");
-                        }
-                        PostResult result =OkHttpUtils.submitZhengshu(s);
-                        if("failed".equals(result.getResult())){
-                            t.setFucha(result.getReason());
-                            t.setUpdateBy(operName);
-                            this.updateSysBmb(t);
-                            failureNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":"+result.getReason());
-                            continue;
-                        }else {
-                            t.setSfwc("Y");
-                            if(StringUtils.isEmpty(t.getFucha())){
-                                t.setFucha("报名成功");
-                            }else {
-                                t.setFucha(t.getFucha()+";报名成功");
-                            }
-                            t.setExamId(s.getExamdate().toString());
-                            t.setUpdateBy(operName);
-                            this.updateSysBmb(t);
-                            successNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
-                            continue;
-                        }
-                    }else {
-                        t.setFucha("证书审验没有机位");
+                    List<Jiwei> jiweis=JSON.parseArray(jiwei,Jiwei.class);
+                    if(jiweis.isEmpty()){
+                        t.setFucha(kaoshidate+"证书没有机位");
                         t.setUpdateBy(operName);
                         this.updateSysBmb(t);
                         failureNum++;
-                        successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 证书审验没有机位");
-                        break;
+                        return AjaxResult.error(kaoshidate+"证书没有机位");
+                    }else {
+                        boolean mei=false;
+                        for(Jiwei J:jiweis){
+                            if(J.getDate().equals(kaoshidate)&&J.getResTotal()>0){
+                              mei=true;
+                              continue;
+                            }
+                        }
+                        if(!mei){
+                            t.setFucha(kaoshidate+"证书没有机位");
+                            t.setUpdateBy(operName);
+                            this.updateSysBmb(t);
+                            failureNum++;
+                            return AjaxResult.error(kaoshidate+"证书没有机位");
+                        }else {
+                            SubmitVo s = new SubmitVo();
+                            s.setProvince(sheng.getDeptName());
+                            s.setJigou(diqu.getJigouCode());
+                            s.setBankno(shi.getJigouCode());
+                            s.setUsername(t.getName());
+                            s.setIdcard(t.getIdcard());
+                            s.setCardtype("居民身份证");
+                            if(Integer.parseInt(cid_sex)%2==0){
+                                s.setSex("女");
+                            }else {
+                                s.setSex("男");
+                            }
+                            s.setExamtype(t.getExamType());
+                            s.setSessionText("该测评不需要选择场次");
+                            s.setSessionID("0");
+                            s.setCity(diqu.getDeptName());
+                            s.setBank(shi.getDeptName());
+                            s.setEmail("532125082@qq.com");
+                            s.setQq("532125082");
+                            s.setPhone("18899859112");
+                            s.setPeopleBankName("北京金储自动化技术有限公司（"+diqu.getDeptName()+"）");
+                            s.setPbexamdateText(kaoshidate);
+                            s.setExamdateText(kaoshidate);
+                            Gson gs = new Gson();
+                            List<BankExamVo> persons = gs.fromJson(jiwei, new TypeToken<List<BankExamVo>>() {}.getType());
+                            for(BankExamVo v:persons){
+                                if(kaoshidate.equals(v.getDate())){
+                                    s.setExamdate(v.getId());
+                                }
+                            }
+                            Gson gson = new Gson();
+                            List<IdcardVo> depart =gson.fromJson(sfzGetName, new TypeToken<List<IdcardVo>>() {}.getType());
+                            if (!t.getName().equals(depart.get(0).getName())){
+                                t.setFucha("系统姓名为:"+depart.get(0).getName());
+                                s.setUsername(depart.get(0).getName());
+                            }
+                            if(StringUtils.isNotEmpty(depart.get(0).getCertificateCode())){
+                                s.setCertificateID(depart.get(0).getCertificateCode());
+                            }
+                            s.setCertificateType("证书审验集中考试");
+                            String gFilePath="http://221.226.21.180/examinationRY/upload/"+t.getIdcard()+".jpg";
+                            if(ImageUtils.isImagesTrue(gFilePath)){
+                                s.setImgShow("/examinationRY/upload/"+t.getIdcard()+".jpg");
+                            }else {
+                                if(StringUtils.isEmpty(t.getFucha())){
+                                    t.setFucha("没有相片，需要登录上传");
+                                }else {
+                                    t.setFucha(t.getFucha()+";没有相片，需要登录上传");
+                                }
+                                s.setImgShow("/examinationRY/upload/default.jpg");
+                            }
+                            PostResult result =OkHttpUtils.submitZhengshu(s);
+                            if("failed".equals(result.getResult())){
+                                t.setFucha(result.getReason());
+                                t.setUpdateBy(operName);
+                                this.updateSysBmb(t);
+                                failureNum++;
+                                continue;
+                            }else {
+                                t.setSfwc("Y");
+                                if(StringUtils.isEmpty(t.getFucha())){
+                                    t.setFucha("报名成功");
+                                }else {
+                                    t.setFucha(t.getFucha()+";报名成功");
+                                }
+                                t.setExamId(s.getExamdate().toString());
+                                t.setUpdateBy(operName);
+                                this.updateSysBmb(t);
+                                successNum++;
+                                continue;
+                            }
+                        }
                     }
                 }else {
                     t.setKaoshiType("1");
@@ -391,125 +414,123 @@ public class SysBmbServiceImpl implements ISysBmbService
                         t.setUpdateBy(operName);
                         this.updateSysBmb(t);
                         failureNum++;
-                        successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 不满足参加该场测评的资格");
                         continue;
                     }
-
-                String jiwei=HttpUtils.sendGet("http://221.226.21.180/examinationRY/loadPeopleBankExamList.action","bankNO="+shi.getJigouCode()+"&type=1");
-                if (jiwei.length()>2) {
-                    if (jiwei.indexOf(kaoshidate) == -1) {
-                        t.setFucha(kaoshidate + "没有机位");
+                    String jiwei=HttpUtils.sendGet("http://221.226.21.180/examinationRY/loadPeopleBankExamList.action","bankNO="+shi.getJigouCode()+"&type=1");
+                    List<Jiwei> jiweis=JSON.parseArray(jiwei,Jiwei.class);
+                    if(jiweis.isEmpty()){
+                        t.setFucha(kaoshidate+"首次没有机位");
                         t.setUpdateBy(operName);
                         this.updateSysBmb(t);
                         failureNum++;
-                        successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 首次考试没有机位");
-                        break;
-                    }
-                    PhoteSubmitVo p=new PhoteSubmitVo();
-                    Gson gs = new Gson();
-                    List<BankExamVo> persons = gs.fromJson(jiwei, new TypeToken<List<BankExamVo>>() {}.getType());
-                    for(BankExamVo v:persons){
-                        if(kaoshidate.equals(v.getDate())){
-                            p.setExamdate(v.getId().toString());
-                            p.setPbexamdate(v.getId().toString());
-                        }
-                    }
-                    p.setIdcard(t.getIdcard());
-                    p.setName(t.getName());
-                    p.setProvince(sheng.getDeptName());
-                    p.setCity(diqu.getDeptName());
-                    p.setJigou(diqu.getJigouCode());
-                    p.setBank(shi.getJigouCode());
-                    p.setBankname(shi.getJigouCode());
-                    p.setBankno(shi.getJigouCode());
-                    if(Integer.parseInt(cid_sex)%2==0){
-                        p.setSex("女");
+                        return AjaxResult.error(kaoshidate+"首次没有机位");
                     }else {
-                        p.setSex("男");
-                    }
-                    p.setExamtype(t.getExamType());
-                    String sfz= HttpUtils.sendGet("http://221.226.21.180/examinationRY/loadExamineeInfo.action","idcard="+t.getIdcard()+"&type=1");
-                    File folder =null;
-                    if(sfz.length()>2){
-                        PostResult result = OkHttpUtils.OkHttpOpst(p, folder);
-                        if ("failed".equals(result.getResult())) {
-                            t.setFucha(result.getReason());
-                            t.setUpdateBy(operName);
-                            this.updateSysBmb(t);
-                            failureNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":" + result.getReason());
-                            continue;
-                        } else {
-                            t.setSfwc("Y");
-                            t.setFucha("报名成功");
-                            t.setExamId(p.getExamdate());
-                            t.setUpdateBy(operName);
-                            this.updateSysBmb(t);
-                            successNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
-                            continue;
-                        }
-                    }else {
-                        folder = new File("D:/jinchu/uploadPath/avatar/" + t.getAvatarUrl() + "/" + t.getIdcard() + ".jpg");
-                        if (!folder.exists()) {
-                            String sfjxm = t.getName() + t.getIdcard();
-                            folder = new File("D:/jinchu/uploadPath/avatar/" + t.getAvatarUrl() + "/" + sfjxm + ".jpg");
-                            if (!folder.exists()) {
-                                String sfjxm1 = t.getName() + "+" + t.getIdcard();
-                                folder = new File("D:/jinchu/uploadPath/avatar/" + t.getAvatarUrl() + "/" + sfjxm1 + ".jpg");
+                        boolean mei=false;
+                        for(Jiwei J:jiweis){
+                            if(J.getDate().equals(kaoshidate)&&J.getResTotal()>0){
+                                mei=true;
+                                continue;
                             }
                         }
-                        if (!folder.exists()) {
-                            t.setFucha("没有相片,无法注册");
+                        if(!mei){
+                            t.setFucha(kaoshidate+"首次没有机位");
                             t.setUpdateBy(operName);
                             this.updateSysBmb(t);
                             failureNum++;
-                            successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 没有相片,无法注册");
-                            continue;
-                        } else {
-                            PostResult result = OkHttpUtils.OkHttpOpst(p, folder);
-                            if ("failed".equals(result.getResult())) {
-                                t.setFucha(result.getReason());
+                            return AjaxResult.error(kaoshidate+"首次没有机位");
+                        }else{
+                            PhoteSubmitVo p=new PhoteSubmitVo();
+                            Gson gs = new Gson();
+                            List<BankExamVo> persons = gs.fromJson(jiwei, new TypeToken<List<BankExamVo>>() {}.getType());
+                            for(BankExamVo v:persons){
+                                if(kaoshidate.equals(v.getDate())){
+                                    p.setExamdate(v.getId().toString());
+                                    p.setPbexamdate(v.getId().toString());
+                                }
+                            }
+                            p.setIdcard(t.getIdcard());
+                            p.setName(t.getName());
+                            p.setProvince(sheng.getDeptName());
+                            p.setCity(diqu.getDeptName());
+                            p.setJigou(diqu.getJigouCode());
+                            p.setBank(shi.getJigouCode());
+                            p.setBankname(shi.getJigouCode());
+                            p.setBankno(shi.getJigouCode());
+                            if(Integer.parseInt(cid_sex)%2==0){
+                                p.setSex("女");
+                            }else {
+                                p.setSex("男");
+                            }
+                            p.setExamtype(t.getExamType());
+                            File folder =null;
+
+                            folder = new File(RuoYiConfig.getAvatarPath()+ "/"  + t.getAvatarUrl() + "/" + t.getIdcard() + ".jpg");
+                            if (!folder.exists()) {
+                                String sfjxm = t.getName() + t.getIdcard();
+                                folder = new File(RuoYiConfig.getAvatarPath()+ "/"  + t.getAvatarUrl() + "/" + sfjxm + ".jpg");
+                                if (!folder.exists()) {
+                                    String sfjxm1 = t.getName() + "+" + t.getIdcard();
+                                    folder = new File(RuoYiConfig.getAvatarPath()+ "/"  + t.getAvatarUrl() + "/" + sfjxm1 + ".jpg");
+                                    if(!folder.exists()){
+                                        String sfjxm2 = t.getName() + " " + t.getIdcard();
+                                        folder = new File(RuoYiConfig.getAvatarPath()+ "/"  + t.getAvatarUrl() + "/" + sfjxm2 + ".jpg");
+                                    }
+                                }
+                            }
+                            if (!folder.exists()) {
+                                t.setFucha("没有相片,无法注册");
                                 t.setUpdateBy(operName);
                                 this.updateSysBmb(t);
                                 failureNum++;
-                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":" + result.getReason());
                                 continue;
                             } else {
-                                t.setSfwc("Y");
-                                t.setFucha("报名成功");
-                                t.setExamId(p.getExamdate());
-                                t.setUpdateBy(operName);
-                                this.updateSysBmb(t);
-                                successNum++;
-                                successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + ":报名成功");
-                                continue;
+                                String session="";
+                                if (redisCache.hasKey(Constants.SYS_SESSION+t.getDeptId())){
+                                    session=redisCache.getCacheObject(Constants.SYS_SESSION+t.getDeptId());
+                                }else {
+                                    session=HttpUtils.getSession("http://221.226.21.180/examinationRY/");
+                                    redisCache.setCacheObject(Constants.SYS_SESSION+t.getDeptId(),session,50, TimeUnit.MINUTES);
+                                }
+                                System.out.println(session+"==session");
+                                PostResult result = OkHttpUtils.shangchangzp(p, folder,session);
+                                if ("failed".equals(result.getResult())) {
+                                    t.setFucha("上传相片失败");
+                                    t.setUpdateBy(operName);
+                                    this.updateSysBmb(t);
+                                    failureNum++;
+                                    continue;
+                                } else {
+                                    PostResult resu = OkHttpUtils.OkHttpOpst(p, folder,session);
+                                    if ("failed".equals(result.getResult())) {
+                                        t.setFucha(resu.getReason());
+                                        t.setUpdateBy(operName);
+                                        this.updateSysBmb(t);
+                                        failureNum++;
+                                        continue;
+                                    }else {
+                                        t.setSfwc("Y");
+                                        t.setFucha("报名成功");
+                                        t.setExamId(p.getExamdate());
+                                        t.setUpdateBy(operName);
+                                        this.updateSysBmb(t);
+                                        successNum++;
+                                        continue;
+                                    }
+                                }
                             }
                         }
                     }
-                }else {
-                    t.setFucha("首次考试没有机位");
-                    t.setUpdateBy(operName);
-                    this.updateSysBmb(t);
-                    failureNum++;
-                    successMsg.append("<br/>" + t.getId() + "、姓名 " + t.getName() + " 首次考试没有机位");
-                    break;
-                }
                 }
             }catch (Exception e)
                 {
                     failureNum++;
-                    String msg = "<br/>" + t.getId() + "、姓名 " +t.getName() + " 录入失败：";
-                    successMsg.append(msg + e.getMessage());
-                    log.error(msg, e);
                 }
         }
         if(successNum==0&&failureNum==0){
-            successMsg.insert(0,"没有数据需要录入");
+            return AjaxResult.error("没有数据需要录入");
         }else {
-            successMsg.insert(0, "恭喜您，数据已全部录入完毕！共 成功" + successNum + " 条，失败" + failureNum + " 条，数据如下：");
+            return AjaxResult.success("成功" + successNum + " 条，失败" + failureNum + " 条");
         }
-        return successMsg.toString();
     }
 
     /**
@@ -532,17 +553,21 @@ public class SysBmbServiceImpl implements ISysBmbService
      */
     @Override
     public AjaxResult updateAvatar(SysBmb bmb, String operName, Long userId) throws IOException {
-        if(!StringUtils.isEmpty(bmb.getExamId())){
+        if(StringUtils.isEmpty(bmb.getExamId())){
             return AjaxResult.error("只有录入成功后才能修改照片");
         }
         File folder =null;
-        folder = new File("D:/jinchu/uploadPath/avatar/"+bmb.getAvatarUrl()+"/"+bmb.getIdcard()+".jpg");
+        folder = new File(RuoYiConfig.getAvatarPath()+ "/" +bmb.getAvatarUrl()+"/"+bmb.getIdcard()+".jpg");
         if(!folder.exists()){
             String sfjxm=bmb.getName()+bmb.getIdcard();
-            folder = new File("D:/jinchu/uploadPath/avatar/"+bmb.getAvatarUrl()+"/"+sfjxm+".jpg");
+            folder = new File(RuoYiConfig.getAvatarPath()+ "/" +bmb.getAvatarUrl()+"/"+sfjxm+".jpg");
             if(!folder.exists()){
                 String sfjxm1=bmb.getName()+"+"+bmb.getIdcard();
-                folder = new File("D:/jinchu/uploadPath/avatar/"+bmb.getAvatarUrl()+"/"+sfjxm1+".jpg");
+                folder = new File(RuoYiConfig.getAvatarPath()+ "/" +bmb.getAvatarUrl()+"/"+sfjxm1+".jpg");
+                if(!folder.exists()){
+                    String sfjxm2 = bmb.getName() + " " + bmb.getIdcard();
+                    folder = new File(RuoYiConfig.getAvatarPath()+ "/"  + bmb.getAvatarUrl() + "/" + sfjxm2 + ".jpg");
+                }
             }
         }
         if(!folder.exists()){
@@ -557,19 +582,13 @@ public class SysBmbServiceImpl implements ISysBmbService
         }
         /*** 登录*/
         String args="operatoraccount="+bmb.getName()+"&password="+bmb.getIdcard()+"&roleID=8&sessionUserID=0";
-        String url="http://221.226.21.180/examinationRY/userLogin.action";
-        String su=OkHttpUtils.wwwFormPost(args,url,session,"POST");
-        if(StringUtils.isEmpty(su)){
+        Boolean login=OkHttpUtils.loginPost(args,session);
+        if(!login){
             return AjaxResult.error("登录访问失败");
-        }
-        Re json = JSON.parseObject(su,Re.class);
-        if(!"success".equals(json.getResp().getResultMsg())){
-            return AjaxResult.error("用户名或者密码错误");
         }
         /*** 通过场次id获取信息*/
         String exid="examID="+bmb.getExamId();
         String cs=OkHttpUtils.wwwFormPost(exid,"http://221.226.21.180/examinationRY/exam.html?serviceType=getExamineeInfo",session,"POST");
-        System.out.println(cs);
         if(StringUtils.isEmpty(cs)){
             return AjaxResult.error("访问场次信息失败");
         }
@@ -614,36 +633,48 @@ public class SysBmbServiceImpl implements ISysBmbService
         return AjaxResult.success("修改成功");
     }
 
+    /**
+     * 导出统计、明细表
+     * @param pici
+     * @return
+     */
     @Override
     public AjaxResult exportCount(String pici) {
         List<CountUserVo> userVos=sysBmbMapper.coutsBypici(pici);
         if(userVos.isEmpty()){
             return AjaxResult.error("没有查询到统计数据");
         }
+        for(CountUserVo vo:userVos){
+            if(StringUtils.isBlank(vo.getLiluenhegeli())){
+                vo.setLiluenhegeli("0%");
+            }
+            if(StringUtils.isBlank(vo.getShicaohegeli())){
+                vo.setShicaohegeli("0%");
+            }
+        }
         OutputStream out = null;
         Workbook wb = new SXSSFWorkbook(500); //创建Excel文件(Workbook)
         this.styles = Excel_Utils.createStyles(wb);
         try {
+             fields= Excel_Utils.createExcelField(CountUserVo.class, Excel.Type.EXPORT);
+             Sheet sheet=wb.createSheet("数量统计");
+            // 产生一行
+            org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
+            int column = 0;
+            // 写入各个字段的列头名称
+            for (Object[] os : fields)
+            {
+                Excel excel = (Excel) os[1];
+                Excel_Utils.createCell(excel,row,column++,sheet,styles);
+            }
+            Excel_Utils.fillExcelData(0, row,userVos,sheet,fields,styles);
+            fields.clear();
             for (int i = 0; i < userVos.size(); i++) {
-                if (i == -1) {
-                    List<Object[]> fields= Excel_Utils.createExcelField(CountUserVo.class, Excel.Type.EXPORT);
-                    Sheet sheet=wb.createSheet(pici+"统计");
+                    fields= Excel_Utils.createExcelField(SysBmb.class, Excel.Type.EXPORT);
+                    sheet=wb.createSheet(userVos.get(i).getJigou());
                     // 产生一行
-                    org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
-                    int column = 0;
-                    // 写入各个字段的列头名称
-                    for (Object[] os : fields)
-                    {
-                        Excel excel = (Excel) os[1];
-                        Excel_Utils.createCell(excel,row,column++,sheet,styles);
-                    }
-                    Excel_Utils.fillExcelData(0, row,userVos,sheet,fields,styles);
-                }else {
-                    List<Object[]> fields= Excel_Utils.createExcelField(SysBmb.class, Excel.Type.EXPORT);
-                    Sheet sheet=wb.createSheet(userVos.get(i).getJigou());
-                    // 产生一行
-                    org.apache.poi.ss.usermodel.Row row = sheet.createRow(0);
-                    int column = 0;
+                     row = sheet.createRow(0);
+                    column = 0;
                     // 写入各个字段的列头名称
                     for (Object[] os : fields)
                     {
@@ -655,7 +686,6 @@ public class SysBmbServiceImpl implements ISysBmbService
                     bmb.setDeptId(userVos.get(i).getId());
                     List<SysBmb> sysBmbs=sysBmbMapper.selectSysBmbList(bmb);
                     Excel_Utils.fillExcelData(0, row,sysBmbs,sheet,fields,styles);
-                }
             }
             String filename = Excel_Utils.encodingFilename("统计明细表");
             out = new FileOutputStream(Excel_Utils.getAbsoluteFile(filename));
@@ -668,6 +698,85 @@ public class SysBmbServiceImpl implements ISysBmbService
         {
             Excel_Utils.closeOut(wb,out);
         }
+    }
+
+    /**
+     * 测评中心下载成绩
+     * @param pici 批次
+     * @param deptId 机构id
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public AjaxResult downloadChengji(String pici, Long deptId) throws IOException {
+        SysBmb bmb=new SysBmb();
+        bmb.setPici(pici);
+        bmb.setDeptId(deptId);
+        List<SysBmb> bmbList=sysBmbMapper.selectSysBmbList(bmb);
+        if(bmbList.isEmpty()){
+            return AjaxResult.error("没有数据可操作，请选择其他机构");
+        }
+        List<String> list=sysBmbMapper.selectExml(pici,deptId);
+        if(list.isEmpty()){
+            return AjaxResult.error("没有数据可操作，请选择已录入的机构");
+        }
+        String session="";
+        if (redisCache.hasKey(Constants.SYS_SESSION+deptId)){
+            session=redisCache.getCacheObject(Constants.SYS_SESSION+deptId);
+        }else {
+            session= HttpUtils.getSession("http://221.226.21.180/examinationRY/manager.jsp");
+            redisCache.setCacheObject(Constants.SYS_SESSION+deptId,session,5, TimeUnit.MINUTES);
+        }
+        /*** 登录*/
+        SysDept shi = sysDeptMapper.selectDeptById(deptId);
+        String args="operatoraccount="+shi.getJigouCode()+"&password=123456&roleID=10&sessionUserID=0";
+        Boolean login=OkHttpUtils.loginPost(args,session);
+        if(!login){
+            return AjaxResult.error("登录访问失败");
+        }
+        int successNum=0;
+        for(String s:list){
+            if(StringUtils.isBlank(s)){
+                continue;
+            }
+            String ags="examID="+s+"&serviceType=getAllExamineeScoreByPageFromSecondBank&page=1&rows=500";
+            String cs=OkHttpUtils.wwwFormPost(ags,"http://221.226.21.180/examinationRY/exam.html",session,"POST");
+            if(!StringUtils.isEmpty(cs)){
+                Cj cj=JSON.parseObject(cs,Cj.class);
+                if(cj!=null){
+                    List<ChengjiList> lists=cj.getRows();
+                    for(ChengjiList l:lists){
+                        if(!"未公布".equals(l.getActualOperationExamResults())||!"未公布".equals(l.getTheoreticalExamResults())){
+                            for(SysBmb b:bmbList){
+                                if(l.getUsername().equals(b.getName())&&l.getCid().equals(b.getIdcard())){
+                                    successNum++;
+                                    String liluen=zhuanhuan(l.getTheoreticalExamResults());
+                                    String shicao=zhuanhuan(l.getActualOperationExamResults());
+                                    b.setLiluen(liluen);
+                                    b.setShichao(shicao);
+                                    sysBmbMapper.updateSysBmb(b);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return successNum==0?AjaxResult.error("没有数据更新"):AjaxResult.success("成功更新"+successNum+"条成绩");
+    }
+
+    private String zhuanhuan(String t) {
+        String s="W";
+        if("合格".equals(t)){
+            s="Y";
+        }else if("不合格".equals(t)){
+            s="N";
+        }else if("缺考".equals(t)){
+            s="Q";
+        }else {
+            s="W";
+        }
+        return s;
     }
 
 

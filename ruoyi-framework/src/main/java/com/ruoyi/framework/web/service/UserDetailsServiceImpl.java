@@ -49,8 +49,9 @@ public class UserDetailsServiceImpl implements UserDetailsService
             log.info("登录用户：{} 已被停用.", username);
             throw new BaseException("对不起，您的账号：" + username + " 已停用");
         }
+        UserDetails doubs=createLoginUser(user);
 
-        return createLoginUser(user);
+        return doubs;
     }
 
     public UserDetails createLoginUser(SysUser user)

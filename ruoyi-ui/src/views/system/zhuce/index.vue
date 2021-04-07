@@ -10,7 +10,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="身份证" prop="cid">
+      <el-form-item label="身份" prop="cid">
         <el-input
           v-model="queryParams.cid"
           placeholder="请输入身份证"
@@ -37,19 +37,7 @@
           />
         </el-select>
       </el-form-item>
-        <el-form-item label="机构" prop="deptId">
-          <el-cascader
-            v-model="queryParams.deptId"
-            placeholder="请选择机构名称"
-            :options="deptOptions"
-            size="medium"
-            :show-all-levels="false"
-            @change="handleChange"
-            ref="myCascader"
-            clearable
-          >
-          </el-cascader>
-        </el-form-item>
+
         <el-form-item label="状态" prop="status">
           <el-select v-model="queryParams.status" placeholder="请选择审核状态" clearable size="small">
             <el-option
@@ -61,7 +49,7 @@
           </el-select>
         </el-form-item>
 
-      <el-form-item label="考试类型" prop="kaoshiType">
+      <el-form-item label="类型" prop="kaoshiType">
         <el-select v-model="queryParams.kaoshiType" placeholder="请选择考试类型" clearable size="small">
           <el-option
             v-for="item in kaoOptions"
@@ -72,64 +60,76 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="机构" prop="deptId">
+        <el-cascader
+          v-model="queryParams.deptId"
+          placeholder="请选择机构名称"
+          :options="deptOptions"
+          size="medium"
+          :show-all-levels="false"
+          @change="handleChange"
+          ref="myCascader"
+          clearable
+        >
+        </el-cascader>
+      </el-form-item>
+
       <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+        <el-button type="cyan" icon="el-icon-search"  @click="handleQuery">搜索</el-button>
+        <el-button type="danger" icon="el-icon-refresh"  @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:zhuce:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
+          type="cyan"
           icon="el-icon-upload2"
           size="mini"
           @click="handleImport"
           v-hasPermi="['system:zhuce:import']"
         >导入</el-button>
       </el-col>
+      <el-tooltip class="item" effect="dark" content="请选择机构或者批次" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="warning"
+          type="cyan"
           icon="el-icon-download"
           size="mini"
+          :disabled="queryParams.pici==null&&queryParams.deptId==null"
           @click="handleExport"
           v-hasPermi="['system:zhuce:export']"
         >导出</el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="至少选择一行数据,机构、时间、状态、批次" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="success"
+          type="cyan"
           icon="el-icon-check"
-          :disabled="multiple"
+          :disabled="tongguo"
           size="mini"
           @click="handleTong"
           v-hasPermi="['system:zhuce:appver']"
         >通过</el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="至少选择一行数据,机构、时间、状态、批次" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="danger"
+          type="cyan"
           icon="el-icon-close"
-          :disabled="multiple"
+          :disabled="bohui"
           size="mini"
           @click="handleBo"
           v-hasPermi="['system:zhuce:appver']"
         >驳回</el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请选择机构或者批次" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="info"
+          type="cyan"
           icon="el-icon-set-up"
           :disabled="queryParams.deptId==null||queryParams.pici==null"
           size="mini"
@@ -137,17 +137,30 @@
           v-hasPermi="['system:zhuce:export']"
         >核对</el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="至少选择一行数据" placement="bottom">
+      <el-col :span="1.5">
+        <el-button
+          type="cyan"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['system:zhuce:remove']"
+        >删除</el-button>
+      </el-col>
+      </el-tooltip>
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="zhuceList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" min-width="5%" align="center" />
-      <el-table-column label="id" min-width="5%" align="center" prop="zcId" />
-      <el-table-column label="用户名称" min-width="10%" align="center" prop="username" />
+    <el-table v-loading="loading" :data="zhuceList"  @selection-change="handleSelectionChange">
+      <el-table-column type="selection" min-width="4%" align="center" />
+      <el-table-column label="id" min-width="4%" align="center" prop="zcId" />
+      <el-table-column label="用户名称" min-width="8%" align="center" prop="username" />
       <el-table-column label="身份证" min-width="15%"  align="center" prop="cid" />
-      <el-table-column label="机构名称" min-width="20%"  align="center" prop="alternatename" />
-      <el-table-column label="考试名称" min-width="20%"  align="center" prop="examname" />
-      <el-table-column label="状态" min-width="10%" align="center" prop="status" :formatter="ifendcase" />
+      <el-table-column label="机构名称" min-width="25%"  align="center" prop="alternatename" />
+      <el-table-column label="考试名称" min-width="22%"  align="center" prop="examname" />
+      <el-table-column label="状态" min-width="7%" align="center" prop="status" :formatter="ifendcase" />
       <el-table-column label="操作" min-width="10%" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -281,6 +294,8 @@ export default {
       single: true,
       // 非多个禁用
       multiple: true,
+      tongguo:true,
+      bohui:true,
       // 显示搜索条件
       showSearch: true,
       // 总条数
@@ -323,7 +338,7 @@ export default {
         pici:''
       },
       res:{msg:'',code:200},
-      apper:{ids:'',is:true,deptId:0},
+      apper:{ids:[],is:true,deptId:0,exmaId:'',pici:''},
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -358,6 +373,19 @@ export default {
         this.zhuceList = response.rows;
         this.total = response.total;
         this.loading = false;
+        if(this.total==0){
+          this.tongguo=true;
+          this.bohui=true;
+        }else {
+        if(this.queryParams.pici!=null&&this.queryParams.kaoshiTime!=null&&this.queryParams.status=='0'&&this.queryParams.deptId!=null||this.queryParams.status=='2'){
+          this.tongguo=false;
+          this.bohui=true;
+        }
+        if(this.queryParams.pici!=null&&this.queryParams.kaoshiTime!=null&&this.queryParams.status=='1'&&this.queryParams.deptId!=null){
+          this.tongguo=true;
+          this.bohui=false;
+        }
+        }
       });
     },
     /** 查询部门下拉树结构 */
@@ -427,8 +455,12 @@ export default {
       this.zcIds=selection.map(item=>item.id)
       this.single = selection.length!==1
       this.multiple = !selection.length
-      this.daoqi=selection[0].daoTime
-      this.apper.deptId=selection[0].deptId
+      if(selection.length>0) {
+        this.daoqi = selection[0].daoTime
+        this.apper.deptId = selection[0].deptId
+        this.apper.exmaId = selection[0].remark
+        this.apper.pici=selection[0].pici
+      }
     },
     /** 注册详情 */
     handleUpdate(row) {
@@ -530,6 +562,10 @@ export default {
     /** 审核通过 */
     handleTong(row){
       const zcIds = row.id || this.zcIds;
+      if(!zcIds){
+        this.msgError('至少选择一行');
+        return;
+      }
       var end =new Date(this.daoqi);
       var now = new Date();
       if(now.getTime()>end.getTime()){
@@ -538,6 +574,54 @@ export default {
       }else {
         this.apper.ids=zcIds.toString();
         this.apper.is=true;
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '消息',
+          message: h('p', null, [
+            h('span', null, '是否确认要通过审核?')
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          beforeClose: (action, instance, done) => {
+            if (action === 'confirm') {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = '执行中...';
+              appver(this.apper).then(res=>{
+                this.res.msg=res.msg;
+                this.res.code=res.code;
+                setTimeout(() => {
+                  done();
+                  setTimeout(() => {
+                    instance.confirmButtonLoading = false;
+                  }, 300);
+                }, 500);
+              })
+            } else {
+              done();
+            }
+          }
+        }).then(action => {
+          if(this.res.code==200){
+            this.msgSuccess(this.res.msg);
+            this.getList();
+          }else {
+            this.msgError(this.res.msg);
+          }
+        });
+      }
+    },
+    /** 审核驳回 */
+    handleBo(row){
+      const zcIds = row.id || this.zcIds;
+      var end =new Date(this.daoqi);
+      var now = new Date();
+      if(now.getTime()>end.getTime()){
+        this.msgError('审核时间已过期');
+        return;
+      }else {
+        this.apper.ids=zcIds.toString();
+        this.apper.is=false;
         const h = this.$createElement;
         this.$msgbox({
           title: '消息',

@@ -78,7 +78,7 @@ public interface ISysZhuceService
      * @param operName
      * @return
      */
-    public AjaxResult appver(String ids, boolean is, String operName,Long deptId) throws ParseException;
+    public AjaxResult appver(String ids, boolean is, String operName,Long deptId,String exmaId,String pici) throws ParseException, IOException;
 
     /**
      * 核对

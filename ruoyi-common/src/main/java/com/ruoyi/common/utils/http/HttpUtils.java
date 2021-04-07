@@ -16,21 +16,16 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import com.alibaba.fastjson.JSON;
-import com.ruoyi.common.core.domain.entity.SysZhuce;
-import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.core.domain.baoming.Jiwei;
 import com.ruoyi.common.utils.bean.BeanUtils;
-import okhttp3.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.CharArrayBuffer;
 import org.apache.http.util.EntityUtils;
@@ -60,6 +55,7 @@ public class HttpUtils
     }
 
     public static String requestGet(String url) throws IOException {
+        System.out.println(url+"===>地址");
         String  str = Request.Get(url)
                 .execute()
                 .returnContent()
@@ -475,6 +471,7 @@ public class HttpUtils
             String cookieValue=con.getHeaderField("Set-Cookie");
             int i=cookieValue.indexOf(";");
             String sessionId=cookieValue.substring(0, i);
+            System.out.println(sessionId);
             return sessionId;
     }   catch (Exception e) {
     e.printStackTrace();
@@ -495,16 +492,19 @@ public class HttpUtils
         //sendGet("http://221.226.21.180/examinationRY/loadExamineeInfo.action","idcard=441521199604278541");
        // requestGet("http://221.226.21.180/examinationRY/checkQualification.action?Name=何海玲&IdNumber=350181199701271968");
         //sendGet("http://221.226.21.180/examinationRY/loadPeopleBankExamList.action","bankNO=B0017B235010001&type=2");
-       getSession("http://221.226.21.180/examinationRY/manager.jsp");
+    //   getSession("http://221.226.21.180/examinationRY/");
 //        String S="JSESSIONID=5BDEE54F9BD92B8EB92FD5CA624D96C7; Path=/examinationRY; HttpOnly";
 //      int i=S.indexOf(";");
 //      System.out.println(i);
 //        System.out.println(S.substring(0,i));
-        String S="{\"rows\":[{\"alternateName\":\"平安银行股份有限公司福州分行\",\"cid\":\"350103199409143521\",\"email\":\"532125082@qq.com\",\"examName\":\"2021年01月08日临柜-首次考试\",\"fileName\":\"350103199409143521.jpg\",\"id\":3181347,\"idcardType\":\"居民身份证\",\"phone\":\"18899859112\",\"qq\":\"\",\"sex\":\"女\",\"username\":\"潘晓灵\"}],\"total\":1}";
-        TableDataInfo info= JSON.parseObject(S,TableDataInfo.class);
-        List<SysZhuce> zc= (List<SysZhuce>) info.getRows();
-        for(SysZhuce s:zc){
-            System.out.println(s);
-        }
+//        String S="{\"rows\":[{\"alternateName\":\"平安银行股份有限公司福州分行\",\"cid\":\"350103199409143521\",\"email\":\"532125082@qq.com\",\"examName\":\"2021年01月08日临柜-首次考试\",\"fileName\":\"350103199409143521.jpg\",\"id\":3181347,\"idcardType\":\"居民身份证\",\"phone\":\"18899859112\",\"qq\":\"\",\"sex\":\"女\",\"username\":\"潘晓灵\"}],\"total\":1}";
+//        TableDataInfo info= JSON.parseObject(S,TableDataInfo.class);
+//        List<SysZhuce> zc= (List<SysZhuce>) info.getRows();
+//        for(SysZhuce s:zc){
+//            System.out.println(s);
+//        }
+        String jiwei=sendGet("http://221.226.21.180/examinationRY/loadPeopleBankExamList.action","bankNO=G0018B211000011&type=1");
+                List<Jiwei> list=JSON.parseArray(jiwei,Jiwei.class);
+                System.out.println(list.size());
     }
 }

@@ -8,6 +8,8 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.framework.web.service.TokenService;
+import com.ruoyi.system.domain.vo.CountUserVo;
+import com.ruoyi.system.mapper.SysBmbMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,9 @@ public class SysBmbController extends BaseController
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private SysBmbMapper bmbMapper;
     /**
      * 查询报名列表
      */
@@ -52,6 +57,7 @@ public class SysBmbController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(SysBmb sysBmb)
     {
+        LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
         List<SysBmb> list=new ArrayList<>();
         if(StringUtils.isBlank(sysBmb.getName())&&StringUtils.isBlank(sysBmb.getIdcard())&&StringUtils.isBlank(sysBmb.getBukao())
                 &&StringUtils.isBlank(sysBmb.getSfwc())&&
@@ -64,10 +70,31 @@ public class SysBmbController extends BaseController
     }
 
     /**
+     * 用于首页显示统计列表
+     * @return
+     */
+    @GetMapping("/countList")
+    public TableDataInfo countList(SysBmb sysBmb){
+        startPage();
+        List<CountUserVo> list=bmbMapper.findAllList(sysBmb.getName());
+        return getDataTable(list);
+    }
+
+    /**
+     * 用于首页地图数据
+     * @return
+     */
+    @GetMapping("/findShengCount")
+    public AjaxResult findShengCount(){
+        List<CountUserVo> list=bmbMapper.findShengCount();
+        return AjaxResult.success(list);
+    }
+
+    /**
      * 导出报名列表
      */
     @PreAuthorize("@ss.hasPermi('system:bmb:export')")
-    @Log(title = "报名表导出", businessType = BusinessType.EXPORT)
+    @Log(title = "导出报名表", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(SysBmb sysBmb)
     {
@@ -79,20 +106,28 @@ public class SysBmbController extends BaseController
     /**
      * 导出统计报表
      */
-    @PreAuthorize("@ss.hasPermi('system:bmb:export')")
+    @PreAuthorize("@ss.hasPermi('system:bmb:exportCount')")
     @Log(title = "导出统计报表", businessType = BusinessType.EXPORT)
     @GetMapping("/exportCount")
-    public AjaxResult exportCount(String pici)
-    {
+    public AjaxResult exportCount(String pici) {
         return sysBmbService.exportCount(pici);
+    }
+
+    /**
+     * 从测评中心下载成绩
+     */
+    @PreAuthorize("@ss.hasPermi('system:bmb:download')")
+    @Log(title = "从测评中心下载成绩", businessType = BusinessType.UPDATE)
+    @GetMapping("/downloadChengji")
+    public AjaxResult downloadChengji(String pici,Long deptId) throws IOException {
+        return sysBmbService.downloadChengji(pici,deptId);
     }
 
     @Log(title = "报名表导入", businessType = BusinessType.IMPORT)
     @PreAuthorize("@ss.hasPermi('system:bmb:import')")
     @PostMapping("/importData")
-    public AjaxResult importData(MultipartFile file, boolean updateSupport, String kaoshiTime,  Long deptId, String pici,String avatarUrl,String ancestors) throws Exception
+    public AjaxResult importData(MultipartFile file, boolean updateSupport, String kaoshiTime,  Long deptId, String pici,String avatarUrl,String ancestors,Long shengId) throws Exception
     {
-       //System.out.println(updateSupport+","+kaoshiTime+","+deptId+","+pici+","+pici+","+avatarUrl+","+ancestors);
         if(!updateSupport){
             if(StringUtils.isBlank(kaoshiTime)||StringUtils.isBlank(pici)||StringUtils.isBlank(avatarUrl)||deptId==null){
                 return AjaxResult.error("提交数据不全");
@@ -109,7 +144,7 @@ public class SysBmbController extends BaseController
         List<SysBmb> bmbList = util.importExcel(file.getInputStream());
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
         String operName = loginUser.getUsername();
-        String message = sysBmbService.importBmb(bmbList, updateSupport, operName,kaoshiTime,deptId,pici,avatarUrl,ancestors);
+        String message = sysBmbService.importBmb(bmbList, updateSupport, operName,kaoshiTime,deptId,pici,avatarUrl,ancestors,shengId);
         return AjaxResult.success(message);
     }
     /**
@@ -140,7 +175,6 @@ public class SysBmbController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody SysBmb sysBmb)
     {
-        System.out.println(sysBmb.toString());
         return toAjax(sysBmbService.insertSysBmb(sysBmb));
     }
 
@@ -177,8 +211,7 @@ public class SysBmbController extends BaseController
         List<SysBmb> list = sysBmbService.selectSysBmbByIds(ids);
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
         String operName = loginUser.getUsername();
-        String message = sysBmbService.luru(list,operName,loginUser.getUser().getUserId());
-        return AjaxResult.success(message);
+        return sysBmbService.luru(list,operName,loginUser.getUser().getUserId());
     }
 
     /**
@@ -210,11 +243,13 @@ public class SysBmbController extends BaseController
      * 是否补考状态修改
      */
     @PreAuthorize("@ss.hasPermi('system:bmb:edit')")
-    @Log(title = "是否完成状态修改", businessType = BusinessType.UPDATE)
+    @Log(title = "是否补考修改", businessType = BusinessType.UPDATE)
     @PutMapping("/changeBukao")
     public AjaxResult changeBukao(@RequestBody SysBmb sysBmb)
     {
         sysBmb.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(sysBmbService.updateSfwcStatus(sysBmb));
     }
+
+
 }

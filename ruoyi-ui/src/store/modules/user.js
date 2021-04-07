@@ -7,7 +7,9 @@ const user = {
     name: '',
     avatar: '',
     roles: [],
-    permissions: []
+    permissions: [],
+    roleName:'',
+    deptName:''
   },
 
   mutations: {
@@ -25,7 +27,13 @@ const user = {
     },
     SET_PERMISSIONS: (state, permissions) => {
       state.permissions = permissions
-    }
+    },
+    SET_ROLENAME: (state, roleName) => {
+      state.roleName = roleName
+    },
+    SET_DEPTNAME: (state, deptName) => {
+      state.deptName = deptName
+    },
   },
 
   actions: {
@@ -33,10 +41,9 @@ const user = {
     Login({ commit }, userInfo) {
       const username = userInfo.username.trim()
       const password = userInfo.password
-      const code = userInfo.code
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
+        login(username, password).then(res => {
           setToken(res.token)
           commit('SET_TOKEN', res.token)
           resolve()
@@ -58,15 +65,17 @@ const user = {
           } else {
             commit('SET_ROLES', ['ROLE_DEFAULT'])
           }
-          commit('SET_NAME', user.userName)
+          commit('SET_NAME', user.nickName)
           commit('SET_AVATAR', avatar)
+          commit('SET_ROLENAME',user.roles[0].roleName)
+          commit('SET_DEPTNAME',user.dept.jianCheng)
           resolve(res)
         }).catch(error => {
           reject(error)
         })
       })
     },
-    
+
     // 退出系统
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {

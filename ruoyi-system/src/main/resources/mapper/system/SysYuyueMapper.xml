@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysYuyueMapper">
+
+    <resultMap type="SysYuyue" id="SysYuyueResult">
+        <result property="id"    column="id"    />
+        <result property="kaoshiTime"    column="kaoshi_time"    />
+        <result property="kaoshiName"    column="kaoshi_name"    />
+        <result property="showTime"    column="show_time"    />
+        <result property="pbeExamid"    column="pbe_examid"    />
+        <result property="terminalTime"    column="terminal_time"    />
+        <result property="bankName"    column="bank_name"    />
+        <result property="bankNo"    column="bank_no"    />
+        <result property="examId"    column="exam_id"    />
+        <result property="apperTime"    column="apper_time"    />
+        <result property="certifType"    column="certif_type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="countNum"    column="count_num"    />
+        <result property="useNum"    column="use_num"    />
+    </resultMap>
+
+    <sql id="selectSysYuyueVo">
+        select id, kaoshi_time, kaoshi_name, show_time, pbe_examid, terminal_time, bank_name, bank_no, exam_id, apper_time, certif_type,
+        create_time, update_time, create_by, update_by, remark, del_flag,count_num,use_num from sys_yuyue
+    </sql>
+
+    <select id="selectSysYuyueList" parameterType="SysYuyue" resultMap="SysYuyueResult">
+        <include refid="selectSysYuyueVo"/>
+        <where>
+            <if test="kaoshiTime != null  and kaoshiTime != ''"> and kaoshi_time = #{kaoshiTime}</if>
+            <if test="bankNo != null  and bankNo != ''"> and bank_no = #{bankNo}</if>
+            <if test="certifType != null  and certifType != ''"> and certif_type = #{certifType}</if>
+        </where>
+    </select>
+
+    <select id="selectSysYuyueById" parameterType="Long" resultMap="SysYuyueResult">
+        <include refid="selectSysYuyueVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysYuyue" parameterType="SysYuyue">
+        insert into sys_yuyue
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="kaoshiTime != null">kaoshi_time,</if>
+            <if test="kaoshiName != null">kaoshi_name,</if>
+            <if test="showTime != null">show_time,</if>
+            <if test="pbeExamid != null">pbe_examid,</if>
+            <if test="terminalTime != null">terminal_time,</if>
+            <if test="bankName != null">bank_name,</if>
+            <if test="bankNo != null">bank_no,</if>
+            <if test="examId != null">exam_id,</if>
+            <if test="apperTime != null">apper_time,</if>
+            <if test="certifType != null">certif_type,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="countNum != null">count_num,</if>
+            <if test="useNum != null">use_num,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="kaoshiTime != null">#{kaoshiTime},</if>
+            <if test="kaoshiName != null">#{kaoshiName},</if>
+            <if test="showTime != null">#{showTime},</if>
+            <if test="pbeExamid != null">#{pbeExamid},</if>
+            <if test="terminalTime != null">#{terminalTime},</if>
+            <if test="bankName != null">#{bankName},</if>
+            <if test="bankNo != null">#{bankNo},</if>
+            <if test="examId != null">#{examId},</if>
+            <if test="apperTime != null">#{apperTime},</if>
+            <if test="certifType != null">#{certifType},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="countNum != null">#{countNum},</if>
+            <if test="useNum != null">#{useNum},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysYuyue" parameterType="SysYuyue">
+        update sys_yuyue
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="kaoshiTime != null">kaoshi_time = #{kaoshiTime},</if>
+            <if test="kaoshiName != null">kaoshi_name = #{kaoshiName},</if>
+            <if test="showTime != null">show_time = #{showTime},</if>
+            <if test="pbeExamid != null">pbe_examid = #{pbeExamid},</if>
+            <if test="terminalTime != null">terminal_time = #{terminalTime},</if>
+            <if test="bankName != null">bank_name = #{bankName},</if>
+            <if test="bankNo != null">bank_no = #{bankNo},</if>
+            <if test="examId != null">exam_id = #{examId},</if>
+            <if test="apperTime != null">apper_time = #{apperTime},</if>
+            <if test="certifType != null">certif_type = #{certifType},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="countNum != null">count_num = #{countNum},</if>
+            <if test="useNum != null">use_num = #{useNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysYuyueById" parameterType="Long">
+        delete from sys_yuyue where id = #{id}
+    </delete>
+
+    <delete id="deleteSysYuyueByIds" parameterType="String">
+        delete from sys_yuyue where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

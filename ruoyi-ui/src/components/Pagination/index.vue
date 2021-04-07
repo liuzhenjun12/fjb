@@ -95,6 +95,7 @@ export default {
   background: #fff;
   padding: 32px 16px;
 }
+.el-pagination__total{color:white}
 .pagination-container.hidden {
   display: none;
 }

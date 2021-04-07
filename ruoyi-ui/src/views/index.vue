@@ -1,78 +1,80 @@
 <template>
   <div class="dashboard-editor-container">
-    <img v-if="home" :src="home" >
-<!--    <panel-group @handleSetLineChartData="handleSetLineChartData" />-->
-
-<!--    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">-->
-<!--      <line-chart :chart-data="lineChartData" />-->
-<!--    </el-row>-->
-
-<!--    <el-row :gutter="32">-->
-<!--      <el-col :xs="24" :sm="24" :lg="8">-->
-<!--        <div class="chart-wrapper">-->
-<!--          <raddar-chart />-->
-<!--        </div>-->
-<!--      </el-col>-->
-<!--      <el-col :xs="24" :sm="24" :lg="8">-->
-<!--        <div class="chart-wrapper">-->
-<!--          <pie-chart />-->
-<!--        </div>-->
-<!--      </el-col>-->
-<!--      <el-col :xs="24" :sm="24" :lg="8">-->
-<!--        <div class="chart-wrapper">-->
-<!--          <bar-chart />-->
-<!--        </div>-->
-<!--      </el-col>-->
-<!--    </el-row>-->
-
-
+    <el-row :gutter="32">
+      <el-col :xs="24" :sm="24" :lg="12">
+        <div class="chart-wrapper">
+          <china-chart />
+        </div>
+      </el-col>
+      <el-col :xs="24" :sm="24" :lg="12">
+        <div class="chart-wrapper">
+          <el-table
+            v-loading="loading"
+            :data="bmbList"
+            :row-style="rowStyle"
+            :header-cell-style="headerStyle"
+          >
+            <el-table-column label="机构名称" min-width="20%" align="center" prop="jigou" />
+            <el-table-column label="测评人数" min-width="15%" align="center" prop="shi" />
+            <el-table-column label="理论合格" min-width="15%" align="center" prop="liluenshi" />
+            <el-table-column label="实操合格" min-width="15%" align="center" prop="shichaoshi" />
+            <el-table-column label="缺考人数" min-width="15%" align="center" prop="liluenque" />
+            <el-table-column label="考试日期" min-width="20%" align="center" prop="kaoshitime" />
+          </el-table>
+            <pagination
+              v-show="total>0"
+              :total="total"
+              :page.sync="queryParams.pageNum"
+              :limit.sync="queryParams.pageSize"
+              @pagination="getList"
+            />
+        </div>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
-import PanelGroup from './dashboard/PanelGroup'
-import LineChart from './dashboard/LineChart'
-import RaddarChart from './dashboard/RaddarChart'
-import PieChart from './dashboard/PieChart'
-import BarChart from './dashboard/BarChart'
-import homeImg from '@/assets/image/2.gif'
-const lineChartData = {
-  newVisitis: {
-    expectedData: [100, 120, 161, 134, 105, 160, 165],
-    actualData: [120, 82, 91, 154, 162, 140, 145]
-  },
-  messages: {
-    expectedData: [200, 192, 120, 144, 160, 130, 140],
-    actualData: [180, 160, 151, 106, 145, 150, 130]
-  },
-  purchases: {
-    expectedData: [80, 100, 121, 104, 105, 90, 100],
-    actualData: [120, 90, 100, 138, 142, 130, 130]
-  },
-  shoppings: {
-    expectedData: [130, 140, 141, 142, 145, 150, 160],
-    actualData: [120, 82, 91, 154, 162, 140, 130]
-  }
-}
-
+import ChinaChart from './dashboard/ChinaChart'
+import { countList } from "@/api/system/bmb";
 export default {
   name: 'Index',
   components: {
-    PanelGroup,
-    LineChart,
-    RaddarChart,
-    PieChart,
-    BarChart
+    ChinaChart
   },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis,
-      home:homeImg
+      // 报名表格数据
+      bmbList: [],
+      total: 0,
+      queryParams: {
+        pageNum: 1,
+        pageSize: 10
+      }
     }
   },
+  created() {
+    this.getList();
+  },
   methods: {
-    handleSetLineChartData(type) {
-      this.lineChartData = lineChartData[type]
+    /** 查询报名列表 */
+    getList() {
+      this.loading = true;
+      countList(this.queryParams).then(response => {
+        this.bmbList = response.rows;
+        this.total = response.total;
+        this.loading = false;
+      });
+    },
+    rowStyle({ row, rowIndex}){
+      let stylejson={}
+      stylejson.color='#097bba'
+      return stylejson
+    },
+    headerStyle({row, rowIndex}){
+      let stylejson={}
+      stylejson.color='#025871'
+      return stylejson
     }
   }
 }
@@ -80,14 +82,9 @@ export default {
 
 <style lang="scss" scoped>
 .dashboard-editor-container {
-  padding: 32px;
-  background-color: rgb(240, 242, 245);
   position: relative;
-
   .chart-wrapper {
     background: #fff;
-    padding: 16px 16px 0;
-    margin-bottom: 32px;
   }
 }
 

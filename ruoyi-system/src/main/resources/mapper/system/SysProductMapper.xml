@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysProductMapper">
+
+    <resultMap type="SysProduct" id="SysProductResult">
+        <result property="id"    column="id"    />
+        <result property="cid"    column="cid"    />
+        <result property="cname"    column="cname"    />
+        <result property="type"    column="type"    />
+        <result property="num"    column="num"    />
+        <result property="money"    column="money"    />
+        <result property="img"    column="img"    />
+        <result property="chicun"    column="chicun"    />
+        <result property="dingzhi"    column="dingzhi"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+        <result property="sendTime"    column="send_time"    />
+    </resultMap>
+
+    <sql id="selectSysProductVo">
+        select id, cid,cname, type, num, money,chicun,dingzhi,img,create_time, update_time, create_by, del_flag, update_by, remark, send_time from sys_product
+    </sql>
+
+    <select id="selectSysProductList" parameterType="SysProduct" resultMap="SysProductResult">
+        <include refid="selectSysProductVo"/>
+        <where>
+            <if test="cid != null "> and cid = #{cid}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="sendTime != null "> and send_time = #{sendTime}</if>
+        </where>
+    </select>
+
+    <select id="selectSysProductById" parameterType="Long" resultMap="SysProductResult">
+        <include refid="selectSysProductVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysProduct" parameterType="SysProduct" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cid != null">cid,</if>
+            <if test="cname != null">cname,</if>
+            <if test="type != null">type,</if>
+            <if test="num != null">num,</if>
+            <if test="money != null">money,</if>
+            <if test="img != null">img,</if>
+            <if test="chicun != null">chicun,</if>
+            <if test="dingzhi != null">dingzhi,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+            <if test="sendTime != null">send_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cid != null">#{cid},</if>
+            <if test="cname != null">#{cname},</if>
+            <if test="type != null">#{type},</if>
+            <if test="num != null">#{num},</if>
+            <if test="money != null">#{money},</if>
+            <if test="img != null">#{img},</if>
+            <if test="chicun != null">#{chicun},</if>
+            <if test="dingzhi != null">#{dingzhi},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="sendTime != null">#{sendTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysProduct" parameterType="SysProduct">
+        update sys_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cid != null">cid = #{cid},</if>
+            <if test="cname != null">cname = #{cname},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="money != null">money = #{money},</if>
+            <if test="img != null">img = #{img},</if>
+            <if test="chicun != null">chicun = #{chicun},</if>
+            <if test="dingzhi != null">dingzhi = #{dingzhi},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="sendTime != null">send_time = #{sendTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysProductById" parameterType="Long">
+        delete from sys_product where id = #{id}
+    </delete>
+
+    <delete id="deleteSysProductByIds" parameterType="String">
+        delete from sys_product where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countByCid" resultType="Integer">
+	    select count(1) from sys_product where cid=#{cid}
+	</select>
+</mapper>

@@ -9,6 +9,23 @@ export function listBmb(query) {
   })
 }
 
+// 查询统计报名列表
+export function countList(query) {
+  return request({
+    url: '/system/bmb/countList',
+    method: 'get',
+    params: query
+  })
+}
+
+// 用于首页地图数据
+export function findShengCount() {
+  return request({
+    url: '/system/bmb/findShengCount',
+    method: 'get',
+  })
+}
+
 // 查询报名详细
 export function getBmb(id) {
   return request({
@@ -106,6 +123,14 @@ export function changeBukao(id, bukao) {
 export function exportCount(data) {
   return request({
     url: '/system/bmb/exportCount?pici='+data,
+    method: 'get'
+  })
+}
+
+// 从测评中心下载成绩
+export function downloadChengji(pici,deptId) {
+  return request({
+    url: '/system/bmb/downloadChengji?pici='+pici+'&deptId='+deptId,
     method: 'get'
   })
 }

@@ -13,14 +13,15 @@
             style="margin-bottom: 20px"
           />
         </div>
-        <div class="head-container">
+        <div class="head-container" style="background-color: white">
           <el-tree
             :data="deptOptions"
             :props="defaultProps"
             :expand-on-click-node="false"
             :filter-node-method="filterNode"
+            node-key="id"
+            :default-expanded-keys="[101]"
             ref="tree"
-            default-expand-all
             @node-click="handleNodeClick"
           />
         </div>
@@ -133,12 +134,12 @@
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
-        <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+        <el-table v-loading="loading" :data="userList"  @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="用户编号" align="center" prop="userId" />
           <el-table-column label="用户名称" align="center" prop="userName" :show-overflow-tooltip="true" />
           <el-table-column label="用户昵称" align="center" prop="nickName" :show-overflow-tooltip="true" />
-          <el-table-column label="部门" align="center" prop="dept.deptName" :show-overflow-tooltip="true" />
+          <el-table-column label="机构" align="center" prop="dept.jianCheng" :show-overflow-tooltip="true" />
           <el-table-column label="手机号码" align="center" prop="phonenumber" width="120" />
           <el-table-column label="状态" align="center">
             <template slot-scope="scope">
@@ -150,10 +151,7 @@
               ></el-switch>
             </template>
           </el-table-column>
-          <el-table-column label="创建时间" align="center" prop="createTime" width="160">
-            <template slot-scope="scope">
-              <span>{{ parseTime(scope.row.createTime) }}</span>
-            </template>
+          <el-table-column label="身份证号" align="center" prop="idcard" width="200">
           </el-table-column>
           <el-table-column
             label="操作"
@@ -220,20 +218,20 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="邮箱" prop="email">
+            <el-form-item label="邮箱地址" prop="email">
               <el-input v-model="form.email" placeholder="请输入邮箱" maxlength="50" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item v-if="form.userId == undefined" label="用户名称" prop="userName">
+            <el-form-item  label="用户名称" prop="userName">
               <el-input v-model="form.userName" placeholder="请输入用户名称" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.userId == undefined" label="用户密码" prop="password">
-              <el-input v-model="form.password" placeholder="请输入用户密码" type="password" />
+            <el-form-item  label="身份证号" prop="idcard">
+              <el-input v-model="form.idcard" placeholder="请输入身份证号"  maxlength="20" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -311,7 +309,7 @@
         :limit="1"
         accept=".xlsx, .xls"
         :headers="upload.headers"
-        :action="upload.url + '?updateSupport=' + upload.updateSupport"
+        :action="upload.url + '?updateSupport=' + upload.updateSupport+'&deptId='+upload.deptId"
         :disabled="upload.isUploading"
         :on-progress="handleFileUploadProgress"
         :on-success="handleFileSuccess"
@@ -325,7 +323,7 @@
         </div>
         <div class="el-upload__tip" slot="tip">
           <el-cascader
-            v-model="upload.dept"
+            v-model="upload.deptId"
             placeholder="请选择机构名称"
             :options="deptidOptions"
             size="small"
@@ -384,8 +382,6 @@ export default {
       open: false,
       // 部门名称
       deptName: undefined,
-      // 默认密码
-      initPassword: undefined,
       // 日期范围
       dateRange: [],
       // 状态数据字典
@@ -396,6 +392,8 @@ export default {
       postOptions: [],
       // 角色选项
       roleOptions: [],
+
+      deptidOptions:undefined,
       // 表单参数
       form: {},
       defaultProps: {
@@ -412,8 +410,6 @@ export default {
         isUploading: false,
         // 是否更新已经存在的用户数据
         updateSupport: 0,
-        //部门名称
-        dept:null,
         //部门id
         deptId:null,
         // 设置上传的请求头部
@@ -441,8 +437,13 @@ export default {
         deptId: [
           { required: true, message: "归属部门不能为空", trigger: "blur" }
         ],
-        password: [
-          { required: true, message: "用户密码不能为空", trigger: "blur" }
+        idcard: [
+          { required: true, message: "用户身份证不能为空", trigger: "blur" },
+          {
+            pattern: /^[0-9]{17}[0-9X]$/,
+            message: "请输入正确的身份证号码",
+            trigger: "blur"
+          }
         ],
         email: [
           { required: true, message: "邮箱地址不能为空", trigger: "blur" },
@@ -470,6 +471,7 @@ export default {
     }
   },
   created() {
+    this.queryParams.deptId=110;
     this.getList();
     this.getTreeselect();
     this.getCascadeselect();
@@ -478,9 +480,6 @@ export default {
     });
     this.getDicts("sys_user_sex").then(response => {
       this.sexOptions = response.data;
-    });
-    this.getConfigKey("sys.user.initPassword").then(response => {
-      this.initPassword = response.msg;
     });
   },
   methods: {
@@ -496,19 +495,9 @@ export default {
     },
     /** 上传时选择机构 */
     handleZong(value){
-      var labelList = [];
-      var checkLabels = this.$refs['cascaderUser'].getCheckedNodes();
-      checkLabels.forEach(function(item) {
-        if(!item.hasChildren) {
-          labelList.push(item.label);
-        }
-      })
-      console.log(labelList.join(","))
-      if(value&&labelList){
-        this.upload.dept =value[2];
-        this.upload.deptId =labelList[2]
+      if(value){
+        this.upload.deptId =value[2];
       }else {
-        this.upload.dept =null;
         this.upload.deptId = null;
       }
     },
@@ -560,7 +549,7 @@ export default {
         deptId: undefined,
         userName: undefined,
         nickName: undefined,
-        password: undefined,
+        idcard: undefined,
         phonenumber: undefined,
         email: undefined,
         sex: undefined,
@@ -597,7 +586,6 @@ export default {
         this.roleOptions = response.roles;
         this.open = true;
         this.title = "添加用户";
-        this.form.password = this.initPassword;
       });
     },
     /** 修改按钮操作 */
@@ -613,7 +601,6 @@ export default {
         this.form.roleIds = response.roleIds;
         this.open = true;
         this.title = "修改用户";
-        this.form.password = "";
       });
     },
     /** 重置密码按钮操作 */
@@ -625,6 +612,8 @@ export default {
           resetUserPwd(row.userId, value).then(response => {
             if (response.code === 200) {
               this.msgSuccess("修改成功，新密码是：" + value);
+            }else {
+              this.msgError("修改失败：" + response.msg);
             }
           });
         }).catch(() => {});
@@ -642,11 +631,16 @@ export default {
               }
             });
           } else {
+            this.getConfigKey("sys.user.initPassword").then(response => {
+              this.form.password= response.msg;
+            });
             addUser(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("新增成功");
                 this.open = false;
                 this.getList();
+              }else {
+                this.msgError("新增失败：" + response.msg);
               }
             });
           }
@@ -705,7 +699,11 @@ export default {
     },
     // 提交上传文件
     submitFileForm() {
-      this.$refs.upload.submit();
+      if(this.upload.deptId==null){
+        this.msgError("请选择机构" );
+      }else {
+        this.$refs.upload.submit();
+      }
     }
   }
 };

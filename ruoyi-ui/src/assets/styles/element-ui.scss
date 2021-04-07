@@ -4,7 +4,9 @@
 .el-breadcrumb__inner a {
   font-weight: 400 !important;
 }
-
+.el-container{
+  background-color: #f4f4f5;
+}
 .el-upload {
   input[type="file"] {
     display: none !important;
@@ -83,7 +85,7 @@
   box-sizing: content-box;
 }
 .el-cascader--medium{
-  width: 300px;
+  width: 200px;
 }
 .el-cascader--small {
   width: 100%;

@@ -25,7 +25,7 @@ import com.ruoyi.system.service.ISysDictTypeService;
 
 /**
  * 数据字典信息
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -61,6 +61,7 @@ public class SysDictTypeController extends BaseController
     @GetMapping(value = "/{dictId}")
     public AjaxResult getInfo(@PathVariable Long dictId)
     {
+        System.out.println(dictId+"====>dictId");
         return AjaxResult.success(dictTypeService.selectDictTypeById(dictId));
     }
 

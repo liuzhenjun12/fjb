@@ -186,7 +186,7 @@ export default {
       const offsetLeft = this.$el.getBoundingClientRect().left // container margin left
       const offsetWidth = this.$el.offsetWidth // container width
       const maxLeft = offsetWidth - menuMinWidth // left boundary
-      const left = e.clientX - offsetLeft + 15 // 15: margin right
+      const left = e.clientX - offsetLeft + 280 // 15: margin right
 
       if (left > maxLeft) {
         this.left = maxLeft
@@ -194,7 +194,7 @@ export default {
         this.left = left
       }
 
-      this.top = e.clientY
+      this.top = e.clientY+15
       this.visible = true
       this.selectedTag = tag
     },
@@ -210,11 +210,8 @@ export default {
 
 <style lang="scss" scoped>
 .tags-view-container {
-  height: 34px;
+  height: 44px;
   width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #d8dce5;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
   .tags-view-wrapper {
     .tags-view-item {
       display: inline-block;
@@ -222,13 +219,13 @@ export default {
       cursor: pointer;
       height: 26px;
       line-height: 26px;
-      border: 1px solid #d8dce5;
-      color: #495060;
-      background: #fff;
+      border: 1px solid #DCDFE6;
+      color: #1e1e1e;
       padding: 0 8px;
       font-size: 12px;
       margin-left: 5px;
       margin-top: 4px;
+      border-radius: 4px;
       &:first-of-type {
         margin-left: 15px;
       }

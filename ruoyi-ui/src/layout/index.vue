@@ -1,18 +1,21 @@
 <template>
-  <div :class="classObj" class="app-wrapper">
-    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
-    <sidebar class="sidebar-container" />
-    <div :class="{hasTagsView:needTagsView}" class="main-container">
-      <div :class="{'fixed-header':fixedHeader}">
-        <navbar />
-        <tags-view v-if="needTagsView" />
-      </div>
-      <app-main />
-      <right-panel v-if="showSettings">
-        <settings />
-      </right-panel>
-    </div>
-  </div>
+  <el-container>
+    <el-header>
+    <navbar />
+    </el-header>
+        <el-container>
+          <el-aside width="200px">
+            <sidebar class="sidebar-container" />
+          </el-aside>
+          <el-main>
+            <tags-view v-if="needTagsView" />
+            <app-main />
+                  <right-panel v-if="showSettings">
+            <settings />
+          </right-panel>
+          </el-main>
+        </el-container>
+  </el-container>
 </template>
 
 <script>
@@ -60,13 +63,15 @@ export default {
 <style lang="scss" scoped>
   @import "~@/assets/styles/mixin.scss";
   @import "~@/assets/styles/variables.scss";
-
+  .topbu{
+    background: url(../assets/image/bg_top-2.png) center no-repeat;
+    background-color: #030829;
+  }
   .app-wrapper {
     @include clearfix;
     position: relative;
     height: 100%;
     width: 100%;
-
     &.mobile.openSidebar {
       position: fixed;
       top: 0;

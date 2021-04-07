@@ -23,11 +23,11 @@ public class SysBmb extends BaseEntity
     private Long id;
 
     /** 姓名 */
-    @Excel(name = "姓名")
+    @Excel(name = "姓名(必填)")
     private String name;
 
     /** 身份证 */
-    @Excel(name = "身份证", width = 30)
+    @Excel(name = "身份证(必填)", width = 30)
     private String idcard;
 
     /** 考试日期 */
@@ -41,11 +41,17 @@ public class SysBmb extends BaseEntity
     /** 机构名称 */
     private Long deptId;
 
+    /** 省id */
+    private Long shengId;
+
+    /** 省名称 */
+    private String shengName;
+
     /** 祖级列表 */
     private String ancestors;
 
     /** 是否补考 */
-    @Excel(name = "是否补考", readConverterExp = "Y=是,N=不是,W=未知")
+    @Excel(name = "是否补考(空白为不是)", readConverterExp = "Y=是,N=不是,W=未知", width = 30)
     private String bukao;
 
     /** 是否完成 */
@@ -57,11 +63,11 @@ public class SysBmb extends BaseEntity
     private String fucha;
 
     /** 理论成绩 */
-    @Excel(name = "理论成绩", readConverterExp = "Y=合格,N=不合格,W=未公布")
+    @Excel(name = "理论成绩", readConverterExp = "Y=合格,N=不合格,W=未公布,Q=缺考",type = Excel.Type.EXPORT)
     private String liluen;
 
     /** 实操成绩 */
-    @Excel(name = "实操成绩", readConverterExp = "Y=合格,N=不合格,W=未公布")
+    @Excel(name = "实操成绩", readConverterExp = "Y=合格,N=不合格,W=未公布,Q=缺考",type = Excel.Type.EXPORT)
     private String shichao;
 
     /** 批次 */
@@ -69,7 +75,7 @@ public class SysBmb extends BaseEntity
     private String pici;
 
     /** 岗位类型 */
-    @Excel(name = "岗位类型")
+    @Excel(name = "岗位类型(空白为临柜)", width = 30)
     private String examType;
 
     /** 日期id */
@@ -229,6 +235,14 @@ public class SysBmb extends BaseEntity
 
     public void setExamId(String examId) { this.examId = examId; }
 
+    public Long getShengId() { return shengId; }
+
+    public void setShengId(Long shengId) { this.shengId = shengId; }
+
+    public String getShengName() { return shengName; }
+
+    public void setShengName(String shengName) { this.shengName = shengName; }
+
     public SysBmb() { }
     @Override
     public String toString() {
@@ -256,6 +270,8 @@ public class SysBmb extends BaseEntity
                 .append("kaoshiType", getKaoshiType())
                 .append("examType", getExamType())
                 .append("examId", getExamId())
+                .append("shengId", getShengId())
+                .append("shengName", getShengName())
                 .toString();
     }
 }

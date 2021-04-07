@@ -1,16 +1,20 @@
 package com.ruoyi.system.service.impl;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.chengji.CjR;
 import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysZhuce;
 import com.ruoyi.common.core.domain.pici.PiciList;
@@ -70,6 +74,7 @@ public class SysZhuceServiceImpl implements ISysZhuceService
      * @return 【请填写功能名称】
      */
     @Override
+    @DataScope(deptAlias = "d")
     public List<SysZhuce> selectSysZhuceList(SysZhuce sysZhuce)
     {
         return sysZhuceMapper.selectSysZhuceList(sysZhuce);
@@ -137,14 +142,9 @@ public class SysZhuceServiceImpl implements ISysZhuceService
         /*** 登录*/
         SysDept shi = sysDeptMapper.selectDeptById(sysZhuce.getDeptId());
         String args="operatoraccount="+shi.getJigouCode()+"&password=123456&roleID=10&sessionUserID=0";
-        String url="http://221.226.21.180/examinationRY/userLogin.action";
-        String su= OkHttpUtils.wwwFormPost(args,url,session,"POST");
-        if(StringUtils.isEmpty(su)){
+        Boolean login=OkHttpUtils.loginPost(args,session);
+        if(!login){
             return AjaxResult.error("登录访问失败");
-        }
-        Re json = JSON.parseObject(su,Re.class);
-        if(!"success".equals(json.getResp().getResultMsg())){
-            return AjaxResult.error("账号或者密码错误");
         }
         /*** 查询注册日期列表*/
         String pi=OkHttpUtils.wwwFormPost("","http://221.226.21.180/examinationRY/examManage.html?serviceType=getPeopleBankSelectedExamListBySecondBank",session,"POST");
@@ -160,9 +160,9 @@ public class SysZhuceServiceImpl implements ISysZhuceService
         /*** 循环日期列表，获取注册列表*/
         for(PiciList l:lists){
             if(l.getDate().equals(sdf.format(sysZhuce.getKaoshiTime()))){
-            getZhuceList(session,l.getCertificateType(),"serviceType=getExamineeDatas&state=待审核&examID="+l.getId()+"&cidSearch=&page=1&rows=1000",sysZhuce,operName,"0",l.getAuditDeadlineDateTime(),l.getId());
-            getZhuceList(session,l.getCertificateType(),"serviceType=getExamineeDatas&state=审核通过&examID="+l.getId()+"&cidSearch=&page=1&rows=1000",sysZhuce,operName,"1",l.getAuditDeadlineDateTime(),l.getId());
-            getZhuceList(session,l.getCertificateType(),"serviceType=getExamineeDatas&state=拒绝通过&examID="+l.getId()+"&cidSearch=&page=1&rows=1000",sysZhuce,operName,"2",l.getAuditDeadlineDateTime(),l.getId());
+            getZhuceList(session,l.getCertificateType(),"serviceType=getExamineeDatas&state=待审核&examID="+l.getId()+"&cidSearch=&page=1&rows=2000",sysZhuce,operName,"0",l.getAuditDeadlineDateTime(),l.getId());
+            getZhuceList(session,l.getCertificateType(),"serviceType=getExamineeDatas&state=审核通过&examID="+l.getId()+"&cidSearch=&page=1&rows=2000",sysZhuce,operName,"1",l.getAuditDeadlineDateTime(),l.getId());
+            getZhuceList(session,l.getCertificateType(),"serviceType=getExamineeDatas&state=拒绝通过&examID="+l.getId()+"&cidSearch=&page=1&rows=2000",sysZhuce,operName,"2",l.getAuditDeadlineDateTime(),l.getId());
             }
         }
         return AjaxResult.success("操作成功");
@@ -175,7 +175,7 @@ public class SysZhuceServiceImpl implements ISysZhuceService
      * @return
      */
     @Override
-    public AjaxResult appver(String ids, boolean is, String operName,Long deptId) throws ParseException {
+    public AjaxResult appver(String ids, boolean is, String operName,Long deptId,String exmaId,String pici) throws ParseException, IOException {
         String session="";
         if (redisCache.hasKey(Constants.SYS_SESSION+deptId)){
             session=redisCache.getCacheObject(Constants.SYS_SESSION+deptId);
@@ -183,14 +183,38 @@ public class SysZhuceServiceImpl implements ISysZhuceService
             session= HttpUtils.getSession("http://221.226.21.180/examinationRY/manager.jsp");
             redisCache.setCacheObject(Constants.SYS_SESSION+deptId,session,50, TimeUnit.MINUTES);
         }
-        String b="";
-        if(is){
-            b="审核通过";
-        }else {
-            b="拒绝通过";
+        /*** 登录*/
+        SysDept shi = sysDeptMapper.selectDeptById(deptId);
+        String args="operatoraccount="+shi.getJigouCode()+"&password=123456&roleID=10&sessionUserID=0";
+        Boolean login=OkHttpUtils.loginPost(args,session);
+        if(!login){
+            return AjaxResult.error("登录访问失败");
         }
-        String str="serviceType=updateExamineeState&state="+b+"&examID=";
-        return AjaxResult.success("操作成功");
+        String b="",status="";
+        if(is){
+            b= URLEncoder.encode("审核通过","UTF-8");
+            status="1";
+        }else {
+            b= URLEncoder.encode("拒绝通过","UTF-8");
+            status="2";
+        }
+        ids=ids.replaceAll(",","%2C");
+        String str="serviceType=updateExamineeState&state="+b+"&examID="+exmaId+"&ids=%5B"+ ids+"%5D";
+        String sult=OkHttpUtils.wwwFormPost(str,"http://221.226.21.180/examinationRY/examSecondBank.action",session,"POST");
+        if(StringUtils.isBlank(sult)){
+            return AjaxResult.error("审核失败，服务器访问异常");
+        }
+        System.out.println(sult+"==>返回结果");
+        if(sult.indexOf("success")>-1){
+//            Long[] attr = new Long[at.length];
+//            for (int idx = 0; idx < at.length; idx++) {
+//                attr[idx] = Long.parseLong(at[idx]);
+//            }
+//         int i=sysZhuceMapper.updateStatus(status,attr,pici,deptId);
+            return AjaxResult.success("审核成功");
+        }else {
+            return AjaxResult.error("审核失败");
+        }
     }
 
     /**
@@ -218,32 +242,39 @@ public class SysZhuceServiceImpl implements ISysZhuceService
         }
         int successNum = 0;
         int failureNum = 0;
-        List<SysBmb> bmbList = bmbs.stream()
-                .filter(item -> !zhuces.stream()
-                        .map(e -> e.getCid())
-                        .collect(Collectors.toList())
-                        .contains(item.getIdcard()))
-                .collect(Collectors.toList());
-        if(bmbList.isEmpty()){
-            for(SysBmb b:bmbs){
-                b.setFucha("报名无误");
-                b.setUpdateBy(operName);
-                sysBmbMapper.updateSysBmb(b);
-            }
-        }else {
-            for(SysBmb bmb1:bmbs){
-                bmb1.setFucha("报名无误");
-                bmb1.setUpdateBy(operName);
-                for(SysBmb bmb2:bmbList){
-                    if(bmb1.getIdcard().equals(bmb2.getIdcard())){
-                        bmb1.setFucha("未报名成功");
-                        bmb1.setSfwc("N");
+        boolean is=false;
+        for(SysBmb b1:bmbs){
+            is=false;
+            String sfz=b1.getIdcard().replace(" ","");
+            for(SysZhuce z1:zhuces){
+                String sf=z1.getCid().replace(" ","");
+                if(sfz.equals(sf)){
+                    String status="";
+                    if("0".equals(z1.getStatus())){
+                        status="等待审核";
+                    }else if("1".equals(z1.getStatus())){
+                        status="通过审核";
+                    }else {
+                        status="驳回审核";
                     }
+                    b1.setSfwc("Y");
+                    b1.setFucha(status);
+                    b1.setUpdateBy(operName);
+                    successNum++;
+                    is=true;
+                    sysBmbMapper.updateSysBmb(b1);
+                    continue;
                 }
-                sysBmbMapper.updateSysBmb(bmb1);
+            }
+            if(!is){
+                    failureNum++;
+                    b1.setSfwc("N");
+                    b1.setFucha("核对未报名成功");
+                    b1.setUpdateBy(operName);
+                    sysBmbMapper.updateSysBmb(b1);
             }
         }
-        return AjaxResult.success(bmbList.size()==0?"全部核对成功":"报名成功"+(bmbs.size()-bmbList.size())+"人,报名失败"+bmbList.size()+"人");
+        return AjaxResult.success(failureNum==0?"全部核对成功":"报名成功"+successNum+"人,报名失败"+failureNum+"人");
     }
 
     private void getZhuceList( String session, String certificateType, String s,SysZhuce sysZhuce, String operName,String status,String daoTime,String id) throws IOException {

@@ -1,23 +1,19 @@
 <template>
   <div class="navbar">
-    <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
+<!--    <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />-->
+    <div  v-if="showLogo" class="tupian"><img v-if="showLogo" :src="logo" ></div>
+    <div class="biaoti"> 金储自动化<span class="ml0">|</span></div>
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
-      <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
-
-
-
-        <screenfull id="screenfull" class="right-menu-item hover-effect" />
-
-        <el-tooltip content="布局大小" effect="dark" placement="bottom">
-          <size-select id="size-select" class="right-menu-item hover-effect" />
-        </el-tooltip>
-
-      </template>
-
+<!--      <template v-if="device!=='mobile'">-->
+<!--        <search id="header-search" class="right-menu-item" />-->
+<!--        <screenfull id="screenfull" class="right-menu-item hover-effect" />-->
+<!--        <el-tooltip content="布局大小" effect="dark" placement="bottom">-->
+<!--          <size-select id="size-select" class="right-menu-item hover-effect" />-->
+<!--        </el-tooltip>-->
+<!--      </template>-->
+      <div  style="float: right">
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar" class="user-avatar">
@@ -36,6 +32,10 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+      <div  class="juese">{{name}}</div>
+      <div  class="juese">{{roleName}}<span class="ml0">|</span></div>
+      <div  class="juese">{{deptName}}<span class="ml0">|</span></div>
+    </div>
   </div>
 </template>
 
@@ -43,28 +43,35 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import Search from '@/components/HeaderSearch'
-import RuoYiGit from '@/components/RuoYi/Git'
-import RuoYiDoc from '@/components/RuoYi/Doc'
-
+// import Screenfull from '@/components/Screenfull'
+// import SizeSelect from '@/components/SizeSelect'
+// import Search from '@/components/HeaderSearch'
+// import RuoYiGit from '@/components/RuoYi/Git'
+// import RuoYiDoc from '@/components/RuoYi/Doc'
+import logoImg from '@/assets/logo/logo-1.png'
 export default {
   components: {
     Breadcrumb,
     Hamburger,
-    Screenfull,
-    SizeSelect,
-    Search,
-    RuoYiGit,
-    RuoYiDoc
+  },
+  data() {
+    return {
+      logo: logoImg
+    }
   },
   computed: {
     ...mapGetters([
       'sidebar',
       'avatar',
-      'device'
+      'device',
+      'deptName',
+      'roleName',
+      'name'
     ]),
+    showLogo() {
+      console.log(this.$store.state.settings.sidebarLogo+'============')
+      return this.$store.state.settings.sidebarLogo;
+    },
     setting: {
       get() {
         return this.$store.state.settings.showSettings
@@ -95,15 +102,16 @@ export default {
   }
 }
 </script>
-
 <style lang="scss" scoped>
 .navbar {
-  height: 50px;
+  height: 80px;
   overflow: hidden;
   position: relative;
-  background: #fff;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
-
+  .tupian{float: left;margin-left: 12px;margin-top: 12px}
+  .biaoti{
+    float: left;font-size: 20px;line-height: 80px;margin-left: 10px;font-weight: bold;
+  }
   .hamburger-container {
     line-height: 46px;
     height: 100%;
@@ -129,8 +137,10 @@ export default {
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
-
+    line-height: 80px;
+    .juese{
+      float: right;margin-right: 10px;font-size: 20px;
+    }
     &:focus {
       outline: none;
     }
@@ -157,14 +167,14 @@ export default {
       margin-right: 30px;
 
       .avatar-wrapper {
-        margin-top: 5px;
+        margin-top: 15px;
         position: relative;
 
         .user-avatar {
           cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 40px;
+          width: 50px;
+          height: 50px;
+          border-radius: 50px;
         }
 
         .el-icon-caret-bottom {
@@ -178,4 +188,14 @@ export default {
     }
   }
 }
+  .header_center{
+    position: absolute;
+    color: #00f6ff;
+    text-align: center;
+    height: 80px;
+    font-family: 微软雅黑 !important;
+    left: 0;
+    right: 0;
+    top: -10px;
+  }
 </style>

@@ -109,7 +109,9 @@ public class Excel_Utils {
                 Excel[] excels = attrs.value();
                 for (Excel excel : excels)
                 {
-                    fields.add(new Object[] { field, excel });
+                    if(excel.type()==type) {
+                        fields.add(new Object[]{field, excel});
+                    }
                 }
             }
         }

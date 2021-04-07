@@ -42,6 +42,12 @@ service.interceptors.response.use(res => {
           location.href = '/index';
         })
       })
+    }else if(msg=="用户不存在/密码错误"){
+        Message({
+          message: msg,
+          type: 'error'
+        })
+        return Promise.reject(new Error(msg))
     }
     // else if (code === 500) {
     //   Message({

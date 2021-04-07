@@ -1,5 +1,11 @@
 <template>
   <div class="app-container">
+<!--    <div class="biankuang">-->
+<!--      <i class="topL"></i>-->
+<!--      <i class="topR"></i>-->
+<!--      <i class="bottomL"></i>-->
+<!--      <i class="bottomR"></i>-->
+
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="姓名" prop="name">
         <el-input
@@ -10,7 +16,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="身份证" prop="idcard">
+      <el-form-item label="身份" prop="idcard">
         <el-input
           v-model="queryParams.idcard"
           placeholder="请输入身份证"
@@ -71,54 +77,37 @@
         </el-cascader>
       </el-form-item>
 
-      <el-form-item>
-        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      <el-form-item >
+        <el-button type="cyan" icon="el-icon-search"  @click="handleQuery">搜索</el-button>
+        <el-button type="danger" icon="el-icon-refresh"  @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+<!--  </div>-->
 
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="mb8 ">
       <el-col :span="1.5">
         <el-button
-          type="primary"
+          type="cyan"
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
           v-hasPermi="['system:bmb:add']"
         >新增</el-button>
       </el-col>
+
       <el-col :span="1.5">
         <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:bmb:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:bmb:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="info"
+          type="cyan"
           icon="el-icon-upload2"
           size="mini"
           @click="handleImport"
           v-hasPermi="['system:bmb:import']"
         >导入</el-button>
       </el-col>
+      <el-tooltip class="item" effect="dark" content="请选择机构或者批次" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="warning"
+          type="cyan"
           icon="el-icon-download"
           size="mini"
           :disabled="queryParams.pici==null&&queryParams.deptId==null"
@@ -126,9 +115,11 @@
           v-hasPermi="['system:bmb:export']"
         >导出</el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请选择一行数据" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="success"
+          type="cyan"
           icon="el-icon-edit-outline"
           size="mini"
           :disabled="multiple"
@@ -137,22 +128,26 @@
         >录入
         </el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请选择一行数据" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          icon="el-icon-folder-checked"
+          type="cyan"
+          icon="el-icon-top"
           size="mini"
           :disabled="single"
           @click="handleUpdateAvatar"
           v-hasPermi="['system:bmb:luru']"
         >
-          调错
+          照片
         </el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请选择批次" placement="bottom">
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          icon="el-icon-finished"
+          type="cyan"
+          icon="el-icon-download"
           size="mini"
           :disabled="queryParams.pici==null"
           @click="handleCount"
@@ -161,18 +156,72 @@
           统计
         </el-button>
       </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请选择批次和机构" placement="bottom">
+        <el-col :span="1.5">
+          <el-button
+            type="cyan"
+            icon="el-icon-download"
+            size="mini"
+            :disabled="queryParams.pici==null||queryParams.deptId==null"
+            @click="handleChengji"
+            v-hasPermi="['system:bmb:luru']"
+          >
+            成绩
+          </el-button>
+        </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请选择批次和机构" placement="bottom">
+        <el-col :span="1.5">
+          <el-button
+            type="cyan"
+            icon="el-icon-upload2"
+            size="mini"
+            :disabled="queryParams.pici==null||queryParams.deptId==null"
+            @click="handleChengji"
+            v-hasPermi="['system:bmb:luru']"
+          >
+            实操
+          </el-button>
+        </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请选择一行数据" placement="bottom">
+        <el-col :span="1.5">
+          <el-button
+            type="cyan"
+            icon="el-icon-edit"
+            size="mini"
+            :disabled="single"
+            @click="handleUpdate"
+            v-hasPermi="['system:bmb:edit']"
+          >修改</el-button>
+        </el-col>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="至少选择一行数据" placement="bottom">
+        <el-col :span="1.5">
+          <el-button
+            type="cyan"
+            icon="el-icon-delete"
+            size="mini"
+            :disabled="multiple"
+            @click="handleDelete"
+            v-hasPermi="['system:bmb:remove']"
+          >删除</el-button>
+        </el-col>
+      </el-tooltip>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="bmbList"  @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="bmbList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" min-width="5%" align="center" />
       <el-table-column label="id" min-width="5%" align="center" prop="id" />
       <el-table-column label="姓名" min-width="10%" align="center" prop="name" />
       <el-table-column label="身份证" min-width="20%" align="center" prop="idcard" />
-      <el-table-column label="类型" min-width="10%" align="center" prop="kaoshiType" :formatter="ikashilx" />
-      <el-table-column label="岗位" min-width="10%" align="center" prop="examType" />
-      <el-table-column label="理论成绩"  min-width="10%"align="center" prop="liluen" :formatter="ifendcase" />
-      <el-table-column label="实操成绩"  min-width="10%" align="center" prop="shichao" :formatter="ifendcase" />
+      <el-table-column label="机构" min-width="10%" align="center" prop="dept.jianCheng" :show-overflow-tooltip="true" />
+      <el-table-column label="类型" min-width="8%" align="center" prop="kaoshiType" :formatter="ikashilx" />
+      <el-table-column label="岗位" min-width="8%" align="center" prop="examType" />
+      <el-table-column label="理论成绩"  min-width="10%" align="center" prop="liluen" :formatter="ifendcase" />
+      <el-table-column label="实操成绩"  min-width="10%" align="center" prop="shichao" :formatter="ishicase" />
       <el-table-column label="补考" min-width="10%" align="center"  >
         <template slot-scope="scope">
           <el-switch
@@ -193,7 +242,7 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="录入结果" min-width="35%" align="left" prop="fucha" />
+      <el-table-column label="当前状态" min-width="20%" align="center" prop="fucha" :show-overflow-tooltip="true" />
 <!--      <el-table-column label="批次" align="center" prop="pici" :formatter="piciFormat" />-->
       <el-table-column label="操作" min-width="15%" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
@@ -241,6 +290,9 @@
         </el-form-item>
         <el-form-item label="机构id" prop="deptId" style="display: none">
           <el-input v-model="form.deptId" placeholder="" type="hidden"/>
+        </el-form-item>
+        <el-form-item label="省id" prop="shengId" style="display: none">
+          <el-input v-model="form.shengId" placeholder="" type="hidden"/>
         </el-form-item>
         <el-form-item label="机构名称" prop="ancestors">
           <el-cascader
@@ -297,6 +349,15 @@
             >{{dict.dictLabel}}</el-radio>
           </el-radio-group>
         </el-form-item>
+        <el-form-item label="考试类型" >
+          <el-radio-group v-model="form.kaoshiType">
+            <el-radio
+              v-for="dict in kaoshiTypeOptions"
+              :key="dict.dictValue"
+              :label="dict.dictValue"
+            >{{dict.dictLabel}}</el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="理论成绩" >
           <el-radio-group v-model="form.liluen">
             <el-radio
@@ -315,7 +376,7 @@
             >{{dict.dictLabel}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="复查情况" prop="fucha">
+        <el-form-item label="当前状态" prop="fucha">
           <el-input v-model="form.fucha" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
@@ -332,7 +393,7 @@
         :limit="1"
         accept=".xlsx, .xls"
         :headers="upload.headers"
-        :action="upload.url + '?updateSupport=' + upload.updateSupport+'&kaoshiTime='+upload.kaoshiTime+'&deptId='+upload.deptId+'&pici='+upload.pici+'&avatarUrl='+upload.avatarUrl+'&ancestors='+upload.ancestors"
+        :action="upload.url + '?updateSupport=' + upload.updateSupport+'&kaoshiTime='+upload.kaoshiTime+'&deptId='+upload.deptId+'&pici='+upload.pici+'&avatarUrl='+upload.avatarUrl+'&ancestors='+upload.ancestors+'&shengId='+this.upload.shengId"
         :disabled="upload.isUploading"
         :on-progress="handleFileUploadProgress"
         :on-success="handleFileSuccess"
@@ -375,8 +436,8 @@
           </el-select>
         </div>
         <div class="el-upload__tip" slot="tip">
-          <el-input placeholder="请输入相片地址" v-model="upload.avatarUrl">
-            <template slot="prepend">/profile/avatar/</template>
+          <el-input placeholder="请输入相片地址"  clearable v-model="upload.avatarUrl">
+            <template slot="prepend">/相片目录/</template>
           </el-input>
         </div>
         <div class="el-upload__tip" slot="tip">
@@ -395,7 +456,7 @@
 </template>
 
 <script>
-  import { listBmb, getBmb, delBmb, addBmb, updateBmb, exportBmb,importTemplate,luruBmb,changeSfwc,changeBukao,updateAvatar,exportCount } from "@/api/system/bmb";
+  import { listBmb, getBmb, delBmb, addBmb, updateBmb, exportBmb,importTemplate,luruBmb,changeSfwc,changeBukao,updateAvatar,exportCount,downloadChengji } from "@/api/system/bmb";
   import { getToken } from "@/utils/auth";
   import { Cascadeselect } from "@/api/system/dept";
   export default {
@@ -435,6 +496,8 @@
         piciOptions: [],
         //理论字典
         liluenOptions:[],
+        //考试类型
+        kaoshiTypeOptions:[],
         gangOptions:[
           {
             value: '临柜',
@@ -462,6 +525,8 @@
           deptId:null,
           //祖级列表
           ancestors:null,
+          //省id
+          shengId:null,
           //批次
           pici:'',
           //相片地址
@@ -525,6 +590,9 @@
       this.getDicts("kaoshi_chengji").then(response => {
         this.liluenOptions = response.data;
       });
+      this.getDicts("sys_kao_type").then(response => {
+        this.kaoshiTypeOptions = response.data;
+      });
       this.getTreeselect();
     },
     methods: {
@@ -555,14 +623,28 @@
       piciFormat(row, column) {
         return this.selectDictLabel(this.piciOptions, row.pici);
       },
-      //格式化理论、实操
+      //格式化理论
       ifendcase(val){
         if(val.liluen=='N'){
           return '不合格'
         }else if(val.liluen=='Y'){
           return '合格'
-        }else {
+        }else if(val.liluen=='W'){
           return '未公布'
+        }else {
+          return '缺考'
+        }
+      },
+      //格式化实操
+      ishicase(val){
+        if(val.shichao=='N'){
+          return '不合格'
+        }else if(val.shichao=='Y'){
+          return '合格'
+        }else if(val.shichao=='W'){
+          return '未公布'
+        }else {
+          return '缺考'
         }
       },
       ikashilx(row){
@@ -617,11 +699,13 @@
           idcard: null,
           kaoshiTime: null,
           deptId: null,
-          bukao: null,
-          sfwc: null,
-          liluen: null,
-          shichao: null,
+          bukao: 'N',
+          sfwc: 'N',
+          liluen: 'W',
+          shichao: 'W',
+          kaoshiType:'3',
           pici: null,
+          shengId:null
         };
         this.resetForm("form");
       },
@@ -649,17 +733,21 @@
       /** 新增修改选择机构 */
       changDept(value){
         if(value){
-          this.form.deptId =value[2]
+          this.form.shengId=value[0];
+          this.form.deptId =value[2];
         }else {
           this.form.deptId = null;
+          this.form.shengId=null;
         }
       },
       /** 上传时选择机构 */
       handleZong(value){
         if(value){
+          this.upload.shengId=value[0];
           this.upload.deptId =value[2];
           this.upload.ancestors=value.toString();
         }else {
+          this.upload.shengId=null;
           this.upload.deptId = null;
           this.upload.ancestors=null;
         }
@@ -686,10 +774,14 @@
         this.reset();
         const id = row.id || this.ids
         getBmb(id).then(response => {
-          this.form = response.data;
-          this.form.ancestors=this.form.ancestors.split(',');
-          this.open = true;
-          this.title = "修改报名";
+          if(response.code==200) {
+            this.form = response.data;
+            this.form.ancestors = this.form.ancestors.split(',');
+            this.open = true;
+            this.title = "修改报名";
+          }else {
+            this.msgError(response.msg);
+          }
         });
       },
       /** 提交按钮 */
@@ -805,7 +897,11 @@
       },
       // 提交上传文件
       submitFileForm() {
-        this.$refs.upload.submit();
+        if(this.upload.pici==''||this.upload.deptId==null||this.upload.ancestors==null||this.upload.avatarUrl==''||this.upload.kaoshiTime==''){
+          this.msgError("请完善必选项");
+        }else {
+          this.$refs.upload.submit();
+        }
       },
       //录入按钮
       handleLuru(row) {
@@ -917,6 +1013,42 @@
         }).then(action => {
           if(this.res.code==200){
             this.download(this.res.msg);
+          }else {
+            this.msgError(this.res.msg);
+          }
+        });
+      },
+      handleChengji(){
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '消息',
+          message: h('p', null, [
+            h('span', null, '是否确认要从测评中心导入成绩?')
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          beforeClose: (action, instance, done) => {
+            if (action === 'confirm') {
+              instance.confirmButtonLoading = true;
+              instance.confirmButtonText = '执行中...';
+              downloadChengji(this.queryParams.pici,this.queryParams.deptId).then(res=>{
+                this.res.msg=res.msg;
+                this.res.code=res.code;
+                setTimeout(() => {
+                  done();
+                  setTimeout(() => {
+                    instance.confirmButtonLoading = false;
+                  }, 300);
+                }, 500);
+              })
+            } else {
+              done();
+            }
+          }
+        }).then(action => {
+          if(this.res.code==200){
+            this.msgSuccess(this.res.msg);
           }else {
             this.msgError(this.res.msg);
           }

@@ -54,7 +54,7 @@ public class IdentityCodeUtils {
             return eightcardid;
         }
     public static void main(String[] args) {
-        String idcard1 = "350211197607142059";
+        String idcard1 = "440923199304101799";
         String idcard2 = "440981198602125624";
         String idcard3 = "440981198602125625";
 

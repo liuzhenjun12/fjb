@@ -34,7 +34,7 @@ import com.ruoyi.system.service.ISysUserService;
 
 /**
  * 用户信息
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -78,13 +78,13 @@ public class SysUserController extends BaseController
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
     @PreAuthorize("@ss.hasPermi('system:user:import')")
     @PostMapping("/importData")
-    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception
+    public AjaxResult importData(MultipartFile file, boolean updateSupport,Long deptId) throws Exception
     {
         ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         List<SysUser> userList = util.importExcel(file.getInputStream());
         LoginUser loginUser = tokenService.getLoginUser(ServletUtils.getRequest());
         String operName = loginUser.getUsername();
-        String message = userService.importUser(userList, updateSupport, operName);
+        String message = userService.importUser(userList, updateSupport, operName,deptId);
         return AjaxResult.success(message);
     }
 
@@ -123,9 +123,9 @@ public class SysUserController extends BaseController
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUser user)
     {
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName())))
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserIdcardUnique(user.getIdcard())))
         {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，身份证号已存在");
         }
         else if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
         {

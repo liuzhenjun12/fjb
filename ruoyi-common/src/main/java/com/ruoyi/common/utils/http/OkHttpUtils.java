@@ -4,11 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.ruoyi.common.core.domain.PhoteSubmitVo;
-import com.ruoyi.common.core.domain.PostResult;
-import com.ruoyi.common.core.domain.SubmitVo;
-import com.ruoyi.common.core.domain.UpdateResult;
+import com.ruoyi.common.core.domain.*;
 import com.ruoyi.common.core.domain.result.Re;
+import com.ruoyi.common.core.domain.yuyue.Pay;
+import com.ruoyi.common.core.domain.yuyue.YueYue;
 import com.ruoyi.common.utils.StringUtils;
 import okhttp3.*;
 import org.apache.http.NameValuePair;
@@ -34,11 +33,11 @@ public class OkHttpUtils {
      * @param file
      * @return
      */
-    public static PostResult OkHttpOpst(PhoteSubmitVo v, File file){
+    public static PostResult OkHttpOpst(PhoteSubmitVo v, File file,String session){
         PostResult result=new PostResult();
         result.setResult("failed");
-        System.setProperty("http.proxyHost", "127.0.0.1");
-        System.setProperty("http.proxyPort", "8888");
+//        System.setProperty("http.proxyHost", "127.0.0.1");
+//        System.setProperty("http.proxyPort", "8888");
         RequestBody body=null;
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("text/plain");
@@ -94,6 +93,7 @@ public class OkHttpUtils {
         Request request = new Request.Builder()
                 .url("http://221.226.21.180/examinationRY/register.action")
                 .method("POST", body)
+                .addHeader("Cookie", session)
                 .build();
         try {
             Response response = client.newCall(request).execute();
@@ -114,6 +114,7 @@ public class OkHttpUtils {
                     }else {
                         result.setReason(persons.get(0).getReason());
                         result.setResult(persons.get(0).getResult());
+                        System.out.println(result.toString());
                         return result;
                     }
                 }
@@ -121,6 +122,60 @@ public class OkHttpUtils {
         } catch (IOException e) {
             System.out.println("发生异常==>"+e.getMessage());
            result.setReason(e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * 首次上传照片
+     * @return
+     */
+    public static PostResult shangchangzp(PhoteSubmitVo v, File file,String session){
+        PostResult result=new PostResult();
+        result.setResult("failed");
+        RequestBody body=null;
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("cardtype", " 居民身份证")
+                .addFormDataPart("idcard", v.getIdcard())
+                .addFormDataPart("bankname", "")
+                .addFormDataPart("username", v.getName())
+                .addFormDataPart("name", v.getName())
+                .addFormDataPart("province", v.getProvince())
+                .addFormDataPart("city", v.getCity())
+                .addFormDataPart("jigou", v.getJigou())
+                .addFormDataPart("peopleBankNo", "")
+                .addFormDataPart("bank", v.getBank())
+                .addFormDataPart("bankno", v.getBankno())
+                .addFormDataPart("examdate", v.getExamdate())
+                .addFormDataPart("pbexamdate", v.getPbexamdate())
+                .addFormDataPart("session", "0")
+                .addFormDataPart("sex", v.getSex())
+                .addFormDataPart("certificateID", "")
+                .addFormDataPart("examtype", v.getExamtype())
+                .addFormDataPart("email", "532125082@qq.com")
+                .addFormDataPart("qq", "")
+                .addFormDataPart("phone", "18899859112")
+                .addFormDataPart("cultural",  v.getIdcard() + ".jpg",
+                        RequestBody.create(MediaType.parse("application/octet-stream"), file)).build();
+                 Request request = new Request.Builder()
+                .url("http://221.226.21.180/examinationRY/photeSubmit.action")
+                .method("POST", body)
+                .addHeader("Cookie", session)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String sult=response.body().string();
+            if(StringUtils.isEmpty(sult)){
+                result.setResult("success");
+                return result;
+            }else {
+                System.out.println(sult);
+            }
+        } catch (Exception e) {
+            System.out.println("发生异常==>"+e.getMessage());
+            result.setReason(e.getMessage());
         }
         return result;
     }
@@ -210,6 +265,62 @@ public class OkHttpUtils {
     }
 
     /**
+     * 添加预约日期
+     * @param yueYue
+     * @param session
+     * @return
+     * @throws IOException
+     */
+    public static String yuyuePost(String yueYue,String session) throws IOException {
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("serviceType","peopleBankAddExamination")
+                .addFormDataPart("examChangeData",yueYue)
+                .build();
+        Request request = new Request.Builder()
+                .url("http://221.226.21.180/examinationRY/examManage.action")
+                .method("POST", body)
+                .addHeader("Cookie", session)
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
+    /**
+     * 确定预约
+     * @param pay
+     * @param session
+     * @return
+     * @throws IOException
+     */
+    public static String yuyueOk(Pay pay, String session)throws IOException {
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("payTypeID","")
+                .addFormDataPart("valueInfo","")
+                .addFormDataPart("examID",pay.getExamID().toString())
+                .addFormDataPart("examType","")
+                .addFormDataPart("amSelectedCheck","on")
+                .addFormDataPart("amOrderCountEdit",pay.getAmOrderCountEdit())
+                .addFormDataPart("pmSelectedCheck","on")
+                .addFormDataPart("pmOrderCountEdit",pay.getPmOrderCountEdit())
+                .addFormDataPart("nmSelectedCheck","on")
+                .addFormDataPart("nmOrderCountEdit",pay.getNmOrderCountEdit())
+                .addFormDataPart("serviceType","setPeopleBankExamOrderSessions")
+                .addFormDataPart("sessionChangeData",pay.getSessionChangeData())
+                .build();
+        Request request = new Request.Builder()
+                .url("http://221.226.21.180/examinationRY/examManage.action")
+                .method("POST", body)
+                .addHeader("Cookie", session)
+                .build();
+        Response response = client.newCall(request).execute();
+        return response.body().string();
+    }
+
+    /**
      * 发送x-www-form-urlencoded格式请求
      * @param args
      * @param url
@@ -219,9 +330,11 @@ public class OkHttpUtils {
      * @throws IOException
      */
     public static String wwwFormPost(String args,String url,String session,String method) throws IOException {
+//        System.setProperty("http.proxyHost", "127.0.0.1");
+//        System.setProperty("http.proxyPort", "8888");
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
         RequestBody body = RequestBody.create(mediaType, args);
         Request request = new Request.Builder()
                 .url(url)
@@ -231,6 +344,18 @@ public class OkHttpUtils {
                 .build();
         Response response = client.newCall(request).execute();
         return response.body().string();
+    }
+
+    public static boolean loginPost(String agrs,String session) throws IOException {
+        String su=wwwFormPost(agrs,"http://221.226.21.180/examinationRY/userLogin.action",session,"POST");
+        if(StringUtils.isEmpty(su)){
+            return false;
+        }
+        Re json = JSON.parseObject(su,Re.class);
+        if(!"success".equals(json.getResp().getResultMsg())){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -311,7 +436,45 @@ public class OkHttpUtils {
 //        String jsonStr="{\"resp\":{\"result\":{\"token\":null,\"user\":{\"account\":\"潘晓灵\",\"branchid\":null,\"id\":\"140540\",\"idnumber\":\"350103199409143521\",\"latestlogintime\":\"0\",\"loginStatus\":\"1\",\"password\":\"3d49e8a7819bdbf64a596d8e49342a60\",\"retrylogin\":\"0\",\"roledesc\":\"考生\",\"roleid\":\"8\",\"rolename\":\"考生\",\"status\":\"0\",\"updatetime\":\"1543305243963\",\"userArea\":null,\"userBank\":\"B0014B235010001\",\"username\":\"潘晓灵\",\"userno\":\"1543305243963\"}},\"resultCode\":\"10000\",\"resultList\":null,\"resultMsg\":\"success\"},\"roleID\":\"8\"}";
 //        Re json = JSON.parseObject(jsonStr,Re.class);
 //        System.out.println(json.getResp().getResultMsg());
-        File file=new File("http://221.226.21.180/examinationRY/upload/440682198601202122.jpg");
-        System.out.println(file.exists());
+     //   File file=new File("http://221.226.21.180/examinationRY/upload/440682198601202122.jpg");
+      //  System.out.println(file.exists());
+//        String ids="3197349,3197353";
+//        ids=ids.replaceAll(",","%2C");
+//        System.out.println(ids);
+            OkHttpClient client = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaType = MediaType.parse("text/plain");
+            RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("cardtype","居民身份证")
+                    .addFormDataPart("idcard","350583198806150169")
+                    .addFormDataPart("bankname","")
+                    .addFormDataPart("username","陈丹妮")
+                    .addFormDataPart("name","陈丹妮")
+                    .addFormDataPart("province","福建")
+                    .addFormDataPart("city","厦门")
+                    .addFormDataPart("jigou","31350203")
+                    .addFormDataPart("peopleBankNo","")
+                    .addFormDataPart("bank","B0003L235020001")
+                    .addFormDataPart("bankno","B0003L235020001")
+                    .addFormDataPart("examdate","1415")
+                    .addFormDataPart("pbexamdate","1415")
+                    .addFormDataPart("session","0")
+                    .addFormDataPart("sex","男")
+                    .addFormDataPart("certificateID","")
+                    .addFormDataPart("examtype","临柜")
+                    .addFormDataPart("email","532125082@qq.com")
+                    .addFormDataPart("qq","")
+                    .addFormDataPart("phone","18899859112")
+                    .addFormDataPart("cultural","/C:/jinchu/uploadPath/avatar/2021/03/27/350583198806150169.jpg",
+                            RequestBody.create(MediaType.parse("application/octet-stream"),
+                                    new File("/C:/jinchu/uploadPath/avatar/2021/03/27/350583198806150169.jpg")))
+                    .build();
+            Request request = new Request.Builder()
+                    .url("http://221.226.21.180/examinationRY/register.action")
+                    .method("POST", body)
+                    .addHeader("Cookie", "JSESSIONID=F7B2793A45DAAB0AB677B20BE1F33A54")
+                    .build();
+            Response response = client.newCall(request).execute();
+            System.out.println(response.body().string());
     }
 }

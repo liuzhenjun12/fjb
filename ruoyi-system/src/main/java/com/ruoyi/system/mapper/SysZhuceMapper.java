@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.common.core.domain.entity.SysZhuce;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -66,4 +67,14 @@ public interface SysZhuceMapper
      * @return 【请填写功能名称】集合
      */
     public List<SysZhuce> selectSysZhuceByIds(Long[] zcIds);
+
+    /**
+     * 修改审核状态
+     * @param status
+     * @param attr
+     * @param pici
+     * @param deptId
+     * @return
+     */
+    public int updateStatus(@Param("status") String status,@Param("attr") Long[] attr,@Param("pici") String pici,@Param("deptId") Long deptId);
 }

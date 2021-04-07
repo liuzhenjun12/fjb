@@ -57,6 +57,8 @@ public class SysDept extends BaseEntity
     /*** 机构简称*/
     private String  jianCheng;
 
+    private Integer sizeId;
+
     /** 子部门 */
     private List<SysDept> children = new ArrayList<SysDept>();
 
@@ -193,6 +195,10 @@ public class SysDept extends BaseEntity
     public String getJianCheng() { return jianCheng; }
 
     public void setJianCheng(String jianCheng) { this.jianCheng = jianCheng; }
+
+    public Integer getSizeId() { return sizeId; }
+
+    public void setSizeId(Integer sizeId) { this.sizeId = sizeId; }
 
     @Override
     public String toString() {

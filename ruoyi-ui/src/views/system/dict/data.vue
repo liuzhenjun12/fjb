@@ -78,20 +78,18 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="dataList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="字典编码" align="center" prop="dictCode" />
-      <el-table-column label="字典标签" align="center" prop="dictLabel" />
-      <el-table-column label="字典键值" align="center" prop="dictValue" />
-      <el-table-column label="字典排序" align="center" prop="dictSort" />
-      <el-table-column label="状态" align="center" prop="status" :formatter="statusFormat" />
-      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+    <el-table v-loading="loading" :data="dataList"  @selection-change="handleSelectionChange">
+      <el-table-column type="selection" min-width="5%" align="center" />
+      <el-table-column label="字典编码" min-width="5%" align="center" prop="dictCode" />
+      <el-table-column label="字典标签" min-width="40%" align="center" prop="dictLabel" />
+      <el-table-column label="字典排序" min-width="5%" align="center" prop="dictSort" />
+      <el-table-column label="状态" min-width="15%" align="center" prop="status" :formatter="statusFormat" />
+      <el-table-column label="创建时间" min-width="5%" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="操作" min-width="15%" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
