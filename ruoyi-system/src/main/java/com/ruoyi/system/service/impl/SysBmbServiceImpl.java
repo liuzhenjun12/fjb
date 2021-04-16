@@ -219,6 +219,9 @@ public class SysBmbServiceImpl implements ISysBmbService
                     if(StringUtils.isBlank(bmb.getBukao())){
                         bmb.setBukao("N");
                     }
+                    if(StringUtils.isBlank(bmb.getPhone())){
+                        bmb.setPhone("18899859112");
+                    }
                     SysDept sheng=sysDeptMapper.selectDeptById(shengId);
                     bmb.setKaoshiTime(sdf.parse(kaoshirq));
                     bmb.setPici(pici);
@@ -352,7 +355,7 @@ public class SysBmbServiceImpl implements ISysBmbService
                             s.setBank(shi.getDeptName());
                             s.setEmail("532125082@qq.com");
                             s.setQq("532125082");
-                            s.setPhone("18899859112");
+                            s.setPhone(t.getPhone());
                             s.setPeopleBankName("北京金储自动化技术有限公司（"+diqu.getDeptName()+"）");
                             s.setPbexamdateText(kaoshidate);
                             s.setExamdateText(kaoshidate);

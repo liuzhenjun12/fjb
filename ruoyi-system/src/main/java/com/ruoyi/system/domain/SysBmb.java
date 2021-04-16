@@ -30,6 +30,10 @@ public class SysBmb extends BaseEntity
     @Excel(name = "身份证(必填)", width = 30)
     private String idcard;
 
+    /** 手机号码 */
+    @Excel(name = "手机号码(可空白)", width = 20)
+    private String phone;
+
     /** 考试日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "考试日期",  width = 20,dateFormat = "yyyy-MM-dd",type = Excel.Type.EXPORT)
@@ -40,6 +44,7 @@ public class SysBmb extends BaseEntity
 
     /** 机构名称 */
     private Long deptId;
+
 
     /** 省id */
     private Long shengId;
@@ -243,6 +248,10 @@ public class SysBmb extends BaseEntity
 
     public void setShengName(String shengName) { this.shengName = shengName; }
 
+    public String getPhone() { return phone; }
+
+    public void setPhone(String phone) { this.phone = phone; }
+
     public SysBmb() { }
     @Override
     public String toString() {
@@ -250,6 +259,7 @@ public class SysBmb extends BaseEntity
                 .append("id", getId())
                 .append("name", getName())
                 .append("idcard", getIdcard())
+                .append("phone", getPhone())
                 .append("kaoshiTime", getKaoshiTime())
                 .append("deptId", getDeptId())
                 .append("ancestors", getAncestors())

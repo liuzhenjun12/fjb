@@ -147,10 +147,10 @@
         <el-form-item label="产品尺寸" prop="chicun">
           <el-select v-model="form.chicun" placeholder="请输入产品尺寸" style="width: 100%">
             <el-option
-              v-for="item in gangOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="dict in gangOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -220,16 +220,7 @@ export default {
       // 【请填写功能名称】表格数据
       productList: [],
       //产品尺寸
-      gangOptions:[
-        {
-          value: '130*200*100',
-          label: '130*200*100'
-        },
-        {
-          value: '120*260*260',
-          label: '120*260*260'
-        }
-      ],
+      gangOptions:[],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -261,6 +252,9 @@ export default {
     });
     this.getDicts("sys_yes_no").then(response => {
       this.dingzhiOptions = response.data;
+    });
+    this.getDicts("sys_product_size").then(response => {
+      this.gangOptions = response.data;
     });
   },
   methods: {

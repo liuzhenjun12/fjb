@@ -8,7 +8,7 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.framework.web.service.TokenService;
-import com.ruoyi.system.domain.vo.CountUserVo;
+import com.ruoyi.system.domain.vo.*;
 import com.ruoyi.system.mapper.SysBmbMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -75,8 +75,9 @@ public class SysBmbController extends BaseController
      */
     @GetMapping("/countList")
     public TableDataInfo countList(SysBmb sysBmb){
+        System.out.println(sysBmb.toString());
         startPage();
-        List<CountUserVo> list=bmbMapper.findAllList(sysBmb.getName());
+        List<CountUserVo> list=bmbMapper.findAllList(sysBmb.getName(),sysBmb.getIdcard());
         return getDataTable(list);
     }
 
@@ -251,5 +252,219 @@ public class SysBmbController extends BaseController
         return toAjax(sysBmbService.updateSfwcStatus(sysBmb));
     }
 
+    /**
+     * 首页统计数量
+     */
+    @GetMapping("/countAll")
+    public AjaxResult countAll()
+    {
+        CountAll countAll=bmbMapper.countXueyuan();
+        CountAll countAll_1=bmbMapper.countProductAll();
 
+        if(countAll!=null&&countAll_1!=null){
+            countAll.setDingdan(countAll_1.getDingdan());
+            countAll.setJine(countAll_1.getJine());
+            return AjaxResult.success(countAll);
+        }
+        return null;
+    }
+
+    /**
+     * 首页统计订单地图
+     */
+    @GetMapping("/countOrder")
+    public AjaxResult countOrder()
+    {
+        List<JingduVo> list=bmbMapper.countOrder();
+        return AjaxResult.success(list);
+    }
+
+    /**
+     * 首页统计订单线性图
+     */
+    @GetMapping("/countOrderXian/{nian}")
+    public AjaxResult countOrderXian(@PathVariable String nian)
+    {
+        int[] array1 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] array2 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        ArrayVo arrayVo=new ArrayVo();
+        List<JingduVo> list=bmbMapper.countOrderXian(nian);
+        if(!list.isEmpty()) {
+            for (int i = 1; i < 13; i++) {
+                String ye = "";
+                if (i < 10) {
+                    ye = "0" + i;
+                } else {
+                    ye = i + "";
+                }
+                for (JingduVo v : list) {
+                    if (ye.equals(v.getName())) {
+                        array1[i - 1] = v.getNum();
+                        array2[i - 1] = v.getMoney();
+                        continue;
+                    }
+                }
+            }
+        }
+        arrayVo.setArray1(array1);
+        arrayVo.setArray2(array2);
+        return AjaxResult.success(arrayVo);
+    }
+
+    /**
+     * 首页统计回访
+     */
+    @GetMapping("/countHuifanXian/{nian}")
+    public AjaxResult countHuifanXian(@PathVariable String nian)
+    {
+        int[] array1 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] array2 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] array3 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        ArrayVo arrayVo=new ArrayVo();
+        List<JingduVo> list=bmbMapper.countHuifanXian(nian);
+        if(!list.isEmpty()) {
+            for (int i = 1; i < 13; i++) {
+                String ye = "";
+                if (i < 10) {
+                    ye = "0" + i;
+                } else {
+                    ye = i + "";
+                }
+                for (JingduVo v : list) {
+                    if (ye.equals(v.getName())) {
+                        array1[i - 1] = v.getNum();
+                        array2[i - 1] = v.getMoney();
+                        array3[i - 1] = v.getValue();
+                        continue;
+                    }
+                }
+            }
+        }
+        arrayVo.setArray1(array1);
+        arrayVo.setArray2(array2);
+        arrayVo.setArray3(array3);
+        return AjaxResult.success(arrayVo);
+    }
+
+    /**
+     * 首页统计订单线性图
+     */
+    @GetMapping("/countBaoXian/{nian}")
+    public AjaxResult countBaoXian(@PathVariable String nian)
+    {
+        int[] array1 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] array2 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        int[] array3 = {0,0,0,0,0,0,0,0,0,0,0,0};
+        ArrayVo arrayVo=new ArrayVo();
+        List<JingduVo> list1=bmbMapper.countBaoXian(nian,"福建");
+        List<JingduVo> list2=bmbMapper.countBaoXian(nian,"广东");
+        List<JingduVo> list3=bmbMapper.countBaoXian(nian,"浙江");
+        if(!list1.isEmpty()) {
+            for (int i = 1; i < 13; i++) {
+                String ye = "";
+                if (i < 10) {
+                    ye = "0" + i;
+                } else {
+                    ye = i + "";
+                }
+                for (JingduVo v : list1) {
+                    if (ye.equals(v.getName())) {
+                        array1[i - 1] = v.getNum();
+                        continue;
+                    }
+                }
+            }
+        }
+        if(!list2.isEmpty()) {
+            for (int i = 1; i < 13; i++) {
+                String ye = "";
+                if (i < 10) {
+                    ye = "0" + i;
+                } else {
+                    ye = i + "";
+                }
+                for (JingduVo v : list2) {
+                    if (ye.equals(v.getName())) {
+                        array2[i - 1] = v.getNum();
+                        continue;
+                    }
+                }
+            }
+        }
+        if(!list3.isEmpty()) {
+            for (int i = 1; i < 13; i++) {
+                String ye = "";
+                if (i < 10) {
+                    ye = "0" + i;
+                } else {
+                    ye = i + "";
+                }
+                for (JingduVo v : list3) {
+                    if (ye.equals(v.getName())) {
+                        array3[i - 1] = v.getNum();
+                        continue;
+                    }
+                }
+            }
+        }
+        arrayVo.setArray1(array1);
+        arrayVo.setArray2(array2);
+        arrayVo.setArray3(array3);
+        return AjaxResult.success(arrayVo);
+    }
+    /**
+     * 首页统计订单地图
+     */
+    @GetMapping("/countQy")
+    public AjaxResult countQy()
+    {
+        List<NameValue> nameValues=new ArrayList<>();
+        CountQy qy=bmbMapper.countQy();
+        if(qy!=null){
+            if(qy.getGr()!=null){
+                NameValue nameValue=new NameValue();
+                nameValue.setName("个体");
+                nameValue.setValue(qy.getGr());
+                nameValues.add(nameValue);
+            }
+            if(qy.getQy()!=null){
+                NameValue nameValue=new NameValue();
+                nameValue.setName("企业");
+                nameValue.setValue(qy.getQy());
+                nameValues.add(nameValue);
+            }
+            if(qy.getYh()!=null){
+                NameValue nameValue=new NameValue();
+                nameValue.setName("银行");
+                nameValue.setValue(qy.getYh());
+                nameValues.add(nameValue);
+            }
+            if(qy.getYy()!=null){
+                NameValue nameValue=new NameValue();
+                nameValue.setName("医院");
+                nameValue.setValue(qy.getYy());
+                nameValues.add(nameValue);
+            }
+        }
+        return AjaxResult.success(nameValues);
+    }
+    /**
+     * 首页统计省报名人数
+     */
+    @GetMapping("/countSheng")
+    public AjaxResult countSheng()
+    {
+        List<NameValue> nameValues=bmbMapper.countSheng();
+        return AjaxResult.success(nameValues);
+    }
+
+    /**
+     * 购买产品最多的客户
+     */
+    @GetMapping("/countMai")
+    public AjaxResult countMai()
+    {
+        List<NameValue> nameValues=bmbMapper.countMai();
+        return AjaxResult.success(nameValues);
+    }
 }

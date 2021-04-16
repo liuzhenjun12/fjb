@@ -113,12 +113,6 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/system/huifan/data'], resolve),
         name: 'huifan',
         meta: { title: '回访详情', icon: '' }
-      },
-      {
-        path: 'huifan/table',
-        component: (resolve) => require(['@/views/system/huifan/table'], resolve),
-        name: 'table',
-        meta: { title: '运营图表', icon: '' }
       }
     ]
   },

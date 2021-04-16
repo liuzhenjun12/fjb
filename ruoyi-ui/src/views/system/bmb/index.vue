@@ -1,11 +1,5 @@
 <template>
   <div class="app-container">
-<!--    <div class="biankuang">-->
-<!--      <i class="topL"></i>-->
-<!--      <i class="topR"></i>-->
-<!--      <i class="bottomL"></i>-->
-<!--      <i class="bottomR"></i>-->
-
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
       <el-form-item label="姓名" prop="name">
         <el-input
@@ -76,7 +70,16 @@
         >
         </el-cascader>
       </el-form-item>
-
+      <el-form-item label="类型" prop="kaoshiType">
+        <el-select v-model="queryParams.kaoshiType" placeholder="请选择考试类型" clearable size="small">
+          <el-option
+            v-for="dict in kaoshiTypeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item >
         <el-button type="cyan" icon="el-icon-search"  @click="handleQuery">搜索</el-button>
         <el-button type="danger" icon="el-icon-refresh"  @click="resetQuery">重置</el-button>
@@ -214,10 +217,10 @@
 
     <el-table v-loading="loading" :data="bmbList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" min-width="5%" align="center" />
-      <el-table-column label="id" min-width="5%" align="center" prop="id" />
+      <el-table-column label="id" min-width="8%" align="center" prop="id" />
       <el-table-column label="姓名" min-width="10%" align="center" prop="name" />
       <el-table-column label="身份证" min-width="20%" align="center" prop="idcard" />
-      <el-table-column label="机构" min-width="10%" align="center" prop="dept.jianCheng" :show-overflow-tooltip="true" />
+      <el-table-column label="机构" min-width="12%" align="center" prop="dept.jianCheng" :show-overflow-tooltip="true" />
       <el-table-column label="类型" min-width="8%" align="center" prop="kaoshiType" :formatter="ikashilx" />
       <el-table-column label="岗位" min-width="8%" align="center" prop="examType" />
       <el-table-column label="理论成绩"  min-width="10%" align="center" prop="liluen" :formatter="ifendcase" />
@@ -276,6 +279,9 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="姓名" prop="name">
           <el-input v-model="form.name" placeholder="请输入姓名" />
+        </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="form.phone" placeholder="请输入手机号" />
         </el-form-item>
         <el-form-item label="身份证" prop="idcard">
           <el-input v-model="form.idcard" placeholder="请输入身份证" />
@@ -542,6 +548,7 @@
           pageSize: 10,
           name: null,
           idcard: null,
+          kaoshiType:null,
           kaoshiTime: null,
           deptId: null,
           bukao: null,
@@ -572,6 +579,9 @@
           ],
           avatarUrl: [
             { required: true, message: "照片地址不能为空", trigger: "blur" }
+          ],
+          phone:[
+            { required: true, message: "手机号不能为空", trigger: "blur" }
           ],
         }
       };
@@ -697,6 +707,7 @@
           id: null,
           name: null,
           idcard: null,
+          phone:null,
           kaoshiTime: null,
           deptId: null,
           bukao: 'N',

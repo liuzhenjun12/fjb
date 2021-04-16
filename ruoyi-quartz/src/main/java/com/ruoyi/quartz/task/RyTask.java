@@ -13,14 +13,26 @@ import com.ruoyi.quartz.domain.SysJob;
 import com.ruoyi.quartz.service.ISysJobService;
 import com.ruoyi.system.mapper.SysYuyueMapper;
 import com.ruoyi.system.service.ISysYuyueService;
+import com.ruoyi.system.service.impl.SysGuangaoServiceImpl;
+import org.python.core.PyFunction;
+import org.python.core.PyInteger;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.util.PythonInterpreter;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.utils.StringUtils;
+import us.codecraft.webmagic.Page;
+import us.codecraft.webmagic.Site;
+import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.selector.Selectable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -224,7 +236,7 @@ public class RyTask
         }
     }
 
-    private void closeTask(String jobName) throws SchedulerException {
+    private  void closeTask(String jobName) throws SchedulerException {
         SysJob job=new SysJob();
         job.setJobName(jobName);
         List<SysJob> jobs=SpringUtils.getBean(ISysJobService.class).selectJobList(job);
@@ -233,6 +245,39 @@ public class RyTask
                 SpringUtils.getBean(ISysJobService.class).pauseJob(j);
             }
         }
+    }
+
+    public void netRemark(){
+
+    }
+
+    public static void main(String[] args) throws SchedulerException {
+//        PythonInterpreter interpreter = new PythonInterpreter();
+//        interpreter.execfile("F:/code/xindedaima/RuoYi-Vue/ruoyi-quartz/src/main/java/com/ruoyi/quartz/task/demo.py");
+//        PyFunction func = (PyFunction)interpreter.get("getData",PyFunction.class);
+//        String url="https://www.baidu.com";
+//        PyObject pyobj = func.__call__(new PyString(url));
+//        System.out.println("anwser = " + pyobj.toString());
+
+//        Properties props = new Properties();
+//        props.put("python.home", "path to the Lib folder");
+//        props.put("python.console.encoding", "UTF-8");
+//        Properties preprops = System.getProperties();
+//        PythonInterpreter.initialize(preprops, props, new String[0]);
+//        PythonInterpreter interpreter = new PythonInterpreter();
+//        interpreter.exec("import urllib2");
+//        interpreter.exec("from urllib import quote_plus");
+//        interpreter.exec("import urlparse");
+//        interpreter.exec("import re");
+//        interpreter.exec("import sys");
+//        interpreter.exec("reload(sys)");
+//        interpreter.exec("sys.setdefaultencoding(\"utf-8\")");
+////        interpreter.set("url",new PyString("https://www.baidu.com"));
+//
+//        interpreter.execfile("F:/code/xindedaima/RuoYi-Vue/ruoyi-quartz/src/main/java/com/ruoyi/quartz/task/demo.py");
+//        PyFunction func = (PyFunction) interpreter.get("getData", PyFunction.class);
+//        String url="https://www.baidu.com";
+//        PyObject pyobj = func.__call__(new PyString(url));
     }
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i)
@@ -250,4 +295,5 @@ public class RyTask
     {
         System.out.println("执行无参方法");
     }
+
 }

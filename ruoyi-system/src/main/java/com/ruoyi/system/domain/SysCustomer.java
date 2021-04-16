@@ -60,8 +60,11 @@ public class SysCustomer extends BaseEntity
     @Excel(name = "产品名称",readConverterExp = "1=智能箱柜锁",type = Excel.Type.EXPORT)
     private String type;
 
-    /** 产品图片 */
-    private String img;
+    /** 经度 */
+    private String jingdu;
+
+    /** 纬度 */
+    private String weidu;
 
     /** 是否删除 */
     private String delFlag;
@@ -143,15 +146,7 @@ public class SysCustomer extends BaseEntity
     {
         return type;
     }
-    public void setImg(String img)
-    {
-        this.img = img;
-    }
 
-    public String getImg()
-    {
-        return img;
-    }
     public void setDelFlag(String delFlag)
     {
         this.delFlag = delFlag;
@@ -195,6 +190,22 @@ public class SysCustomer extends BaseEntity
         this.cishu = cishu;
     }
 
+    public String getJingdu() {
+        return jingdu;
+    }
+
+    public void setJingdu(String jingdu) {
+        this.jingdu = jingdu;
+    }
+
+    public String getWeidu() {
+        return weidu;
+    }
+
+    public void setWeidu(String weidu) {
+        this.weidu = weidu;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -206,7 +217,8 @@ public class SysCustomer extends BaseEntity
             .append("money", getMoney())
             .append("num", getNum())
             .append("type", getType())
-            .append("img", getImg())
+            .append("jingdu", getJingdu())
+            .append("weidu", getWeidu())
             .append("createTime", getCreateTime())
             .append("updateTime", getUpdateTime())
             .append("createBy", getCreateBy())

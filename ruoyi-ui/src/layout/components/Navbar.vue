@@ -69,7 +69,6 @@ export default {
       'name'
     ]),
     showLogo() {
-      console.log(this.$store.state.settings.sidebarLogo+'============')
       return this.$store.state.settings.sidebarLogo;
     },
     setting: {

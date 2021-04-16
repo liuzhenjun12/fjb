@@ -20,12 +20,28 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '350px'
+    },
+    autoResize: {
+      type: Boolean,
+      default: true
+    },
+    chartData: {
+      type: Object,
+      required: true
     }
   },
   data() {
     return {
       chart: null
+    }
+  },
+  watch: {
+    chartData: {
+      deep: true,
+      handler(val) {
+        this.setOptions(val)
+      }
     }
   },
   mounted() {
@@ -43,8 +59,20 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
-
+      setTimeout(()=>{
+        this.setOptions(this.chartData)
+      },1500)
+    },
+    setOptions(data) {
       this.chart.setOption({
+        title : {
+          text: '智能箱柜锁客户类型图',
+          textStyle:{
+            color:"rgba(0, 0, 0, 0.45)"
+
+          },
+          x:'center'
+        },
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
@@ -52,7 +80,7 @@ export default {
         legend: {
           left: 'center',
           bottom: '10',
-          data: ['Industries', 'Technology', 'Forex', 'Gold', 'Forecasts']
+          data: ['个体', '企业', '银行', '医院']
         },
         series: [
           {
@@ -60,20 +88,14 @@ export default {
             type: 'pie',
             roseType: 'radius',
             radius: [15, 95],
-            center: ['50%', '38%'],
-            data: [
-              { value: 320, name: 'Industries' },
-              { value: 240, name: 'Technology' },
-              { value: 149, name: 'Forex' },
-              { value: 100, name: 'Gold' },
-              { value: 59, name: 'Forecasts' }
-            ],
+            center: ['50%', '50%'],
+            data: data.data,
             animationEasing: 'cubicInOut',
             animationDuration: 2600
           }
         ]
       })
-    }
+    },
   }
 }
 </script>

@@ -26,6 +26,70 @@ export function findShengCount() {
   })
 }
 
+// 首页统计订单地图
+export function countOrder() {
+  return request({
+    url: '/system/bmb/countOrder',
+    method: 'get',
+  })
+}
+
+// 首页统计订单线性图
+export function countOrderXian(nian) {
+  return request({
+    url: '/system/bmb/countOrderXian/'+nian,
+    method: 'get',
+  })
+}
+
+// 首页统计反假测评人数线性图
+export function countBaoXian(nian) {
+  return request({
+    url: '/system/bmb/countBaoXian/'+nian,
+    method: 'get',
+  })
+}
+
+// 首页统计回访客户线性图
+export function countHuifanXian(nian) {
+  return request({
+    url: '/system/bmb/countHuifanXian/'+nian,
+    method: 'get',
+  })
+}
+
+// 首页统计客户行业图
+export function countQy() {
+  return request({
+    url: '/system/bmb/countQy',
+    method: 'get',
+  })
+}
+
+// 各省报名人数
+export function countSheng() {
+  return request({
+    url: '/system/bmb/countSheng',
+    method: 'get',
+  })
+}
+
+// 购买产品最多的客户
+export function countMai() {
+  return request({
+    url: '/system/bmb/countMai',
+    method: 'get',
+  })
+}
+
+// 用于首页头部面板数据
+export function countAll() {
+  return request({
+    url: '/system/bmb/countAll',
+    method: 'get',
+  })
+}
+
 // 查询报名详细
 export function getBmb(id) {
   return request({

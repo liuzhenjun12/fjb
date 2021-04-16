@@ -3,100 +3,104 @@
 </template>
 
 <script>
-import echarts from 'echarts'
-require('echarts/theme/macarons') // echarts theme
-import resize from './mixins/resize'
+  import echarts from 'echarts'
+  require('echarts/theme/macarons') // echarts theme
+  import resize from './mixins/resize'
 
-const animationDuration = 6000
-
-export default {
-  mixins: [resize],
-  props: {
-    className: {
-      type: String,
-      default: 'chart'
+  export default {
+    mixins: [resize],
+    props: {
+      className: {
+        type: String,
+        default: 'chart'
+      },
+      width: {
+        type: String,
+        default: '100%'
+      },
+      height: {
+        type: String,
+        default: '350px'
+      },
+      autoResize: {
+        type: Boolean,
+        default: true
+      },
+      chartData: {
+        type: Object,
+        required: true
+      }
     },
-    width: {
-      type: String,
-      default: '100%'
+    data() {
+      return {
+        chart: null
+      }
     },
-    height: {
-      type: String,
-      default: '300px'
-    }
-  },
-  data() {
-    return {
-      chart: null
-    }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.initChart()
-    })
-  },
-  beforeDestroy() {
-    if (!this.chart) {
-      return
-    }
-    this.chart.dispose()
-    this.chart = null
-  },
-  methods: {
-    initChart() {
-      this.chart = echarts.init(this.$el, 'macarons')
-
-      this.chart.setOption({
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: { // 坐标轴指示器，坐标轴触发有效
-            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
-          }
-        },
-        grid: {
-          top: 10,
-          left: '2%',
-          right: '2%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: [{
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          axisTick: {
-            alignWithLabel: true
-          }
-        }],
-        yAxis: [{
-          type: 'value',
-          axisTick: {
-            show: false
-          }
-        }],
-        series: [{
-          name: 'pageA',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [79, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }, {
-          name: 'pageB',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [80, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }, {
-          name: 'pageC',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [30, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }]
+    watch: {
+      chartData: {
+        deep: true,
+        handler(val) {
+          this.setOptions(val)
+        }
+      }
+    },
+    mounted() {
+      this.$nextTick(() => {
+        this.initChart()
       })
+    },
+    beforeDestroy() {
+      if (!this.chart) {
+        return
+      }
+      this.chart.dispose()
+      this.chart = null
+    },
+    methods: {
+      initChart() {
+        this.chart = echarts.init(this.$el, 'macarons')
+        setTimeout(()=>{
+          var a=[]
+          var s=this.chartData.data;
+          for(var i=0;i<s.length;i++){
+            a.push(s[i].name)
+          }
+          this.setOptions(this.chartData,a)
+        },1500)
+      },
+      setOptions(data,a) {
+        this.chart.setOption({
+          title : {
+            text: '购买产品最多的用户',
+            textStyle:{
+              color:"rgba(0, 0, 0, 0.45)"
+
+            },
+            x:'center'
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            left: 'center',
+            bottom: '10',
+            data: a
+          },
+          series: [
+            {
+              name: 'WEEKLY WRITE ARTICLES',
+              type: 'pie',
+              roseType: 'radius',
+              radius: [15, 95],
+              center: ['50%', '50%'],
+              data: data.data,
+              animationEasing: 'cubicInOut',
+              animationDuration: 2600
+            }
+          ]
+        })
+      },
     }
   }
-}
 </script>

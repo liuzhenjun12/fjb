@@ -14,7 +14,7 @@
       },
       height: {
         type: String,
-        default: 'calc(100vh - 250px)'
+        default: '700px'
       }
     },
     data() {
@@ -23,7 +23,7 @@
         maps:[],
         geoCoordMap:{},
         data:[
-          {name:'福建',value:'101'},{name:'广东',value:'102'}
+          {name:'福建',value:'101'},{name:'广东',value:'102'},{name:'浙江',value:'103'}
         ]
       };
     },
@@ -72,6 +72,22 @@
           this.geoCoordMap[name] = v.properties.cp;
         });
         myChart.setOption({ // 进行相关配置
+          title:{
+            text:'反假报名测评情况省地图',
+            textStyle:{
+              //文字颜色
+              color:'rgba(0, 0, 0, 0.45)',
+              //字体风格,'normal','italic','oblique'
+              fontStyle:'normal',
+              //字体粗细 'normal','bold','bolder','lighter',100 | 200 | 300 | 400...
+              fontWeight:'bold',
+              //字体系列
+              fontFamily:'sans-serif',
+              left:'center',
+              //字体大小
+              fontSize:20
+            }
+          },
           tooltip: {
             trigger: 'item',
             formatter: params=>{
@@ -126,12 +142,11 @@
           },
           /*工具按钮组*/
           toolbox: {
-            show: false,
+            show: true,
             orient: 'vertical',
             left: 'right',
             top: 'center',
             feature: {
-
               dataView: {
                 readOnly: false
               },
@@ -145,7 +160,7 @@
             label: {
               normal: {
                 show: true,//显示省份标签
-                textStyle:{color:"#025871"}//省份标签字体颜色
+                textStyle:{color:"#fff"}//省份标签字体颜色
               },
               emphasis: {
                 show: true,
@@ -155,13 +170,31 @@
             roam: true,
             itemStyle: {
               normal: {
-                borderWidth: .5,//区域边框宽度
-                areaColor: '#fff',
-                borderColor: '#097bba'
+                borderColor: 'rgba(147, 235, 248, 1)',
+                borderWidth: 1,
+                areaColor: {
+                  type: 'radial',
+                  x: 0.5,
+                  y: 0.5,
+                  r: 0.8,
+                  colorStops: [{
+                    offset: 0,
+                    color: '#000' // 0% 处的颜色
+                  }, {
+                    offset: 1,
+                    color: '#000' // 100% 处的颜色
+                  }],
+                  globalCoord: false // 缺省为 false
+                },
+                shadowColor: 'rgba(128, 217, 248, 1)',
+                // shadowColor: 'rgba(255, 255, 255, 1)',
+                shadowOffsetX: -2,
+                shadowOffsetY: 2,
+                shadowBlur: 10
               },
               emphasis: {
-                borderWidth: .5,
-                areaColor: '#2B91B7'
+                areaColor: '#389BB7',
+                borderWidth: 0
               }
             }
           },
@@ -179,7 +212,7 @@
                 emphasis: {
                   show: true,
                   textStyle: {
-                    color: '#fff'
+                    color: 'blue'
                   }
                 }
               },
@@ -187,10 +220,10 @@
               itemStyle: {
                 normal: {
                   areaColor: '#031525',
-                  borderColor: '#3B5077',
+                  borderColor: 'white',
                 },
                 emphasis: {
-                  areaColor: '#2B91B7'
+                  areaColor: 'blue'
                 }
               },
               animation: false,
@@ -220,9 +253,9 @@
               },
               itemStyle: {
                 normal: {
-                  color: 'rgba(25,254,5,1.8)',
+                  color: 'blue',
                   shadowBlur: 10,
-                  shadowColor: '#05C3F9'
+                  shadowColor: '#000'
                 }
               },
               zlevel: 1

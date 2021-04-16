@@ -33,7 +33,10 @@ export default {
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      queryParams: {
+        nian: null
+      },
     }
   },
   watch: {
@@ -59,75 +62,104 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')
-      this.setOptions(this.chartData)
+      setTimeout(()=>{
+        this.setOptions(this.chartData)
+      },1000)
     },
-    setOptions({ expectedData, actualData } = {}) {
+    setOptions({ array1, array2 } = {}) {
       this.chart.setOption({
-        xAxis: {
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          boundaryGap: false,
-          axisTick: {
-            show: false
-          }
-        },
-        grid: {
-          left: 10,
-          right: 10,
-          bottom: 20,
-          top: 30,
-          containLabel: true
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'cross'
+        title : {
+          text: '智能箱柜锁销售量分析图',
+          textStyle:{
+            color:"rgba(0, 0, 0, 0.45)"
+
           },
-          padding: [5, 10]
+          x:'center'
+
         },
-        yAxis: {
-          axisTick: {
-            show: false
-          }
+        tooltip : {
+          trigger: 'axis'
         },
         legend: {
-          data: ['expected', 'actual']
+          orient : 'vertical',
+          x : 'left',
+          data:['箱柜锁销售数量'],
+          textStyle:{
+            color:"rgba(0, 0, 0, 0.45)"
+
+          },
         },
-        series: [{
-          name: 'expected', itemStyle: {
-            normal: {
-              color: '#FF005A',
-              lineStyle: {
-                color: '#FF005A',
-                width: 2
+        toolbox: {
+          orient: 'vertical',
+          right: '1%',
+          top: '20%',
+          iconStyle: {
+            color: 'rgba(0, 0, 0, 0.45)',
+            borderColor: 'rgba(0, 0, 0, 0.45)',
+            borderWidth: 1,
+          },
+          feature: {
+            saveAsImage: {},
+            magicType: {
+              // show: true,
+              type: ['line','bar']
+            }
+          }
+        },
+        calculable : false,
+        xAxis : [
+          {
+            type : 'category',
+            splitLine:{show: false},
+            axisLabel : {
+              formatter: '{value} ',
+              textStyle: {
+                color: '#a4a7ab',
+                align: 'right'
+              }
+            },
+            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+          }
+        ],
+        yAxis : [
+          {
+            type : 'value',
+            splitLine:{show: false},
+            axisLabel : {
+              formatter: '{value} ',
+              textStyle: {
+                color: '#a4a7ab',
+                align: 'right'
               }
             }
-          },
-          smooth: true,
-          type: 'line',
-          data: expectedData,
-          animationDuration: 2800,
-          animationEasing: 'cubicInOut'
+          }
+        ],
+        grid:{
+          borderWidth:0
         },
-        {
-          name: 'actual',
-          smooth: true,
-          type: 'line',
-          itemStyle: {
-            normal: {
-              color: '#3888fa',
-              lineStyle: {
-                color: '#3888fa',
-                width: 2
-              },
-              areaStyle: {
-                color: '#f3f8ff'
+        series : [
+          {
+            name:'箱柜锁销售数量',
+            type:'bar',
+            data:array1,
+            itemStyle: {
+              normal: {
+                color: '#2481ff'
               }
+            },
+            markPoint : {
+              data : [
+                {type : 'max', name: '最大值'},
+                {type : 'min', name: '最小值'}
+              ]
+            },
+            markLine : {
+              data : [
+                {type : 'average', name: '平均值'}
+              ]
             }
-          },
-          data: actualData,
-          animationDuration: 2800,
-          animationEasing: 'quadraticOut'
-        }]
+          }
+        ]
       })
     }
   }

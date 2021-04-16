@@ -201,6 +201,10 @@
           {
             value: '千牛',
             label: '千牛'
+          },
+          {
+            value: '其他',
+            label: '其他'
           }
         ],
         taiduOptions:[

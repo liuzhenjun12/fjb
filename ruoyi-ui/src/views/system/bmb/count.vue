@@ -9,6 +9,16 @@
                         placeholder="选择考试年份">
         </el-date-picker>
       </el-form-item>
+      <el-form-item label="银行省份" prop="idcard">
+        <el-select v-model="queryParams.idcard" placeholder="请选择银行省份" clearable size="small">
+          <el-option
+            v-for="item in shengOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -19,12 +29,14 @@
       v-loading="loading"
       :data="bmbList"
     >
-      <el-table-column label="机构名称" min-width="20%" align="center" prop="jigou" />
-      <el-table-column label="测评人数" min-width="15%" align="center" prop="shi" />
-      <el-table-column label="理论合格" min-width="15%" align="center" prop="liluenshi" />
-      <el-table-column label="实操合格" min-width="15%" align="center" prop="shichaoshi" />
-      <el-table-column label="缺考人数" min-width="15%" align="center" prop="liluenque" />
-      <el-table-column label="考试日期" min-width="20%" align="center" prop="kaoshitime" />
+      <el-table-column label="银行省份"  align="center" prop="sheng" />
+      <el-table-column label="机构名称"  align="center" prop="jigou" />
+      <el-table-column label="测评人数"  align="center" prop="shi" />
+      <el-table-column label="理论合格"  align="center" prop="liluenshi" />
+      <el-table-column label="理论不合格"  align="center" prop="liluenbu" />
+      <el-table-column label="实操合格"  align="center" prop="shichaoshi" />
+      <el-table-column label="缺考人数"  align="center" prop="liluenque" />
+      <el-table-column label="考试日期"  align="center" prop="kaoshitime" />
     </el-table>
     <pagination
       v-show="total>0"
@@ -45,9 +57,24 @@
         showSearch: true,
         // 报名表格数据
         bmbList: [],
+        shengOptions:[
+          {
+            value: '福建',
+            label: '福建'
+          },
+          {
+            value: '广东',
+            label: '广东'
+          },
+          {
+            value: '浙江',
+            label: '浙江'
+          }
+        ],
         total: 0,
         queryParams: {
           name:null,
+          idcard:null,
           pageNum: 1,
           pageSize: 10
         }
@@ -56,12 +83,12 @@
     created() {
       var shijian=new Date().getFullYear()+'';
       this.queryParams.name=shijian;
+      this.queryParams.idcard='福建'
       this.getList();
     },
     methods: {
       /** 查询报名列表 */
       getList() {
-        console.log(JSON.stringify(this.queryParams))
         this.loading = true;
         countList(this.queryParams).then(response => {
           this.bmbList = response.rows;

@@ -139,6 +139,12 @@
         <el-form-item label="地址" prop="address">
           <el-input v-model="form.address" placeholder="请输入地址" />
         </el-form-item>
+        <el-form-item label="经度" prop="jingdu">
+          <el-input v-model="form.jingdu" placeholder="请输入地址经度" />
+        </el-form-item>
+        <el-form-item label="纬度" prop="weidu">
+          <el-input v-model="form.weidu" placeholder="请输入地址纬度" />
+        </el-form-item>
         <el-form-item label="行业" prop="industry">
           <el-select v-model="form.industry" placeholder="请选择客户行业" style="width: 100%">
             <el-option
@@ -208,6 +214,30 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        name: [
+          { required: true, message: "客户名称不能为空", trigger: "blur" }
+        ],
+        // phone: [
+        //   { required: true, message: "客户手机不能为空", trigger: "blur" }
+        // ],
+        // sheng: [
+        //   { required: true, message: "客户省份不能为空", trigger: "blur" }
+        // ],
+        // shi: [
+        //   { required: true, message: "客户城市不能为空", trigger: "blur" }
+        // ],
+        // address: [
+        //   { required: true, message: "客户地址不能为空", trigger: "blur" }
+        // ],
+        // jingdu: [
+        //   { required: true, message: "客户城市经度不能为空", trigger: "blur" }
+        // ],
+        // weidu: [
+        //   { required: true, message: "客户城市纬度不能为空", trigger: "blur" }
+        // ],
+        industry: [
+          { required: true, message: "客户行业不能为空", trigger: "blur" }
+        ],
       }
     };
   },

@@ -8,6 +8,7 @@
         <result property="id"    column="id"    />
         <result property="name"    column="name"    />
         <result property="idcard"    column="idcard"    />
+        <result property="phone"    column="phone"    />
         <result property="kaoshiTime"    column="kaoshi_time"    />
         <result property="kaoshiType"    column="kaoshi_type"    />
         <result property="deptId"    column="dept_id"    />
@@ -43,7 +44,7 @@
     </resultMap>
 
     <sql id="selectSysBmbVo">
-        select b.id, b.name, b.idcard, b.kaoshi_time,  b.dept_id, b.bukao, b.sfwc, b.fucha, b.liluen, b.shichao, b.pici, b.create_time,
+        select b.id, b.name, b.idcard,b.phone, b.kaoshi_time,  b.dept_id, b.bukao, b.sfwc, b.fucha, b.liluen, b.shichao, b.pici, b.create_time,
          b.update_time, b.create_by, b.update_by, b.remark, b.del_flag, b.avatar_url,b.kaoshi_type,b.ancestors,b.exam_type,b.exam_id,
          b.sheng_id,b.sheng_name,
          d.dept_id, d.parent_id, d.dept_name, d.order_num, d.leader, d.status as dept_status,d.jian_cheng
@@ -55,6 +56,7 @@
         <where>
             <if test="name != null  and name != ''"> and b.name like concat('%', #{name}, '%')</if>
             <if test="idcard != null  and idcard != ''"> and b.idcard = #{idcard}</if>
+            <if test="kaoshiType != null  and kaoshiType != ''"> and b.kaoshi_type = #{kaoshiType}</if>
             <if test="kaoshiTime != null "> and b.kaoshi_time = #{kaoshiTime}</if>
             <if test="sfwc != null  and sfwc != ''"> and b.sfwc = #{sfwc}</if>
             <if test="bukao != null  and bukao != ''"> and b.bukao = #{bukao}</if>
@@ -80,6 +82,7 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="name != null and name != ''">name,</if>
             <if test="idcard != null and idcard != ''">idcard,</if>
+            <if test="phone != null and phone != ''">phone,</if>
             <if test="kaoshiTime != null">kaoshi_time,</if>
             <if test="kaoshiType != null">kaoshi_type,</if>
             <if test="deptId != null">dept_id,</if>
@@ -105,6 +108,7 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="name != null and name != ''">#{name},</if>
             <if test="idcard != null and idcard != ''">#{idcard},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
             <if test="kaoshiTime != null">#{kaoshiTime},</if>
             <if test="kaoshiType != null">#{kaoshiType},</if>
             <if test="deptId != null">#{deptId},</if>
@@ -134,6 +138,7 @@
         <trim prefix="SET" suffixOverrides=",">
             <if test="name != null and name != ''">name = #{name},</if>
             <if test="idcard != null and idcard != ''">idcard = #{idcard},</if>
+            <if test="phone != null and phone != ''">phone = #{phone},</if>
             <if test="kaoshiTime != null">kaoshi_time = #{kaoshiTime},</if>
             <if test="kaoshiType != null">kaoshi_type = #{kaoshiType},</if>
             <if test="deptId != null">dept_id = #{deptId},</if>

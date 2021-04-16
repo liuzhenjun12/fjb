@@ -3,30 +3,31 @@ package com.ruoyi.system.domain.vo;
 import com.ruoyi.common.annotation.Excel;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class CountUserVo implements Serializable {
-    @Excel(name = "机构名称",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "省份",  width = 10,type = Excel.Type.EXPORT)
+    private String sheng;//机构名称
+    @Excel(name = "机构名称",  width = 15,type = Excel.Type.EXPORT)
     private String jigou;//机构名称
-    @Excel(name = "报名总数",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "报名总数",  width = 10,type = Excel.Type.EXPORT)
     private Integer zongshu;//报名总人数
-    @Excel(name = "成功数量",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "成功数量",  width = 10,type = Excel.Type.EXPORT)
     private Integer shi;//报名成功数
-    @Excel(name = "失败数量",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "失败数量",  width = 10,type = Excel.Type.EXPORT)
     private Integer bu;//未成功数量
-    @Excel(name = "理论合格数量",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "理论合格数量",  width = 15,type = Excel.Type.EXPORT)
     private Integer liluenshi;
-    @Excel(name = "理论不合格数",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "理论不合格数",  width = 15,type = Excel.Type.EXPORT)
     private Integer liluenbu;
-    @Excel(name = "理论缺考数量",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "理论缺考数量",  width = 15,type = Excel.Type.EXPORT)
     private Integer liluenque;
-    @Excel(name = "实操合格数量",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "实操合格数量",  width = 15,type = Excel.Type.EXPORT)
     private Integer shichaoshi;
-    @Excel(name = "理论合格率",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "理论合格率",  width = 15,type = Excel.Type.EXPORT)
     private String liluenhegeli;
-    @Excel(name = "实操合格率",  width = 20,type = Excel.Type.EXPORT)
+    @Excel(name = "实操合格率",  width = 15,type = Excel.Type.EXPORT)
     private String shicaohegeli;
-    @Excel(name = "考试日期",  width = 20,dateFormat = "yyyy-MM-dd",type = Excel.Type.EXPORT)
+    @Excel(name = "考试日期",  width = 15,type = Excel.Type.EXPORT)
     private String kaoshitime;
 
     private String pici;//批次
@@ -99,4 +100,12 @@ public class CountUserVo implements Serializable {
     public String getKaoshitime() { return kaoshitime; }
 
     public void setKaoshitime(String kaoshitime) { this.kaoshitime = kaoshitime; }
+
+    public String getSheng() {
+        return sheng;
+    }
+
+    public void setSheng(String sheng) {
+        this.sheng = sheng;
+    }
 }

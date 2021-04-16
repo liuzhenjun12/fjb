@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysGuangaoMapper">
+
+    <resultMap type="SysGuangao" id="SysGuangaoResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="url"    column="url"    />
+        <result property="laizi"    column="laizi"    />
+        <result property="status"    column="status"    />
+        <result property="num"    column="num"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectSysGuangaoVo">
+        select id, name, url, laizi,status,num, create_time, update_time, create_by, update_by, remark, del_flag from sys_guangao
+    </sql>
+
+    <select id="selectSysGuangaoList" parameterType="SysGuangao" resultMap="SysGuangaoResult">
+        <include refid="selectSysGuangaoVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="laizi != null  and laizi != ''"> and laizi = #{laizi}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="createTime != null "> and date_format(create_time, '%Y-%m-%d') = date_format(#{createTime}, '%Y-%m-%d') </if>
+        </where>
+    </select>
+
+    <select id="selectSysGuangaoById" parameterType="Long" resultMap="SysGuangaoResult">
+        <include refid="selectSysGuangaoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysGuangao" parameterType="SysGuangao">
+        insert into sys_guangao
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="url != null">url,</if>
+            <if test="laizi != null">laizi,</if>
+            <if test="status != null">status,</if>
+            <if test="num != null">num,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="url != null">#{url},</if>
+            <if test="laizi != null">#{laizi},</if>
+            <if test="status != null">#{status},</if>
+            <if test="num != null">#{num},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysGuangao" parameterType="SysGuangao">
+        update sys_guangao
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="laizi != null">laizi = #{laizi},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysGuangaoById" parameterType="Long">
+        delete from sys_guangao where id = #{id}
+    </delete>
+
+    <delete id="deleteSysGuangaoByIds" parameterType="String">
+        delete from sys_guangao where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkName" parameterType="String" resultType="int">
+		select count(1) from sys_guangao where name = #{name}
+	</select>
+
+</mapper>
