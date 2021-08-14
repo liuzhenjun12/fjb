@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.FjbUserinfoMapper">
+
+    <resultMap type="FjbUserinfo" id="FjbUserinfoResult">
+        <result property="id"    column="id"    />
+        <result property="username"    column="username"    />
+        <result property="password"    column="password"    />
+        <result property="pwdupdatedate"    column="pwdupdatedate"    />
+        <result property="provinceid"    column="provinceid"    />
+        <result property="cityid"    column="cityid"    />
+        <result property="townid"    column="townid"    />
+        <result property="banktypeid"    column="banktypeid"    />
+        <result property="bankname"    column="bankname"    />
+        <result property="isidentify"    column="isidentify"    />
+        <result property="roleid"    column="roleid"    />
+        <result property="sealCoding"    column="seal_coding"    />
+        <result property="mark"    column="mark"    />
+        <result property="branchname"    column="branchname"    />
+        <result property="branchaddress"    column="branchaddress"    />
+        <result property="branchtype"    column="branchtype"    />
+        <result property="branchcode"    column="branchcode"    />
+        <result property="branchfirm"    column="branchfirm"    />
+        <result property="branchlongitude"    column="branchlongitude"    />
+        <result property="branchlatitude"    column="branchlatitude"    />
+        <result property="contactNumber"    column="contact_number"    />
+        <result property="isdelete"    column="isdelete"    />
+    </resultMap>
+
+    <sql id="selectFjbUserinfoVo">
+        select id, username, password, pwdupdatedate, provinceid, cityid, townid, banktypeid, bankname, isidentify, roleid, seal_coding, mark, branchname, branchaddress, branchtype, branchcode, branchfirm, branchlongitude, branchlatitude, contact_number, isdelete from fjb_userinfo
+    </sql>
+
+    <select id="selectFjbUserinfoList" parameterType="FjbUserinfo" resultMap="FjbUserinfoResult">
+    <include refid="selectFjbUserinfoVo"/>
+    <where>
+        <if test="username != null  and username != ''"> and username like concat('%', #{username}, '%')</if>
+        <if test="password != null  and password != ''"> and password = #{password}</if>
+        <if test="pwdupdatedate != null  and pwdupdatedate != ''"> and pwdupdatedate = #{pwdupdatedate}</if>
+        <if test="provinceid != null "> and provinceid = #{provinceid}</if>
+        <if test="cityid != null "> and cityid = #{cityid}</if>
+        <if test="townid != null "> and townid = #{townid}</if>
+        <if test="banktypeid != null "> and banktypeid = #{banktypeid}</if>
+        <if test="bankname != null  and bankname != ''"> and bankname like concat('%', #{bankname}, '%')</if>
+        <if test="isidentify != null "> and isidentify = #{isidentify}</if>
+        <if test="roleid != null "> and roleid = #{roleid}</if>
+        <if test="sealCoding != null  and sealCoding != ''"> and seal_coding = #{sealCoding}</if>
+        <if test="mark != null  and mark != ''"> and mark = #{mark}</if>
+        <if test="branchname != null  and branchname != ''"> and branchname like concat('%', #{branchname}, '%')</if>
+        <if test="branchaddress != null  and branchaddress != ''"> and branchaddress = #{branchaddress}</if>
+        <if test="branchtype != null  and branchtype != ''"> and branchtype = #{branchtype}</if>
+        <if test="branchcode != null  and branchcode != ''"> and branchcode = #{branchcode}</if>
+        <if test="branchfirm != null  and branchfirm != ''"> and branchfirm = #{branchfirm}</if>
+        <if test="branchlongitude != null  and branchlongitude != ''"> and branchlongitude = #{branchlongitude}</if>
+        <if test="branchlatitude != null  and branchlatitude != ''"> and branchlatitude = #{branchlatitude}</if>
+        <if test="contactNumber != null  and contactNumber != ''"> and contact_number = #{contactNumber}</if>
+        <if test="isdelete != null "> and isdelete = #{isdelete}</if>
+    </where>
+</select>
+
+    <select id="selectFjbUserinfoListGroup" parameterType="FjbUserinfo" resultMap="FjbUserinfoResult">
+        <include refid="selectFjbUserinfoVo"/>
+        <where>
+            <if test="cityid != null "> and cityid = #{cityid}</if>
+            <if test="townid != null "> and townid = #{townid}</if>
+            <if test="banktypeid != null "> and banktypeid = #{banktypeid}</if>
+            <if test="bankname != null  and bankname != ''"> and bankname like concat('%', #{bankname}, '%')</if>
+            <if test="roleid != null "> and roleid = #{roleid}</if>
+            <if test="sealCoding != null  and sealCoding != ''"> and seal_coding = #{sealCoding}</if>
+            <if test="isdelete != null "> and isdelete = #{isdelete}</if>
+        </where>
+        group by cityid
+    </select>
+
+    <select id="selectFjbUserinfoById" parameterType="Integer" resultMap="FjbUserinfoResult">
+        <include refid="selectFjbUserinfoVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertFjbUserinfo" parameterType="FjbUserinfo" useGeneratedKeys="true" keyProperty="id">
+        insert into fjb_userinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="pwdupdatedate != null">pwdupdatedate,</if>
+            <if test="provinceid != null">provinceid,</if>
+            <if test="cityid != null">cityid,</if>
+            <if test="townid != null">townid,</if>
+            <if test="banktypeid != null">banktypeid,</if>
+            <if test="bankname != null">bankname,</if>
+            <if test="isidentify != null">isidentify,</if>
+            <if test="roleid != null">roleid,</if>
+            <if test="sealCoding != null">seal_coding,</if>
+            <if test="mark != null">mark,</if>
+            <if test="branchname != null">branchname,</if>
+            <if test="branchaddress != null">branchaddress,</if>
+            <if test="branchtype != null">branchtype,</if>
+            <if test="branchcode != null">branchcode,</if>
+            <if test="branchfirm != null">branchfirm,</if>
+            <if test="branchlongitude != null">branchlongitude,</if>
+            <if test="branchlatitude != null">branchlatitude,</if>
+            <if test="contactNumber != null">contact_number,</if>
+            <if test="isdelete != null">isdelete,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="username != null">#{username},</if>
+            <if test="password != null">#{password},</if>
+            <if test="pwdupdatedate != null">#{pwdupdatedate},</if>
+            <if test="provinceid != null">#{provinceid},</if>
+            <if test="cityid != null">#{cityid},</if>
+            <if test="townid != null">#{townid},</if>
+            <if test="banktypeid != null">#{banktypeid},</if>
+            <if test="bankname != null">#{bankname},</if>
+            <if test="isidentify != null">#{isidentify},</if>
+            <if test="roleid != null">#{roleid},</if>
+            <if test="sealCoding != null">#{sealCoding},</if>
+            <if test="mark != null">#{mark},</if>
+            <if test="branchname != null">#{branchname},</if>
+            <if test="branchaddress != null">#{branchaddress},</if>
+            <if test="branchtype != null">#{branchtype},</if>
+            <if test="branchcode != null">#{branchcode},</if>
+            <if test="branchfirm != null">#{branchfirm},</if>
+            <if test="branchlongitude != null">#{branchlongitude},</if>
+            <if test="branchlatitude != null">#{branchlatitude},</if>
+            <if test="contactNumber != null">#{contactNumber},</if>
+            <if test="isdelete != null">#{isdelete},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFjbUserinfo" parameterType="FjbUserinfo">
+        update fjb_userinfo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="pwdupdatedate != null">pwdupdatedate = #{pwdupdatedate},</if>
+            <if test="provinceid != null">provinceid = #{provinceid},</if>
+            <if test="cityid != null">cityid = #{cityid},</if>
+            <if test="townid != null">townid = #{townid},</if>
+            <if test="banktypeid != null">banktypeid = #{banktypeid},</if>
+            <if test="bankname != null">bankname = #{bankname},</if>
+            <if test="isidentify != null">isidentify = #{isidentify},</if>
+            <if test="roleid != null">roleid = #{roleid},</if>
+            <if test="sealCoding != null">seal_coding = #{sealCoding},</if>
+            <if test="mark != null">mark = #{mark},</if>
+            <if test="branchname != null">branchname = #{branchname},</if>
+            <if test="branchaddress != null">branchaddress = #{branchaddress},</if>
+            <if test="branchtype != null">branchtype = #{branchtype},</if>
+            <if test="branchcode != null">branchcode = #{branchcode},</if>
+            <if test="branchfirm != null">branchfirm = #{branchfirm},</if>
+            <if test="branchlongitude != null">branchlongitude = #{branchlongitude},</if>
+            <if test="branchlatitude != null">branchlatitude = #{branchlatitude},</if>
+            <if test="contactNumber != null">contact_number = #{contactNumber},</if>
+            <if test="isdelete != null">isdelete = #{isdelete},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteFjbUserinfoById" parameterType="Integer">
+        delete from fjb_userinfo where id = #{id}
+    </delete>
+
+    <delete id="deleteFjbUserinfoByIds" parameterType="String">
+        delete from fjb_userinfo where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

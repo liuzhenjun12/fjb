@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.FjbBanktypeMapper">
+
+    <resultMap type="FjbBanktype" id="FjbBanktypeResult">
+        <result property="banktypeId"    column="banktype_id"    />
+        <result property="banktypeName"    column="banktype_name"    />
+        <result property="banktypeDiscription"    column="banktype_discription"    />
+        <result property="isdelete"    column="isdelete"    />
+    </resultMap>
+
+    <sql id="selectFjbBanktypeVo">
+        select banktype_id, banktype_name, banktype_discription, isdelete from fjb_banktype
+    </sql>
+
+    <select id="selectFjbBanktypeList" parameterType="FjbBanktype" resultMap="FjbBanktypeResult">
+        <include refid="selectFjbBanktypeVo"/>
+        <where>
+            <if test="banktypeName != null  and banktypeName != ''"> and banktype_name like concat('%', #{banktypeName}, '%')</if>
+            <if test="banktypeDiscription != null  and banktypeDiscription != ''"> and banktype_discription = #{banktypeDiscription}</if>
+            <if test="isdelete != null "> and isdelete = #{isdelete}</if>
+        </where>
+    </select>
+
+    <select id="selectFjbBanktypeById" parameterType="Integer" resultMap="FjbBanktypeResult">
+        <include refid="selectFjbBanktypeVo"/>
+        where banktype_id = #{banktypeId}
+    </select>
+
+    <select id="selectFjbBanktypeByName" parameterType="String" resultMap="FjbBanktypeResult">
+        <include refid="selectFjbBanktypeVo"/>
+        where banktype_name = #{banktypeName}
+    </select>
+
+    <insert id="insertFjbBanktype" parameterType="FjbBanktype" useGeneratedKeys="true" keyProperty="banktypeId">
+        insert into fjb_banktype
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="banktypeName != null">banktype_name,</if>
+            <if test="banktypeDiscription != null">banktype_discription,</if>
+            <if test="isdelete != null">isdelete,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="banktypeName != null">#{banktypeName},</if>
+            <if test="banktypeDiscription != null">#{banktypeDiscription},</if>
+            <if test="isdelete != null">#{isdelete},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFjbBanktype" parameterType="FjbBanktype">
+        update fjb_banktype
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="banktypeName != null">banktype_name = #{banktypeName},</if>
+            <if test="banktypeDiscription != null">banktype_discription = #{banktypeDiscription},</if>
+            <if test="isdelete != null">isdelete = #{isdelete},</if>
+        </trim>
+        where banktype_id = #{banktypeId}
+    </update>
+
+    <delete id="deleteFjbBanktypeById" parameterType="Integer">
+        delete from fjb_banktype where banktype_id = #{banktypeId}
+    </delete>
+
+    <delete id="deleteFjbBanktypeByIds" parameterType="String">
+        delete from fjb_banktype where banktype_id in
+        <foreach item="banktypeId" collection="array" open="(" separator="," close=")">
+            #{banktypeId}
+        </foreach>
+    </delete>
+
+</mapper>
