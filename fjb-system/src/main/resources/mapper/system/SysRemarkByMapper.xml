@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.SysRemarkByMapper">
+
+    <resultMap type="SysRemarkBy" id="SysRemarkByResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="ptType"    column="pt_type"    />
+        <result property="ptName"    column="pt_name"    />
+        <result property="contentNum"    column="content_num"    />
+        <result property="dianzanNum"    column="dianzan_num"    />
+        <result property="guanzuNum"    column="guanzu_num"    />
+        <result property="fensiNum"    column="fensi_num"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectSysRemarkByVo">
+        select id, user_id, user_name, pt_type, pt_name, content_num, dianzan_num, guanzu_num, fensi_num, create_time, update_time, create_by, update_by, remark, del_flag from sys_remark_by
+    </sql>
+
+    <select id="selectSysRemarkByList" parameterType="SysRemarkBy" resultMap="SysRemarkByResult">
+        <include refid="selectSysRemarkByVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+            <if test="ptType != null  and ptType != ''"> and pt_type = #{ptType}</if>
+            <if test="ptName != null  and ptName != ''"> and pt_name like concat('%', #{ptName}, '%')</if>
+            <if test="contentNum != null "> and content_num = #{contentNum}</if>
+            <if test="dianzanNum != null "> and dianzan_num = #{dianzanNum}</if>
+            <if test="guanzuNum != null "> and guanzu_num = #{guanzuNum}</if>
+            <if test="fensiNum != null "> and fensi_num = #{fensiNum}</if>
+        </where>
+    </select>
+
+    <select id="selectSysRemarkByById" parameterType="Long" resultMap="SysRemarkByResult">
+        <include refid="selectSysRemarkByVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysRemarkBy" parameterType="SysRemarkBy" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_remark_by
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="ptType != null">pt_type,</if>
+            <if test="ptName != null">pt_name,</if>
+            <if test="contentNum != null">content_num,</if>
+            <if test="dianzanNum != null">dianzan_num,</if>
+            <if test="guanzuNum != null">guanzu_num,</if>
+            <if test="fensiNum != null">fensi_num,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="ptType != null">#{ptType},</if>
+            <if test="ptName != null">#{ptName},</if>
+            <if test="contentNum != null">#{contentNum},</if>
+            <if test="dianzanNum != null">#{dianzanNum},</if>
+            <if test="guanzuNum != null">#{guanzuNum},</if>
+            <if test="fensiNum != null">#{fensiNum},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysRemarkBy" parameterType="SysRemarkBy">
+        update sys_remark_by
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="ptType != null">pt_type = #{ptType},</if>
+            <if test="ptName != null">pt_name = #{ptName},</if>
+            <if test="contentNum != null">content_num = #{contentNum},</if>
+            <if test="dianzanNum != null">dianzan_num = #{dianzanNum},</if>
+            <if test="guanzuNum != null">guanzu_num = #{guanzuNum},</if>
+            <if test="fensiNum != null">fensi_num = #{fensiNum},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysRemarkByById" parameterType="Long">
+        delete from sys_remark_by where id = #{id}
+    </delete>
+
+    <delete id="deleteSysRemarkByByIds" parameterType="String">
+        delete from sys_remark_by where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkPemarkUnique"  resultType="int">
+		select count(1) from sys_remark_by where user_id = #{userId} and pt_type=#{ptType} limit 1
+	</select>
+
+    <select id="checkPtNameUnique" parameterType="String" resultMap="SysRemarkByResult">
+		select id, pt_name from sys_remark_by where pt_name = #{ptName} limit 1
+	</select>
+
+    <select id="selectByUserid"  resultMap="SysRemarkByResult">
+		select id, content_num from sys_remark_by where user_id = #{userId} and pt_type=#{ptType} limit 1
+	</select>
+
+    <select id="selectByPtname"  resultMap="SysRemarkByResult">
+		select id, user_id, user_name, pt_type, pt_name, content_num, dianzan_num, guanzu_num, fensi_num, create_time, update_time, create_by, update_by, remark, del_flag  from sys_remark_by where pt_name = #{ptName}  limit 1
+	</select>
+
+</mapper>
