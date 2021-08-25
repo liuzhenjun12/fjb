@@ -36,6 +36,14 @@ public interface SysUserMapper
     public SysUser selectUserByUserName(String userName);
 
     /**
+     * 通过用户名、密码查询用户
+     *
+     * @param userName 用户名
+     * @return 用户对象信息
+     */
+    public SysUser selectUserByUserNameAndPwd(@Param("userName")String userName,@Param("password") String password);
+
+    /**
      * 通过手机号查询用户
      * @param phonenumber
      * @return
@@ -99,6 +107,14 @@ public interface SysUserMapper
      * @return 结果
      */
     public int deleteUserByIds(Long[] userIds);
+
+    /**
+     * 校验用户名称是否唯一
+     *
+     * @param userName 用户名称
+     * @return 结果
+     */
+    public int checkUserNameUnique(String userName);
 
     /**
      * 校验用户身份证是否唯一

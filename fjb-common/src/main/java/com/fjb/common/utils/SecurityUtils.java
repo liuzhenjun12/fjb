@@ -59,9 +59,9 @@ public class SecurityUtils
      */
     public static String encryptPassword(String password)
     {
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        return passwordEncoder.encode(password);
-        return MD5Util.getInstance().encode(password);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
+//        return MD5Util.getInstance().encode(password);
     }
 
     /**
@@ -73,10 +73,10 @@ public class SecurityUtils
      */
     public static boolean matchesPassword(String rawPassword, String encodedPassword)
     {
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        return passwordEncoder.matches(rawPassword, encodedPassword);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(rawPassword, encodedPassword);
 //        System.out.println(rawPassword+","+encodedPassword);
-        return encodedPassword.equals(MD5Util.getInstance().encode(rawPassword));
+//        return encodedPassword.equals(MD5Util.getInstance().encode(rawPassword));
     }
 
     /**

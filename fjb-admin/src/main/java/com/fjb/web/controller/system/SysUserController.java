@@ -66,6 +66,11 @@ public class SysUserController extends BaseController
         return getDataTable(list);
     }
 
+    /**
+     * 导出用户
+     * @param user
+     * @return
+     */
     @Log(title = "用户管理", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:user:export')")
     @GetMapping("/export")
@@ -76,6 +81,14 @@ public class SysUserController extends BaseController
         return util.exportExcel(list, "用户数据");
     }
 
+    /**
+     * 导入用户
+     * @param file
+     * @param updateSupport
+     * @param deptId
+     * @return
+     * @throws Exception
+     */
     @Log(title = "用户管理", businessType = BusinessType.IMPORT)
     @PreAuthorize("@ss.hasPermi('system:user:import')")
     @PostMapping("/importData")
@@ -124,17 +137,27 @@ public class SysUserController extends BaseController
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysUser user)
     {
-        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserIdcardUnique(user.getIdcard())))
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user.getUserName())))
         {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，身份证号已存在");
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
         }
-        else if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
-        {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+        if(StringUtils.isNotEmpty(user.getIdcard())){
+            if (UserConstants.NOT_UNIQUE.equals(userService.checkUserIdcardUnique(user.getIdcard())))
+            {
+                return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，身份证号已存在");
+            }
         }
-        else if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
-        {
-            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        if(StringUtils.isNotEmpty(user.getPhonenumber())){
+            if (UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
+            {
+                return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+            }
+        }
+        if(StringUtils.isNotEmpty(user.getEmail())){
+            if (UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
+            {
+                return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+            }
         }
         user.setCreateBy(SecurityUtils.getUsername());
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));

@@ -1,33 +1,14 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="系统模块" prop="title">
-        <el-input
-          v-model="queryParams.title"
-          placeholder="请输入系统模块"
-          clearable
-          style="width: 240px;"
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="操作人员" prop="operName">
-        <el-input
-          v-model="queryParams.operName"
-          placeholder="请输入操作人员"
-          clearable
-          style="width: 240px;"
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="类型" prop="businessType">
+    <div class="form_kuand" >
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px"  class="form_input">
+      <el-form-item label="操作类型" prop="businessType">
         <el-select
           v-model="queryParams.businessType"
           placeholder="操作类型"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 150px"
         >
           <el-option
             v-for="dict in typeOptions"
@@ -37,13 +18,13 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
+      <el-form-item label="操作状态" prop="status">
         <el-select
           v-model="queryParams.status"
           placeholder="操作状态"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 150px"
         >
           <el-option
             v-for="dict in statusOptions"
@@ -70,8 +51,9 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -216,8 +198,6 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        title: undefined,
-        operName: undefined,
         businessType: undefined,
         status: undefined
       }

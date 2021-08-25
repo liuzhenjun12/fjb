@@ -23,12 +23,14 @@
             node-key="id"
             highlight-current
             ref="tree"
+            :default-expanded-keys="[1]"
             @node-click="handleNodeClick"
           />
         </div>
       </el-col>
       <!--用户数据-->
       <el-col :span="19" :xs="24">
+        <div class="form_kuand" >
         <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" class="form_input">
           <el-form-item label="用户账号" prop="userName">
             <el-input
@@ -61,8 +63,9 @@
             <el-button type="danger" icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
           </el-form-item>
         </el-form>
-        <div style="box-shadow: -8px 0px 10px #034c6a inset, 8px 0px 10px #034c6a inset;background-color: #072951;padding: 0px 0px 0px 10px;">
-        <el-row :gutter="10" class="mb8">
+        </div>
+        <div class="sanguang">
+        <el-row :gutter="10" class="gao">
           <el-col :span="1.5">
             <el-button
               type="primary"
@@ -117,17 +120,6 @@
         <el-table v-loading="loading" :data="userList"  @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="用户账号" align="center" prop="userName"  />
-          <el-table-column label="省" align="center" prop="dept.sheng"  />
-          <el-table-column prop="dept.shi" label="市" align="center" :show-overflow-tooltip="true" >
-            <template slot-scope="{row}">
-              {{ row.dept.shi || '--' }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="dept.xian" label="县(区)" align="center" :show-overflow-tooltip="true" >
-            <template slot-scope="{row}">
-              {{ row.dept.xian || '--' }}
-            </template>
-          </el-table-column>
           <el-table-column label="机构" align="center" prop="dept.jianCheng" :show-overflow-tooltip="true" />
           <el-table-column label="角色" align="center" prop="roles[0].roleName" :show-overflow-tooltip="true" />
           <el-table-column label="状态" align="center">
@@ -188,13 +180,36 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
+            <el-form-item  label="用户账号" prop="userName">
+              <el-input v-model="form.userName" placeholder="请输入用户账号" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
             <el-form-item label="用户昵称" prop="nickName">
               <el-input v-model="form.nickName" placeholder="请输入用户昵称" />
             </el-form-item>
           </el-col>
+        </el-row>
+        <el-row>
           <el-col :span="12">
             <el-form-item label="归属机构" prop="deptId">
-              <treeselect v-model="form.deptId" :options="deptOptions" :show-count="true" placeholder="请选择归属机构" />
+            <el-cascader
+              v-model="form.deptId"
+              placeholder="请选择机构名称"
+              :options="deptidOptions"
+              :props="{ checkStrictly: true }"
+              size="small"
+              :show-all-levels="false"
+              @change="handleZong_1"
+              ref="cascUser"
+              clearable
+            >
+            </el-cascader>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item  label="身份证号" prop="idcard">
+              <el-input v-model="form.idcard" placeholder="请输入身份证号"  maxlength="20" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -207,18 +222,6 @@
           <el-col :span="12">
             <el-form-item label="邮箱地址" prop="email">
               <el-input v-model="form.email" placeholder="请输入邮箱" maxlength="50" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item  label="用户名称" prop="userName">
-              <el-input v-model="form.userName" placeholder="请输入用户名称" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item  label="身份证号" prop="idcard">
-              <el-input v-model="form.idcard" placeholder="请输入身份证号"  maxlength="20" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -313,6 +316,7 @@
             v-model="upload.deptId"
             placeholder="请选择机构名称"
             :options="deptidOptions"
+            :props="{ checkStrictly: true }"
             size="small"
             :show-all-levels="false"
             @change="handleZong"
@@ -339,12 +343,9 @@
 import { listUser, getUser, delUser, addUser, updateUser, exportUser, resetUserPwd, changeUserStatus, importTemplate } from "@/api/system/user";
 import { getToken } from "@/utils/auth";
 import { treeselect,Cascadeselect } from "@/api/system/dept";
-import Treeselect from "@riophae/vue-treeselect";
-import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "User",
-  components: { Treeselect },
   data() {
     return {
       // 遮罩层
@@ -467,8 +468,6 @@ export default {
     }
   },
   created() {
-    this.queryParams.deptId=110;
-    // this.getList();
     this.getTreeselect();
     this.getCascadeselect();
     this.getDicts("sys_normal_disable").then(response => {
@@ -489,12 +488,20 @@ export default {
         }
       );
     },
-    /** 上传时选择机构 */
+    /** 导入上传时选择机构 */
     handleZong(value){
       if(value){
-        this.upload.deptId =value[3];
+        this.upload.deptId =value[value.length-1];
       }else {
         this.upload.deptId = null;
+      }
+    },
+    /** 新增、修改时选择机构 */
+    handleZong_1(value){
+      if(value){
+        this.form.deptId =value[value.length-1];
+      }else {
+        this.form.deptId = null;
       }
     },
     /** 查询部门下拉树结构 */
@@ -592,6 +599,7 @@ export default {
       const userId = row.userId || this.ids;
       getUser(userId).then(response => {
         this.form = response.data;
+        this.form.deptId =response.data.deptId.toString();
         this.postOptions = response.posts;
         this.roleOptions = response.roles;
         this.form.postIds = response.postIds;
@@ -602,17 +610,21 @@ export default {
     },
     /** 重置密码按钮操作 */
     handleResetPwd(row) {
-      this.$prompt('请输入"' + row.userName + '"的新密码', "提示", {
+      this.$prompt('请输入"' + row.userName + '"的新密码，6~18位的字符', "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       }).then(({ value }) => {
+        if(value.length<6||value.length>18){
+          this.msgError("修改失败：请输入6~18位的字符");
+        }else {
           resetUserPwd(row.userId, value).then(response => {
             if (response.code === 200) {
               this.msgSuccess("修改成功，新密码是：" + value);
-            }else {
+            } else {
               this.msgError("修改失败：" + response.msg);
             }
           });
+        }
         }).catch(() => {});
     },
     /** 提交按钮 */
@@ -630,15 +642,15 @@ export default {
           } else {
             this.getConfigKey("sys.user.initPassword").then(response => {
               this.form.password= response.msg;
-            });
-            addUser(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
-              }else {
-                this.msgError("新增失败：" + response.msg);
-              }
+              addUser(this.form).then(response => {
+                if (response.code === 200) {
+                  this.msgSuccess("新增成功");
+                  this.open = false;
+                  this.getList();
+                }else {
+                  this.msgError("新增失败：" + response.msg);
+                }
+              });
             });
           }
         }

@@ -15,7 +15,7 @@ public class FjbApplication
     {
         // System.setProperty("spring.devtools.restart.enabled", "false");
         SpringApplication.run(FjbApplication.class, args);
-        System.out.println("(♥f‿j)ﾉﾞ  反假系统启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
+        System.out.println("              (♥‿♥)   深圳同心科技有限公司   (♥‿♥)  \n" +
                 "//////////////////////////////////////////////////////////////////// \n" +
                 "//                          _ooOoo_                               // \n" +
                 "//                         o8888888o                              // \n" +

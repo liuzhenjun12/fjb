@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div class="form_kuand" >
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" class="form_input">
       <el-form-item label="参数名称" prop="configName">
         <el-input
@@ -31,25 +32,14 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -201,8 +191,6 @@ export default {
       open: false,
       // 类型数据字典
       typeOptions: [],
-      // 日期范围
-      dateRange: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -237,7 +225,7 @@ export default {
     /** 查询参数列表 */
     getList() {
       this.loading = true;
-      listConfig(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
+      listConfig(this.queryParams).then(response => {
           this.configList = response.rows;
           this.total = response.total;
           this.loading = false;
@@ -272,7 +260,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },

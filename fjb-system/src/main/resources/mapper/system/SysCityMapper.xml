@@ -5,89 +5,71 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.fjb.system.mapper.SysCityMapper">
 
     <resultMap type="SysCity" id="SysCityResult">
-        <result property="id"    column="id"    />
-        <result property="parentId"    column="parent_id"    />
-        <result property="name"    column="name"    />
-        <result property="code"    column="code"    />
-        <result property="orderNum"    column="order_num"    />
-        <result property="cityType"    column="city_type"    />
-        <result property="createBy"       column="create_by"      />
-        <result property="createTime"     column="create_time"    />
-        <result property="updateTime"     column="update_time"    />
-        <result property="updateBy"       column="update_by"      />
+        <result property="cid"    column="cid"    />
+        <result property="cname"    column="cname"    />
+        <result property="proid"    column="proid"    />
+        <result property="zipcode"    column="zipcode"    />
+        <result property="jingDu"    column="jing_du"    />
+        <result property="weiDu"    column="wei_du"    />
     </resultMap>
 
     <sql id="selectSysCityVo">
-        select id,parent_id,name,code,order_num,city_type,create_time from sys_city
+        select cid, cname, proid, zipcode,jing_du,wei_du from sys_city
     </sql>
 
     <select id="selectSysCityList" parameterType="SysCity" resultMap="SysCityResult">
         <include refid="selectSysCityVo"/>
         <where>
-            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
-            <if test="code != null  and code != ''"> and code = #{code}</if>
-            <if test="cityType != null  and cityType != ''"> and city_type = #{cityType}</if>
-            <if test="parentId != null and parentId != 0">
-                AND parent_id = #{parentId}
-            </if>
+            <if test="cname != null  and cname != ''"> and cname like concat('%', #{cname}, '%')</if>
+            <if test="proid != null"> and proid = #{proid}</if>
         </where>
-        order by parent_id, order_num
     </select>
 
-    <select id="selectSysCityById" parameterType="Long" resultMap="SysCityResult">
+    <select id="selectSysCityById" parameterType="Integer" resultMap="SysCityResult">
         <include refid="selectSysCityVo"/>
-        where id = #{id}
+        where cid = #{cid}
     </select>
 
-    <select id="selectByCode" parameterType="String" resultMap="SysCityResult">
-        <include refid="selectSysCityVo"/>
-        where code = #{code}
-    </select>
-
-    <insert id="insertSysCity" parameterType="SysCity" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertSysCity" parameterType="SysCity">
         insert into sys_city
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="parentId != null">parent_id,</if>
-            <if test="name != null">name,</if>
-            <if test="code != null">code,</if>
-            <if test="orderNum != null">order_num,</if>
-            <if test="cityType != null">city_type,</if>
-            <if test="createBy != null and createBy != ''">create_by,</if>
-            create_time
+            <if test="cid != null">cid,</if>
+            <if test="cname != null and cname != ''">cname,</if>
+            <if test="proid != null">proid,</if>
+            <if test="zipcode != null">zipcode,</if>
+            <if test="jingDu != null">jing_du,</if>
+            <if test="weiDu != null">wei_du,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="parentId != null">#{parentId},</if>
-            <if test="name != null">#{name},</if>
-            <if test="code != null">#{code},</if>
-            <if test="orderNum != null">#{orderNum},</if>
-            <if test="cityType != null">#{cityType},</if>
-            <if test="createBy != null and createBy != ''">#{createBy},</if>
-            sysdate()
+            <if test="cid != null">#{cid},</if>
+            <if test="cname != null and cname != ''">#{cname},</if>
+            <if test="proid != null ">#{proid},</if>
+            <if test="zipcode != null">#{zipcode},</if>
+            <if test="jingDu != null">#{jingDu},</if>
+            <if test="weiDu != null">#{weiDu},</if>
          </trim>
     </insert>
 
     <update id="updateSysCity" parameterType="SysCity">
         update sys_city
         <trim prefix="SET" suffixOverrides=",">
-            <if test="parentId != null">parent_id = #{parentId},</if>
-            <if test="name != null">name = #{name},</if>
-            <if test="code != null">code = #{code},</if>
-            <if test="orderNum != null">order_num = #{orderNum},</if>
-            <if test="cityType != null">city_type = #{cityType},</if>
-            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
-            update_time = sysdate()
+            <if test="cname != null and cname != ''">cname = #{cname},</if>
+            <if test="proid != null ">proid = #{proid},</if>
+            <if test="zipcode != null">zipcode = #{zipcode},</if>
+            <if test="jingDu != null">jing_du = #{jingDu},</if>
+            <if test="weiDu != null">wei_du = #{weiDu},</if>
         </trim>
-        where id = #{id}
+        where cid = #{cid}
     </update>
 
-    <delete id="deleteSysCityById" parameterType="Long">
-        delete from sys_city where id = #{id}
+    <delete id="deleteSysCityById" parameterType="Integer">
+        delete from sys_city where cid = #{cid}
     </delete>
 
     <delete id="deleteSysCityByIds" parameterType="String">
-        delete from sys_city where id in
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
+        delete from sys_city where cid in
+        <foreach item="cid" collection="array" open="(" separator="," close=")">
+            #{cid}
         </foreach>
     </delete>
 

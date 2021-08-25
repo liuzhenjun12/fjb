@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.SysGpsMapper">
+    
+    <resultMap type="SysGps" id="SysGpsResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="gps"    column="gps"    />
+    </resultMap>
+
+    <sql id="selectSysGpsVo">
+        select id, name, gps from sys_gps
+    </sql>
+
+    <select id="selectSysGpsList" parameterType="SysGps" resultMap="SysGpsResult">
+        <include refid="selectSysGpsVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="gps != null  and gps != ''"> and gps = #{gps}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysGpsById" parameterType="Long" resultMap="SysGpsResult">
+        <include refid="selectSysGpsVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysGps" parameterType="SysGps" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_gps
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="gps != null">gps,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="gps != null">#{gps},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysGps" parameterType="SysGps">
+        update sys_gps
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="gps != null">gps = #{gps},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysGpsById" parameterType="Long">
+        delete from sys_gps where id = #{id}
+    </delete>
+
+    <delete id="deleteSysGpsByIds" parameterType="String">
+        delete from sys_gps where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

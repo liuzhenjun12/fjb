@@ -1,12 +1,13 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <div class="form_kuand" >
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" class="form_input">
       <el-form-item label="登录地址" prop="ipaddr">
         <el-input
           v-model="queryParams.ipaddr"
           placeholder="请输入登录地址"
           clearable
-          style="width: 240px;"
+          style="width: 150px;"
           size="small"
           @keyup.enter.native="handleQuery"
         />
@@ -16,18 +17,18 @@
           v-model="queryParams.userName"
           placeholder="请输入用户名称"
           clearable
-          style="width: 240px;"
+          style="width: 150px;"
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
+      <el-form-item label="登录状态" prop="status">
         <el-select
           v-model="queryParams.status"
           placeholder="登录状态"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 150px"
         >
           <el-option
             v-for="dict in statusOptions"
@@ -54,8 +55,9 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="danger"

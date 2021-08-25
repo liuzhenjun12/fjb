@@ -9,7 +9,8 @@ const user = {
     roles: [],
     permissions: [],
     roleName:'',
-    deptName:''
+    deptName:'',
+    contactNumber:'',
   },
 
   mutations: {
@@ -34,6 +35,15 @@ const user = {
     SET_DEPTNAME: (state, deptName) => {
       state.deptName = deptName
     },
+    SET_PHONE: (state, contactNumber) => {
+      state.contactNumber = contactNumber
+    },
+    SET_USERID: (state, userId) => {
+      state.userId = userId
+    },
+    SET_DEPTID: (state, deptId) => {
+      state.deptId = deptId
+    }
   },
 
   actions: {
@@ -69,6 +79,9 @@ const user = {
           commit('SET_AVATAR', avatar)
           commit('SET_ROLENAME',user.roles[0].roleName)
           commit('SET_DEPTNAME',user.dept.jianCheng)
+          commit('SET_PHONE',user.phonenumber)
+          commit('SET_USERID',user.userId)
+          commit('SET_DEPTID',user.deptId)
           resolve(res)
         }).catch(error => {
           reject(error)

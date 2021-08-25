@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div class="form_kuand" >
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" class="form_input">
       <el-form-item label="公告标题" prop="noticeTitle">
         <el-input
@@ -34,8 +35,9 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="primary"

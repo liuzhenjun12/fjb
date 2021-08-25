@@ -76,11 +76,11 @@ export default {
       return route.path === this.$route.path
     },
     activeStyle(tag) {
-      if (!this.isActive(tag)) return {};
-      return {
-        "background-color": this.theme,
-        "border-color": this.theme
-      };
+      // if (!this.isActive(tag)) return {};
+      // return {
+      //   "background-color": this.theme,
+      //   "border-color": this.theme
+      // };
     },
     isAffix(tag) {
       return tag.meta && tag.meta.affix
@@ -148,6 +148,7 @@ export default {
       })
     },
     closeSelectedTag(view) {
+      console.log(view)
       this.$store.dispatch('tagsView/delView', view).then(({ visitedViews }) => {
         if (this.isActive(view)) {
           this.toLastView(visitedViews, view)
@@ -226,7 +227,7 @@ export default {
       padding: 0 8px;
       font-size: 12px;
       margin-right: 5px;
-      margin-top: 4px;
+      margin-top: 6px;
       border-radius: 4px;
       &:first-of-type {
         margin-left: 0px;
@@ -235,9 +236,9 @@ export default {
         margin-right: 15px;
       }
       &.active {
-        background-color: #42b983;
+        /*background-color: #42b983;*/
         color: #fff;
-        border-color: #42b983;
+        /*border-color: #42b983;*/
         &::before {
           content: '';
           background: #fff;

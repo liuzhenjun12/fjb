@@ -56,7 +56,41 @@
 .el-dialog:not(.is-fullscreen){
 	margin-top: 6vh !important;
 }
-
+ .el-dialog {
+   .el-form .el-input--small .el-input__inner {
+     border-color:#DCDFE6;
+     background-color: #FFFFFF;
+     color: #606266;
+   }
+   .el-form-item__label {
+     color: #606266;
+   }
+   .el-dialog__body {
+     padding: 10px 20px 0px 20px;
+     color: #606266;
+     font-size: 14px;
+     word-break: break-all;
+   }
+ }
+ .texkuang .el-textarea__inner{
+   border-color: #4b8df8 !important;
+   background-color: #cccccc4f;
+   color: aqua;
+   width: 85%;
+ }
+ .zaopian  .el-upload--picture-card{
+   border-color: #4b8df8 !important;
+   background-color: #cccccc4f;
+   width: 80px;
+   height: 80px;
+   line-height: 86px;
+   margin-top: 8px;
+ }
+ .zaopian .el-upload-list--picture-card .el-upload-list__item{
+   width: 80px;
+   height: 80px;
+   margin-top: 8px;
+ }
 //.el-table {
 //  background-color:#030829;
 //  color: white;
@@ -107,10 +141,11 @@
 //   margin-bottom: 5px;
 // }
  .el-form-item__label{
-   color: #26c6f0;;
+   color: honeydew;
+   font-weight: 100;
  }
  .form_input{
-   margin-top: 15px;margin-left: 10px;
+   margin-top: 22px;margin-left: 10px;
  }
 .biankuang{
   border: 2px solid #032d60;
@@ -131,60 +166,80 @@
    background-color: #030829;
    //background-color: transparent;
  }
- .topL {
-   width: 20px;
-   height: 20px;
-   border-top-width: 2px;
-   border-top-color: #26c6f0;
-   border-top-style: solid;
-   border-left-width: 2px;
-   border-left-color: #26c6f0;
-   border-left-style: solid;
-   position: absolute;
-   top: -2px;
-   left: -2px;
- }
- .topR {
-   width: 20px;
-   height: 20px;
-   border-top-width: 2px;
-   border-top-color: #26c6f0;
-   border-top-style: solid;
-   border-right-width: 2px;
-   border-right-color: #26c6f0;
-   border-right-style: solid;
-   position: absolute;
-   top: -2px;
-   right: -2px;
- }
- .bottomL {
-   width: 20px;
-   height: 20px;
-   border-bottom-width: 2px;
-   border-bottom-color: #26c6f0;
-   border-bottom-style: solid;
-   border-left-width: 2px;
-   border-left-color: #26c6f0;
-   border-left-style: solid;
-   position: absolute;
-   bottom: -2px;
-   left: -2px;
- }
- .bottomR {
-   width: 20px;
-   height: 20px;
-   border-bottom-width: 2px;
-   border-bottom-color: #26c6f0;
-   border-bottom-style: solid;
-   border-right-width: 2px;
-   border-right-color: #26c6f0;
-   border-right-style: solid;
-   position: absolute;
-   bottom: -2px;
-   right: -2px;
- }
 
-
+ .kuand{
+   width: 94%;
+   margin-left: 3%;
+   box-sizing: border-box;
+   position: relative;
+   box-shadow: inset 0 0 30px #07417a;
+   .l_t_line{
+     width: 5px;
+     height: 24px;
+     left: -3px;
+     top: -3px;
+   }
+   //边框
+   .t_l_line{
+     height: 5px;
+     width: 26px;
+     left: -3px;
+     top: -3px;
+   }
+   .t_line_box {
+     position: absolute;
+     width: 100%;
+     height: 100%;
+   }
+   .t_line_box i{
+     background-color: white;
+     box-shadow: 0px 0px 10px white;
+     position: absolute;
+   }
+   .t_r_line{
+     height: 5px;
+     width: 26px;
+     right: -3px;
+     top: -3px;
+   }
+   .r_t_line{
+     width: 5px;
+     height: 24px;
+     right: -3px;
+     top: -3px;
+   }
+   .l_b_line{
+     width: 5px;
+     height: 24px;
+     left: -3px;
+     bottom: -3px;
+   }
+   .b_l_line{
+     height: 5px;
+     width: 26px;
+     left: -3px;
+     bottom: -3px;
+   }
+   .r_b_line{
+     width: 5px;
+     height: 24px;
+     right: -3px;
+     bottom: -3px;
+   }
+   .b_r_line{
+     height: 5px;
+     width: 26px;
+     right: -3px;
+     bottom: -3px;
+   }
+ }
+ .form_kuand{
+   width: calc(100% - 2px);
+   margin: 2px 0px 3px 2px;
+   position: relative;
+   border: 1px solid #030829;
+   box-shadow: inset 0 0 30px #07417a;
+ }
 /** 表单布局 **/
 .form-header {
     font-size:15px;
@@ -195,8 +250,14 @@
 }
 .sanguang{
   padding: 0px 0px 0px 20px;
-  background-color: #072951;
+  //background-color: #072951;
   box-shadow: -8px 0px 10px #034c6a inset, 8px 0px 10px #034c6a inset;
+}
+.gao{
+  height: 35px;
+  .el-col{
+    margin-top: 4px;
+  }
 }
 /** 表格布局 **/
 .pagination-container {
@@ -367,4 +428,5 @@
 .top-right-btn {
 	position: relative;
 	float: right;
+  margin-top: 3px;
 }

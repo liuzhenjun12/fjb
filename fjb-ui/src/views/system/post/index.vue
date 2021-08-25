@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div class="form_kuand" >
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" class="form_input">
       <el-form-item label="岗位编码" prop="postCode">
         <el-input
@@ -19,7 +20,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="状态" prop="status">
+      <el-form-item label="当前状态" prop="status">
         <el-select v-model="queryParams.status" placeholder="岗位状态" clearable size="small">
           <el-option
             v-for="dict in statusOptions"
@@ -34,8 +35,9 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="primary"

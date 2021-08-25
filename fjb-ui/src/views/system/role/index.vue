@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div class="form_kuand" >
     <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true" class="form_input">
       <el-form-item label="角色名称" prop="roleName">
         <el-input
@@ -7,7 +8,7 @@
           placeholder="请输入角色名称"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 150px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -17,7 +18,7 @@
           placeholder="请输入权限字符"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 150px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -27,7 +28,7 @@
           placeholder="角色状态"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 150px"
         >
           <el-option
             v-for="dict in statusOptions"
@@ -37,26 +38,14 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button type="danger" icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
-
+  </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -278,8 +267,6 @@ export default {
       menuNodeAll: false,
       deptExpand: true,
       deptNodeAll: false,
-      // 日期范围
-      dateRange: [],
       // 状态数据字典
       statusOptions: [],
       // 数据范围选项
@@ -347,7 +334,7 @@ export default {
     /** 查询角色列表 */
     getList() {
       this.loading = true;
-      listRole(this.addDateRange(this.queryParams, this.dateRange)).then(
+      listRole(this.queryParams).then(
         response => {
           this.roleList = response.rows;
           this.total = response.total;
@@ -454,7 +441,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },

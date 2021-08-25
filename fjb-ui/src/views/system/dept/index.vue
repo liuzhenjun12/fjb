@@ -1,41 +1,7 @@
 <template>
   <div class="app-container">
-<!--    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" class="form_input">-->
-<!--      <el-form-item label="机构名称" prop="deptName">-->
-<!--        <el-input-->
-<!--          v-model="queryParams.deptName"-->
-<!--          placeholder="请输入机构名称"-->
-<!--          clearable-->
-<!--          size="small"-->
-<!--          @keyup.enter.native="handleQuery"-->
-<!--        />-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="机构代码" prop="jigouCode">-->
-<!--        <el-input-->
-<!--          v-model="queryParams.jigouCode"-->
-<!--          placeholder="请输入部门机构代码"-->
-<!--          clearable-->
-<!--          size="small"-->
-<!--          @keyup.enter.native="handleQuery"-->
-<!--        />-->
-<!--      </el-form-item>-->
-<!--      <el-form-item label="状态" prop="status">-->
-<!--        <el-select v-model="queryParams.status" placeholder="部门状态" clearable size="small">-->
-<!--          <el-option-->
-<!--            v-for="dict in statusOptions"-->
-<!--            :key="dict.dictValue"-->
-<!--            :label="dict.dictLabel"-->
-<!--            :value="dict.dictValue"-->
-<!--          />-->
-<!--        </el-select>-->
-<!--      </el-form-item>-->
-<!--      <el-form-item>-->
-<!--        <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>-->
-<!--        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>-->
-<!--      </el-form-item>-->
-<!--    </el-form>-->
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -45,7 +11,7 @@
           v-hasPermi="['system:dept:add']"
         >新增</el-button>
       </el-col>
-<!--      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>-->
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="shuaxin"></right-toolbar>
     </el-row>
     </div>
     <el-table
@@ -54,20 +20,17 @@
       element-loading-spinner="el-icon-loading"
       :data="deptList"
       lazy=""
-      row-key="deptId"
       :load="loadChildren"
-      :expand-row-keys="['100']"
+      row-key="deptId"
+      ref="tableFee"
       :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
     >
-      <el-table-column prop="deptName" label="机构名称" min-width="40%" :show-overflow-tooltip="true"></el-table-column>
-      <el-table-column prop="jigouCode" label="机构代码" align="center" min-width="11%"></el-table-column>
-      <el-table-column prop="deptType" label="机构类型" align="center" :formatter="deptTypeFormat" min-width="8%"></el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" min-width="15%">
-        <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="orderNum" label="排序" align="center" min-width="5%"></el-table-column>
+      <el-table-column prop="deptName" label="机构名称" min-width="30%" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="province.proname" label="省" align="center" min-width="7%" ></el-table-column>
+      <el-table-column prop="city.cname" label="市" align="center" min-width="7%" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="town.tname" label="县(区)" align="center" min-width="10%" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="jianCheng" label="机构简称" align="center" min-width="15%" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="jigouCode" label="机构代码" align="center" min-width="15%" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column label="操作" min-width="15%" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -132,9 +95,54 @@
               <el-input v-model="form.jigouCode" placeholder="请输入机构代码" maxlength="20" />
             </el-form-item>
           </el-col>
+
+
           <el-col :span="12">
-            <el-form-item label="印章代码" prop="yinCode">
-              <el-input v-model="form.yinCode" placeholder="请输入印章代码" maxlength="25" />
+            <el-form-item  label="所属省份" prop="proid">
+              <el-select
+                v-model="form.proid"
+                @change="selectSheng"
+                placeholder="请选择省份"
+              >
+                <el-option
+                  v-for="item in shengOptions"
+                  :key="item.proid"
+                  :label="item.proname"
+                  :value="item.proid"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item  label="所属城市" prop="cid">
+              <el-select
+                v-model="form.cid"
+                @change="selectShi"
+                placeholder="请选择城市"
+              >
+                <el-option
+                  v-for="item in shiOptions"
+                  :key="item.cid"
+                  :label="item.cname"
+                  :value="item.cid"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item  label="所属县区" prop="tid">
+              <el-select
+                v-model="form.tid"
+                @change="selectXian"
+                placeholder="请选择县区"
+              >
+                <el-option
+                  v-for="item in xianOptions"
+                  :key="item.tid"
+                  :label="item.tname"
+                  :value="item.tid"
+                />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -147,58 +155,9 @@
               <el-input v-model="form.weiDu" placeholder="请输入地图纬度" maxlength="10" />
             </el-form-item>
           </el-col>
-
           <el-col :span="12">
-            <el-form-item  label="所属省份" prop="sheng">
-              <el-select
-                v-model="form.sheng"
-                @change="selectSheng"
-                placeholder="请选择省份"
-              >
-                <el-option
-                  v-for="item in shengOptions"
-                  :key="item.name"
-                  :label="item.name"
-                  :value="item.name"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item  label="所属城市" prop="shi">
-              <el-select
-                v-model="form.shi"
-                @change="selectShi"
-                placeholder="请选择城市"
-              >
-                <el-option
-                  v-for="item in shiOptions"
-                  :key="item.name"
-                  :label="item.name"
-                  :value="item.name"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item  label="所属县区" prop="xian">
-              <el-select
-                v-model="form.xian"
-                @change="selectXian"
-                placeholder="请选择县区"
-              >
-                <el-option
-                  v-for="item in xianOptions"
-                  :key="item.name"
-                  :label="item.name"
-                  :value="item.name"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="机构状态">
-              <el-radio-group v-model="form.status">
+            <el-form-item label="鉴定单位">
+              <el-radio-group v-model="form.isJianDing">
                 <el-radio
                   v-for="dict in statusOptions"
                   :key="dict.dictValue"
@@ -207,23 +166,6 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="鉴定单位">
-              <el-radio-group v-model="form.leader">
-                <el-radio
-                  v-for="dict in leaderOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictValue"
-                >{{dict.dictLabel}}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="具体地址"  prop="address">
-              <el-input v-model="form.address" placeholder="请输入机构具体地址" maxlength="50" />
-            </el-form-item>
-          </el-col>
-
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -235,10 +177,9 @@
 </template>
 
 <script>
-import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild,nextDept,listAll } from "@/api/system/dept";
+import { listDept, getDept, delDept, addDept, updateDept, listDeptExcludeChild,nextDept,listAll,listProvince,listCity,listTown } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import { listCity } from "@/api/system/city";
 export default {
   name: "Dept",
   components: { Treeselect },
@@ -252,8 +193,6 @@ export default {
       deptList: [],
       // 部门树选项
       deptOptions: [],
-      //机构类型
-      deptTypeOptions:[],
       //机构省选择
       shengOptions:[],
       //机构市选择
@@ -264,17 +203,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
-      // 状态数据字典
+      // 是否数据字典
       statusOptions: [],
-      //是否是鉴定单位
-      leaderOptions:[],
-      //网点类型
-      wangTypeOptions:[],
-      // 查询参数
-      queryParams: {
-        deptName: undefined,
-        status: undefined
-      },
       // 表单参数
       form: {},
       // 表单校验
@@ -291,7 +221,7 @@ export default {
         jianCheng:[
           { required: true, message: "机构简称不能为空", trigger: "blur" }
         ],
-        sheng:[
+        proid:[
           { required: true, message: "所属省份不能为空", trigger: "blur" }
         ],
         shi:[
@@ -299,6 +229,11 @@ export default {
         ],
         xian:[
           { required: true, message: "所属县区不能为空", trigger: "blur" }
+        ],
+        jigouCode:[
+          { required: true, message: "机构代码不能为空", trigger: "blur" },
+          { min: 8, max: 15, message: '8~15位数字或字母', trigger: 'blur'},
+          {pattern: /^[A-Z0-9]+$/, message: "请输入大写字母+数字的机构代码", trigger: "blur"}
         ],
         phone: [
           {
@@ -313,78 +248,79 @@ export default {
   created() {
     this.getList();
     this.getSheng();
-    this.getDicts("sys_normal_disable").then(response => {
-      this.statusOptions = response.data;
-    });
     this.getDicts("sys_yes_no").then(response => {
-      this.leaderOptions = response.data;
-    });
-    this.getDicts("sys_dept_type").then(response => {
-      this.deptTypeOptions = response.data;
-    });
-    this.getDicts("sys_wang_type").then(response => {
-      this.wangTypeOptions = response.data;
+      this.statusOptions = response.data;
     });
   },
   methods: {
     /** 查询部门列表 */
     getList() {
       this.loading = true;
-      listDept(this.queryParams).then(response => {
+      listDept().then(response => {
         this.deptList = this.handleTree(response.data, "deptId");
         this.loading = false;
       });
     },
+    shuaxin(){
+      this.deptList=[]
+      this.getList();
+    },
     /** 获取省 */
     getSheng(){
-      var obj={cityType:'1'}
-      listCity(obj).then(response => {
+      listProvince().then(response => {
         this.shengOptions = response.data;
       });
     },
     /** 获取市 */
     getShi(val){
-      var obj={cityType:'2',parentId:val}
+      var obj={proid:val}
       listCity(obj).then(response => {
         this.shiOptions = response.data;
       });
     },
     /** 获取县 */
     getXian(val){
-      var obj={cityType:'3',parentId:val}
-      listCity(obj).then(response => {
+      var obj={cid:val}
+      listTown(obj).then(response => {
         this.xianOptions = response.data;
       });
     },
-    /** 机构省选择 */
+    /** 机构省选择后带出市 */
     selectSheng(val){
-      this.form.shi=undefined;
-      this.form.sheng=val;
-      this.shengOptions.forEach((res, index) => {
-        if(val==res.name){
-          var obj={cityType:'2',parentId:res.id}
-          listCity(obj).then(response => {
-            this.shiOptions = response.data;
-          });
-        }
+      this.form.cid=undefined;
+      this.form.tid=undefined;
+      this.form.jinDu=undefined;
+      this.form.weiDu=undefined;
+      this.form.proid=val;
+      this.shiOptions=[];
+      this.xianOptions=[];
+      var obj={proid:val};
+      listCity(obj).then(response => {
+        this.shiOptions = response.data;
       });
     },
-    /** 机构市选择 */
+    /** 机构市选择带出县*/
     selectShi(val){
-      this.form.xian=undefined;
-      this.form.shi=val;
-      this.shiOptions.forEach((res, index) => {
-        if(val==res.name){
-          var obj={cityType:'3',parentId:res.id}
-          listCity(obj).then(response => {
-            this.xianOptions = response.data;
-          });
-        }
+      this.form.tid=undefined;
+      this.form.jinDu=undefined;
+      this.form.weiDu=undefined;
+      this.form.cid=val;
+      this.xianOptions=[];
+      var obj={cid:val};
+      listTown(obj).then(response => {
+        this.xianOptions = response.data;
       });
     },
     /** 机构县选择 */
-    selectXian(){
-      this.form.xian=val;
+    selectXian(val){
+      this.form.tid=val;
+      for(var i=0;i<this.xianOptions.length;i++){
+        if(val==this.xianOptions[i].tid){
+          this.form.jinDu=this.xianOptions[i].jingDu;
+          this.form.weiDu=this.xianOptions[i].weiDu;
+          continue;
+        }
+      }
     },
     /** 查询菜单下拉树结构 */
     getTreeselect() {
@@ -412,10 +348,6 @@ export default {
         children: node.children
       };
     },
-    // 字典状态字典翻译
-    deptTypeFormat(row, column) {
-      return this.selectDictLabel(this.deptTypeOptions, row.deptType);
-    },
     // 取消按钮
     cancel() {
       this.open = false;
@@ -428,20 +360,15 @@ export default {
         parentId: undefined,
         deptName: undefined,
         orderNum: undefined,
-        leader: 'N',
         phone: undefined,
         jianCheng: undefined,
+        jigouCode: undefined,
         weiDu: undefined,
         jinDu:undefined,
-        yinCode:undefined,
-        address:undefined,
-        status: "0",
-        deptType:"3",
-        wangCode:undefined,
-        wangType:'',
-        sheng:undefined,
-        shi:undefined,
-        xian:undefined
+        isJianDing: "N",
+        proid:undefined,
+        cid:undefined,
+        tid:undefined
       };
       this.resetForm("form");
     },
@@ -460,8 +387,18 @@ export default {
       this.getTreeselect();
       if (row != null && row.deptId) {
         this.form.parentId = row.deptId;
+        this.form.cid=row.cid;
+        this.form.proid=row.proid;
+        this.getShi(row.proid);
+        this.getXian(row.cid)
       } else {
         this.form.parentId = 0;
+        this.getConfigKey("sys.province.id").then(response => {
+          if(response.msg!='') {
+            this.form.proid = parseInt(response.msg);
+          }
+          this.getShi(parseInt(response.msg))
+        });
       }
       this.open = true;
       this.title = "添加机构";
@@ -474,6 +411,8 @@ export default {
         this.open = true;
         this.title = "修改机构";
       });
+      this.getShi(row.proid);
+      this.getXian(row.cid)
       listDeptExcludeChild(row.deptId).then(response => {
         if(row.parentId==0){
           this.deptOptions = [];
@@ -484,18 +423,6 @@ export default {
           this.deptOptions = this.handleTree(response.data, "deptId");
         }
       });
-      if(row.shi){
-        var obj={cityType:'1',name:row.sheng}
-        listCity(obj).then(response => {
-          this.getShi(response.data[0].id)
-        });
-      }
-      if(row.xian){
-        var obj={cityType:'2',name:row.shi}
-        listCity(obj).then(response => {
-          this.getXian(response.data[0].id)
-        });
-      }
     },
     /** 提交按钮 */
     submitForm: function() {

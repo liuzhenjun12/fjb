@@ -147,61 +147,13 @@ export function handleTree(data, id, parentId, children, rootId) {
 	return treeData != '' ? treeData : data;
 }
 
-/*获取IE浏览器版本号*/
-export function ieVersion() {
-  var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
-  var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1; //判断是否IE<11浏览器
-  var isEdge = userAgent.indexOf("Edge") > -1 && !isIE; //判断是否IE的Edge浏览器
-  var isIE11 = userAgent.indexOf('Trident') > -1 && userAgent.indexOf("rv:11.0") > -1;
-  if(isIE) {
-    var reIE = new RegExp("MSIE (\\d+\\.\\d+);");
-    reIE.test(userAgent);
-    var fIEVersion = parseFloat(RegExp["$1"]);
-    if(fIEVersion == 7) {
-      return 7;
-    } else if(fIEVersion == 8) {
-      return 8;
-    } else if(fIEVersion == 9) {
-      return 9;
-    } else if(fIEVersion == 10) {
-      return 10;
-    } else {
-      return 6;//IE版本<=7
-    }
-  } else if(isEdge) {
-    return -1;//edge
-  } else if(isIE11) {
-    return 11; //IE11
-  }else{
-    return -2;//不是ie浏览器
-  }
-}
-
-export function getBrowser(){
-  var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
-  var isOpera = userAgent.indexOf("Opera") > -1;
-  if (isOpera) {
-    return "Opera";
-  }
-  //判断是否Opera浏览器
-  if (userAgent.indexOf("Firefox") > -1) {
-    return "FF";
-  } //判断是否Firefox浏览器
-  if (userAgent.indexOf("Chrome") > -1){
-    return "Chrome";
-  }
-}
-
-
-
-/*判断是否是IE浏览器并且版本小于等于7*/
-export function iteIE7() {
-  var version=ieVersion();
-  return version>0&&version<=7;
-}
-
-/*判断是否是IE浏览器并且版本小于等于8*/
-export function iteIE8() {
-  var version=ieVersion();
-  return version>0&&version<=8;
+/**
+ * 默认当前日期
+ * @returns {string}
+ */
+export function timeDefault(){
+  let date = new Date()
+  // 月，日 不够10补0
+  var defalutEndTime = date.getFullYear() + '-' + ((date.getMonth() + 1) >= 10 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() >= 10 ? date.getDate() : '0' + date.getDate())
+  return defalutEndTime
 }

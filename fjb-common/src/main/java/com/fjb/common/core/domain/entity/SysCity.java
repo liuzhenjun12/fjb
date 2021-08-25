@@ -1,112 +1,103 @@
 package com.fjb.common.core.domain.entity;
 
+import com.fjb.common.annotation.Excel;
 import com.fjb.common.core.domain.BaseEntity;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * 城市名称对象 sys_city
+ * 城市对象 sys_city
  *
  * @author liu
- * @date 2021-08-10
+ * @date 2021-08-16
  */
 public class SysCity extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** id */
-    private Long id;
-
-    /** 父节点 */
-    private Long parentId;
+    /** 城市编号 */
+    private Integer cid;
 
     /** 城市名称 */
-    private String name;
+    @Excel(name = "城市名称")
+    private String cname;
 
-    /** 机构代码 */
-    private String code;
+    /** 省份编号 */
+    @Excel(name = "省份编号")
+    private Integer proid;
 
-    /** 显示顺序 */
-    private String orderNum;
+    /** 邮政编码 */
+    @Excel(name = "邮政编码")
+    private String zipcode;
 
-    /** 地区类型1、省，2、市，3、县 */
-    private String cityType;
+    /** 经度*/
+    private String jingDu;
 
-    /** 子菜单 */
-    private List<SysCity> children = new ArrayList<SysCity>();
+    /** 未度*/
+    private String weiDu;
 
-    public void setId(Long id)
+    public void setCid(Integer cid)
     {
-        this.id = id;
+        this.cid = cid;
     }
 
-    public Long getId()
+    public Integer getCid()
     {
-        return id;
+        return cid;
     }
-    public void setName(String name)
+    public void setCname(String cname)
     {
-        this.name = name;
+        this.cname = cname;
     }
 
-    public String getName()
+    public String getCname()
     {
-        return name;
+        return cname;
     }
-    public void setCode(String code)
+    public void setProid(Integer proid)
     {
-        this.code = code;
+        this.proid = proid;
     }
 
-    public String getCode()
+    public Integer getProid()
     {
-        return code;
+        return proid;
+    }
+    public void setZipcode(String zipcode)
+    {
+        this.zipcode = zipcode;
     }
 
-    public String getOrderNum() {
-        return orderNum;
+    public String getZipcode()
+    {
+        return zipcode;
     }
 
-    public void setOrderNum(String orderNum) {
-        this.orderNum = orderNum;
+    public String getJingDu() {
+        return jingDu;
     }
 
-    public List<SysCity> getChildren() {
-        return children;
+    public void setJingDu(String jingDu) {
+        this.jingDu = jingDu;
     }
 
-    public void setChildren(List<SysCity> children) {
-        this.children = children;
+    public String getWeiDu() {
+        return weiDu;
     }
 
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
-    }
-
-    public String getCityType() {
-        return cityType;
-    }
-
-    public void setCityType(String cityType) {
-        this.cityType = cityType;
+    public void setWeiDu(String weiDu) {
+        this.weiDu = weiDu;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("parentId", getParentId())
-            .append("name", getName())
-            .append("code", getCode())
-            .append("orderNum", getOrderNum())
-            .append("cityType", getCityType())
+            .append("cid", getCid())
+            .append("cname", getCname())
+            .append("proid", getProid())
+            .append("zipcode", getZipcode())
+            .append("jingDu", getJingDu())
+            .append("weiDu", getWeiDu())
             .toString();
     }
 }

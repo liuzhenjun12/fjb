@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.SysProvinceMapper">
+    
+    <resultMap type="SysProvince" id="SysProvinceResult">
+        <result property="proid"    column="proid"    />
+        <result property="proname"    column="proname"    />
+        <result property="countryname"    column="countryname"    />
+        <result property="englishname"    column="Englishname"    />
+        <result property="zipcode"    column="zipcode"    />
+    </resultMap>
+
+    <sql id="selectSysProvinceVo">
+        select proid, proname, countryname, Englishname, zipcode from sys_province
+    </sql>
+
+    <select id="selectSysProvinceList" parameterType="SysProvince" resultMap="SysProvinceResult">
+        <include refid="selectSysProvinceVo"/>
+        <where>  
+            <if test="proname != null  and proname != ''"> and proname like concat('%', #{proname}, '%')</if>
+            <if test="countryname != null  and countryname != ''"> and countryname like concat('%', #{countryname}, '%')</if>
+            <if test="englishname != null  and englishname != ''"> and Englishname like concat('%', #{englishname}, '%')</if>
+            <if test="zipcode != null  and zipcode != ''"> and zipcode = #{zipcode}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysProvinceById" parameterType="Integer" resultMap="SysProvinceResult">
+        <include refid="selectSysProvinceVo"/>
+        where proid = #{proid}
+    </select>
+        
+    <insert id="insertSysProvince" parameterType="SysProvince">
+        insert into sys_province
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="proid != null">proid,</if>
+            <if test="proname != null and proname != ''">proname,</if>
+            <if test="countryname != null and countryname != ''">countryname,</if>
+            <if test="englishname != null and englishname != ''">Englishname,</if>
+            <if test="zipcode != null">zipcode,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="proid != null">#{proid},</if>
+            <if test="proname != null and proname != ''">#{proname},</if>
+            <if test="countryname != null and countryname != ''">#{countryname},</if>
+            <if test="englishname != null and englishname != ''">#{englishname},</if>
+            <if test="zipcode != null">#{zipcode},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysProvince" parameterType="SysProvince">
+        update sys_province
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proname != null and proname != ''">proname = #{proname},</if>
+            <if test="countryname != null and countryname != ''">countryname = #{countryname},</if>
+            <if test="englishname != null and englishname != ''">Englishname = #{englishname},</if>
+            <if test="zipcode != null">zipcode = #{zipcode},</if>
+        </trim>
+        where proid = #{proid}
+    </update>
+
+    <delete id="deleteSysProvinceById" parameterType="Integer">
+        delete from sys_province where proid = #{proid}
+    </delete>
+
+    <delete id="deleteSysProvinceByIds" parameterType="String">
+        delete from sys_province where proid in 
+        <foreach item="proid" collection="array" open="(" separator="," close=")">
+            #{proid}
+        </foreach>
+    </delete>
+    
+</mapper>

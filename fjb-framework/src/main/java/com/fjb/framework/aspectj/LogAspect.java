@@ -212,6 +212,6 @@ public class LogAspect
      */
     public boolean isFilterObject(final Object o)
     {
-        return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse;
+        return o instanceof MultipartFile || o instanceof HttpServletRequest || o instanceof HttpServletResponse || o instanceof MultipartFile[];
     }
 }

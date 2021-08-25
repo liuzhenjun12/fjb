@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div class="form_kuand" >
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" class="form_input">
       <el-form-item label="字典名称" prop="dictName">
         <el-input
@@ -7,17 +8,7 @@
           placeholder="请输入字典名称"
           clearable
           size="small"
-          style="width: 240px"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="字典类型" prop="dictType">
-        <el-input
-          v-model="queryParams.dictType"
-          placeholder="请输入字典类型"
-          clearable
-          size="small"
-          style="width: 240px"
+          style="width: 150px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -27,7 +18,7 @@
           placeholder="字典状态"
           clearable
           size="small"
-          style="width: 240px"
+          style="width: 150px"
         >
           <el-option
             v-for="dict in statusOptions"
@@ -37,25 +28,14 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-        ></el-date-picker>
-      </el-form-item>
       <el-form-item>
         <el-button type="cyan" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -209,14 +189,11 @@ export default {
       open: false,
       // 状态数据字典
       statusOptions: [],
-      // 日期范围
-      dateRange: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
         pageSize: 10,
         dictName: undefined,
-        dictType: undefined,
         status: undefined
       },
       // 表单参数
@@ -242,7 +219,7 @@ export default {
     /** 查询字典类型列表 */
     getList() {
       this.loading = true;
-      listType(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
+      listType(this.queryParams).then(response => {
           this.typeList = response.rows;
           this.total = response.total;
           this.loading = false;
@@ -276,7 +253,6 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
-      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },

@@ -100,9 +100,10 @@ public class MD5Util implements PasswordEncoder {
 	}
 
 	public static void main(String[] args) {
-		String S="贵州省贵阳市清镇市金清路与城北新区一号路交汇处棕榈泉熙街商业项目，第23幢第一层（房号：23-1-78、38）";
-		System.out.println(S.length());
-//		System.out.println(new MD5Util().encode("tongxin"));
+//		System.out.println(new MD5Util().encode("123456"));
+		String S="/profile/avatar/2021/08/20/4a21f9cd-7e19-477f-814a-e7e9aa10de19.jpeg";
+		System.out.println(S.substring(S.lastIndexOf("/")+1,S.length()));
+		System.out.println(StringUtils.substringAfter(S,"/profile"));
 	}
 
 }

@@ -195,10 +195,11 @@ export default {
         }
 
         .el-icon-caret-bottom {
+          color: white;
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 20px;
           font-size: 12px;
         }
       }

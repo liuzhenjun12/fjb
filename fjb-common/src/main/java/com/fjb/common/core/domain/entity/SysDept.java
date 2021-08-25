@@ -40,9 +40,6 @@ public class SysDept extends BaseEntity
     /** 联系电话 */
     private String phone;
 
-    /** 邮箱 */
-    private String email;
-
     /** 部门状态:0正常,1停用 */
     private String status;
 
@@ -61,26 +58,23 @@ public class SysDept extends BaseEntity
     private String jinDu;
     /*** 纬度*/
     private String weiDu;
-    /*** 印章代码*/
-    private String yinCode;
-    /*** 机构地址*/
-    private String address;
 
     private Integer sizeId;
-    /*** 机构类型：1，省。2，市。3，县。4,镇。*/
-    private String deptType;
-    /*** 网点代码*/
-    private String wangCode;
-    /*** 网点类型*/
-    private String wangType;
-    /*** 所在省*/
-    private String sheng;
-    /*** 所在市*/
-    private String shi;
-    /*** 所在县*/
-    private String xian;
-    /*** 所在行*/
-    private String hang;
+
+    /*** 所在省id*/
+    private Integer proid;
+    /*** 所在市id*/
+    private Integer cid;
+    /*** 所在县id*/
+    private Integer tid;
+    /*** 省*/
+    private SysProvince province;
+    /*** 市i*/
+    private SysCity city;
+    /*** 县*/
+    private SysTown town;
+    /*** 是鉴定单位：N或Y*/
+    private String isJianDing;
 
     private boolean hasChildren;
 
@@ -161,18 +155,6 @@ public class SysDept extends BaseEntity
         this.phone = phone;
     }
 
-    @Email(message = "邮箱格式不正确")
-    @Size(min = 0, max = 50, message = "邮箱长度不能超过50个字符")
-    public String getEmail()
-    {
-        return email;
-    }
-
-    public void setEmail(String email)
-    {
-        this.email = email;
-    }
-
     public String getStatus()
     {
         return status;
@@ -241,46 +223,6 @@ public class SysDept extends BaseEntity
         this.weiDu = weiDu;
     }
 
-    public String getYinCode() {
-        return yinCode;
-    }
-
-    public void setYinCode(String yinCode) {
-        this.yinCode = yinCode;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getDeptType() {
-        return deptType;
-    }
-
-    public void setDeptType(String deptType) {
-        this.deptType = deptType;
-    }
-
-    public String getWangCode() {
-        return wangCode;
-    }
-
-    public void setWangCode(String wangCode) {
-        this.wangCode = wangCode;
-    }
-
-    public String getWangType() {
-        return wangType;
-    }
-
-    public void setWangType(String wangType) {
-        this.wangType = wangType;
-    }
-
     public boolean isHasChildren() {
         return hasChildren;
     }
@@ -289,36 +231,60 @@ public class SysDept extends BaseEntity
         this.hasChildren = hasChildren;
     }
 
-    public String getShi() {
-        return shi;
+    public Integer getCid() {
+        return cid;
     }
 
-    public void setShi(String shi) {
-        this.shi = shi;
+    public void setCid(Integer cid) {
+        this.cid = cid;
     }
 
-    public String getXian() {
-        return xian;
+    public Integer getTid() {
+        return tid;
     }
 
-    public void setXian(String xian) {
-        this.xian = xian;
+    public void setTid(Integer tid) {
+        this.tid = tid;
     }
 
-    public String getHang() {
-        return hang;
+    public Integer getProid() {
+        return proid;
     }
 
-    public void setHang(String hang) {
-        this.hang = hang;
+    public void setProid(Integer proid) {
+        this.proid = proid;
     }
 
-    public String getSheng() {
-        return sheng;
+    public SysProvince getProvince() {
+        return province;
     }
 
-    public void setSheng(String sheng) {
-        this.sheng = sheng;
+    public void setProvince(SysProvince province) {
+        this.province = province;
+    }
+
+    public SysCity getCity() {
+        return city;
+    }
+
+    public void setCity(SysCity city) {
+        this.city = city;
+    }
+
+    public SysTown getTown() {
+        return town;
+    }
+
+    public void setTown(SysTown town) {
+        this.town = town;
+    }
+
+    public String getIsJianDing() {
+        return isJianDing;
+    }
+
+    public void setIsJianDing(String isJianDing) {
+        this.isJianDing = isJianDing;
     }
 
     @Override
@@ -331,7 +297,6 @@ public class SysDept extends BaseEntity
             .append("orderNum", getOrderNum())
             .append("leader", getLeader())
             .append("phone", getPhone())
-            .append("email", getEmail())
             .append("status", getStatus())
             .append("delFlag", getDelFlag())
             .append("createBy", getCreateBy())
@@ -342,15 +307,7 @@ public class SysDept extends BaseEntity
             .append("jianCheng", getJianCheng())
             .append("jinDu", getJinDu())
             .append("weiDu", getWeiDu())
-            .append("yinCode", getYinCode())
-            .append("address", getAddress())
-            .append("deptType", getDeptType())
-            .append("wangCode", getWangCode())
-            .append("wangType", getWangType())
-            .append("sheng", getSheng())
-            .append("shi", getShi())
-            .append("xian", getXian())
-            .append("hang", getHang())
+            .append("isJianDing", getIsJianDing())
             .toString();
     }
 }

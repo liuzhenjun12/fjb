@@ -85,6 +85,13 @@ public interface SysDeptMapper
     public SysDept checkDeptNameUnique(@Param("deptName") String deptName, @Param("parentId") Long parentId);
 
     /**
+     * 效验机构代码是否唯一
+     * @param jigouCode
+     * @return
+     */
+    public SysDept checkDeptCodeUnique(@Param("jigouCode") String jigouCode);
+
+    /**
      * 新增部门信息
      *
      * @param dept 部门信息

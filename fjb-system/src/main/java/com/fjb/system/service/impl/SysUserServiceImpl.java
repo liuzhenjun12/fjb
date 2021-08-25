@@ -149,6 +149,23 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     /**
+     * 校验用户名称是否唯一
+     *
+     * @param userName 用户名称
+     * @return 结果
+     */
+    @Override
+    public String checkUserNameUnique(String userName) {
+
+        int count = userMapper.checkUserNameUnique(userName);
+        if (count > 0)
+        {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
+    }
+
+    /**
      * 校验用户身份证是否唯一
      *
      * @param idcard 用户身份证
@@ -426,21 +443,24 @@ public class SysUserServiceImpl implements ISysUserService
         {
             try
             {
+                if(StringUtils.isEmpty(user.getUserName())||StringUtils.isEmpty(user.getNickName())){
+                    failureNum++;
+                    failureMsg.append("<br/>" + failureNum + "、 用户名称是空的");
+                    continue;
+                }
                 // 验证是否存在这个用户
-                SysUser u = userMapper.selectUserByUserPhone(user.getPhonenumber());
+                SysUser u = userMapper.selectUserByUserName(user.getUserName());
                 if (StringUtils.isNull(u))
                 {
-                    user.setUserName(user.getPhonenumber());
                     user.setPassword(SecurityUtils.encryptPassword(password));
                     user.setCreateBy(operName);
                     user.setDeptId(deptId);
                     Long[] roleIds=new Long[1];
                     Long[] postIds=new Long[1];
-                    roleIds[0]=4L;
-                    postIds[0]=6L;
+                    roleIds[0]=3L;
+                    postIds[0]=2L;
                     user.setRoleIds(roleIds);
                     user.setPostIds(postIds);
-                    user.setEmail("123@qq.com");
                     this.insertUser(user);
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getUserName() + " 导入成功");
@@ -492,6 +512,11 @@ public class SysUserServiceImpl implements ISysUserService
             }
         }
         return tree;
+    }
+
+    @Override
+    public SysUser selectUserByUserNameAndPwd(String userName, String password) {
+        return userMapper.selectUserByUserNameAndPwd(userName,password);
     }
 }
 

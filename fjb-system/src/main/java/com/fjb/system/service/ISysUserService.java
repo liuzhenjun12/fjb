@@ -59,6 +59,14 @@ public interface ISysUserService
     public String selectUserPostGroup(String userName);
 
     /**
+     * 校验用户名称是否唯一
+     *
+     * @param userName 用户名称
+     * @return 结果
+     */
+    public String checkUserNameUnique(String userName);
+
+    /**
      * 校验用户身份证是否唯一
      *
      * @param userName 用户身份证
@@ -179,4 +187,12 @@ public interface ISysUserService
      * @return 下拉树结构列表
      */
     public List<TreeSelect> buildUserTreeSelect(List<SysUser> users);
+
+    /**
+     * 通过用户名、密码查询用户
+     *
+     * @param userName 用户名
+     * @return 用户对象信息
+     */
+    public SysUser selectUserByUserNameAndPwd(String userName,String password);
 }

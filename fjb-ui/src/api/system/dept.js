@@ -49,10 +49,11 @@ export function treeselect() {
 }
 
 // 查询部门级联下拉结构
-export function Cascadeselect() {
+export function Cascadeselect(query) {
   return request({
     url: '/system/dept/cascadeselect',
-    method: 'get'
+    method: 'get',
+    params: query
   })
 }
 
@@ -87,5 +88,32 @@ export function delDept(deptId) {
   return request({
     url: '/system/dept/' + deptId,
     method: 'delete'
+  })
+}
+
+// 查询省列表
+export function listProvince(query) {
+  return request({
+    url: '/system/dept/province/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询市列表
+export function listCity(query) {
+  return request({
+    url: '/system/dept/city/list',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询县列表
+export function listTown(query) {
+  return request({
+    url: '/system/dept/town/list',
+    method: 'get',
+    params: query
   })
 }

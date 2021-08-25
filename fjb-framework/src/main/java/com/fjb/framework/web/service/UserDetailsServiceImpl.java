@@ -48,6 +48,9 @@ public class UserDetailsServiceImpl implements UserDetailsService
         {
             log.info("登录用户：{} 已被停用.", username);
             throw new BaseException("对不起，您的账号：" + username + " 已停用");
+        }else if(user.getRoles().isEmpty()){
+            log.info("登录用户：{} 没有分配权限.", username);
+            throw new BaseException("对不起，您的账号：" + username + " 没有分配权限");
         }
         UserDetails doubs=createLoginUser(user);
 

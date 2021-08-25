@@ -175,6 +175,17 @@ public class SysDeptServiceImpl implements ISysDeptService
         return UserConstants.UNIQUE;
     }
 
+    @Override
+    public String checkDeptCodeUnique(SysDept dept) {
+        Long deptId = StringUtils.isNull(dept.getDeptId()) ? -1L : dept.getDeptId();
+        SysDept info = deptMapper.checkDeptCodeUnique(dept.getJigouCode());
+        if (StringUtils.isNotNull(info) && info.getDeptId().longValue() != deptId.longValue())
+        {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
+    }
+
     /**
      * 新增保存部门信息
      *

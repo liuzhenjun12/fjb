@@ -2,68 +2,76 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.fjb.system.mapper.FjbTownMapper">
-    
-    <resultMap type="FjbTown" id="FjbTownResult">
+<mapper namespace="com.fjb.system.mapper.SysTownMapper">
+
+    <resultMap type="SysTown" id="SysTownResult">
         <result property="tid"    column="tid"    />
         <result property="tname"    column="tname"    />
         <result property="cid"    column="cid"    />
         <result property="zipcode"    column="zipcode"    />
+        <result property="jingDu"    column="jing_du"    />
+        <result property="weiDu"    column="wei_du"    />
     </resultMap>
 
-    <sql id="selectFjbTownVo">
-        select tid, tname, cid, zipcode from fjb_town
+    <sql id="selectSysTownVo">
+        select tid, tname, cid, zipcode,jing_du,wei_du from sys_town
     </sql>
 
-    <select id="selectFjbTownList" parameterType="FjbTown" resultMap="FjbTownResult">
-        <include refid="selectFjbTownVo"/>
-        <where>  
+    <select id="selectSysTownList" parameterType="SysTown" resultMap="SysTownResult">
+        <include refid="selectSysTownVo"/>
+        <where>
             <if test="tname != null  and tname != ''"> and tname like concat('%', #{tname}, '%')</if>
             <if test="cid != null "> and cid = #{cid}</if>
             <if test="zipcode != null  and zipcode != ''"> and zipcode = #{zipcode}</if>
         </where>
     </select>
-    
-    <select id="selectFjbTownById" parameterType="Integer" resultMap="FjbTownResult">
-        <include refid="selectFjbTownVo"/>
+
+    <select id="selectSysTownById" parameterType="Integer" resultMap="SysTownResult">
+        <include refid="selectSysTownVo"/>
         where tid = #{tid}
     </select>
-        
-    <insert id="insertFjbTown" parameterType="FjbTown">
-        insert into fjb_town
+
+    <insert id="insertSysTown" parameterType="SysTown">
+        insert into sys_town
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="tid != null">tid,</if>
             <if test="tname != null and tname != ''">tname,</if>
             <if test="cid != null">cid,</if>
             <if test="zipcode != null">zipcode,</if>
+            <if test="jingDu != null">jing_du,</if>
+            <if test="weiDu != null">wei_du,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="tid != null">#{tid},</if>
             <if test="tname != null and tname != ''">#{tname},</if>
             <if test="cid != null">#{cid},</if>
             <if test="zipcode != null">#{zipcode},</if>
+            <if test="jingDu != null">#{jingDu},</if>
+            <if test="weiDu != null">#{weiDu},</if>
          </trim>
     </insert>
 
-    <update id="updateFjbTown" parameterType="FjbTown">
-        update fjb_town
+    <update id="updateSysTown" parameterType="SysTown">
+        update sys_town
         <trim prefix="SET" suffixOverrides=",">
             <if test="tname != null and tname != ''">tname = #{tname},</if>
             <if test="cid != null">cid = #{cid},</if>
             <if test="zipcode != null">zipcode = #{zipcode},</if>
+            <if test="jingDu != null">jing_du = #{jingDu},</if>
+            <if test="weiDu != null">wei_du = #{weiDu},</if>
         </trim>
         where tid = #{tid}
     </update>
 
-    <delete id="deleteFjbTownById" parameterType="Integer">
-        delete from fjb_town where tid = #{tid}
+    <delete id="deleteSysTownById" parameterType="Integer">
+        delete from sys_town where tid = #{tid}
     </delete>
 
-    <delete id="deleteFjbTownByIds" parameterType="String">
-        delete from fjb_town where tid in 
+    <delete id="deleteSysTownByIds" parameterType="String">
+        delete from sys_town where tid in
         <foreach item="tid" collection="array" open="(" separator="," close=")">
             #{tid}
         </foreach>
     </delete>
-    
+
 </mapper>

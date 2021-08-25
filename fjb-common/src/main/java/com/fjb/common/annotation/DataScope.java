@@ -24,4 +24,10 @@ public @interface DataScope
      * 用户表的别名
      */
     public String userAlias() default "";
+
+    /**
+     * 收缴凭证表别名
+     * @return
+     */
+    public String receAlias() default "";
 }

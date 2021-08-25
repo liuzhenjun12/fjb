@@ -86,6 +86,13 @@ public interface ISysDeptService
     public String checkDeptNameUnique(SysDept dept);
 
     /**
+     * 效验机构代码是否唯一
+     * @param dept
+     * @return
+     */
+    public String checkDeptCodeUnique(SysDept dept);
+
+    /**
      * 新增保存部门信息
      *
      * @param dept 部门信息

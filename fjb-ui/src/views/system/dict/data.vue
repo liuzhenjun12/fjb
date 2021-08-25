@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div class="form_kuand" >
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px" class="form_input">
       <el-form-item label="字典名称" prop="dictType">
         <el-select v-model="queryParams.dictType" size="small">
@@ -35,8 +36,9 @@
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <div class="sanguang">
-    <el-row :gutter="10" class="mb8">
+    <el-row :gutter="10" class="gao">
       <el-col :span="1.5">
         <el-button
           type="primary"
@@ -80,8 +82,8 @@
     </div>
     <el-table v-loading="loading" :data="dataList"  @selection-change="handleSelectionChange">
       <el-table-column type="selection" min-width="5%" align="center" />
-      <el-table-column label="字典编码" min-width="5%" align="center" prop="dictCode" />
-      <el-table-column label="字典标签" min-width="40%" align="center" prop="dictLabel" />
+      <el-table-column label="字典编码" min-width="10%" align="center" prop="dictCode" />
+      <el-table-column label="字典标签" min-width="35%" align="center" prop="dictLabel" />
       <el-table-column label="字典排序" min-width="5%" align="center" prop="dictSort" />
       <el-table-column label="状态" min-width="15%" align="center" prop="status" :formatter="statusFormat" />
       <el-table-column label="创建时间" min-width="5%" align="center" prop="createTime" width="180">

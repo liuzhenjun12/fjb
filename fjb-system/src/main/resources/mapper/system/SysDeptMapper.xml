@@ -12,7 +12,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="orderNum"   column="order_num"   />
 		<result property="leader"     column="leader"      />
 		<result property="phone"      column="phone"       />
-		<result property="email"      column="email"       />
 		<result property="status"     column="status"      />
 		<result property="delFlag"    column="del_flag"    />
 		<result property="parentName" column="parent_name" />
@@ -25,26 +24,44 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="sizeId" column="size_id" />
 		<result property="jinDu" column="jin_du" />
 		<result property="weiDu" column="wei_du" />
-		<result property="yinCode" column="yin_code" />
-		<result property="address" column="address" />
-		<result property="deptType" column="dept_type" />
-		<result property="wangCode" column="wang_code" />
-		<result property="wangType" column="wang_type" />
-		<result property="sheng" column="sheng" />
-		<result property="shi" column="shi" />
-		<result property="xian" column="xian" />
-		<result property="hang" column="hang" />
+		<result property="proid" column="proid" />
+		<result property="cid" column="cid" />
+		<result property="tid" column="tid" />
+		<result property="isJianDing" column="is_jian_ding" />
+		<association property="province"    column="proid" javaType="SysProvince" resultMap="SysProvinceResult" />
+		<association property="city"    column="cid" javaType="SysCity" resultMap="SysCityResult" />
+		<association property="town"    column="tid" javaType="SysTown" resultMap="SysTownResult" />
+	</resultMap>
+
+	<resultMap type="SysProvince" id="SysProvinceResult">
+		<result property="proid"    column="proid"    />
+		<result property="proname"    column="proname"    />
+	</resultMap>
+
+	<resultMap type="SysCity" id="SysCityResult">
+		<result property="cid"    column="cid"    />
+		<result property="cname"    column="cname"    />
+	</resultMap>
+
+	<resultMap type="SysTown" id="SysTownResult">
+		<result property="tid"    column="tid"    />
+		<result property="tname"    column="tname"    />
 	</resultMap>
 
 	<sql id="selectDeptVo">
-        select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.email, d.status, d.del_flag, d.create_by, d.create_time ,d.jigou_code
-        ,d.jian_cheng,d.jin_du,d.wei_du,d.yin_code,d.address,d.dept_type,d.wang_code,d.wang_type,d.sheng,d.shi,d.xian,d.hang from sys_dept d
+        select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.status, d.del_flag, d.create_by, d.create_time ,d.jigou_code
+        ,d.jian_cheng,d.jin_du,d.wei_du,d.proid,d.cid,d.tid,d.is_jian_ding from sys_dept d
     </sql>
 
 	<select id="selectDeptList" parameterType="SysDept" resultMap="SysDeptResult">
-        <include refid="selectDeptVo"/>
+		select d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.status, d.del_flag, d.create_by, d.create_time ,d.jigou_code
+		,d.jian_cheng,d.jin_du,d.wei_du,d.proid,d.cid,d.tid,d.is_jian_ding,p.proname,c.cname,t.tname
+		from sys_dept d
+		left join sys_province p on d.proid=p.proid
+		left join sys_city c on d.cid=c.cid
+		left join sys_town t on d.tid=t.tid
         where d.del_flag = '0'
-        <if test="parentId != null and parentId != 0">
+        <if test="parentId != null ">
 			AND parent_id = #{parentId}
 		</if>
 		<if test="deptName != null and deptName != ''">
@@ -53,11 +70,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="status != null and status != ''">
 			AND status = #{status}
 		</if>
-		<if test="deptType != null and deptType != ''">
-			AND dept_type = #{deptType}
-		</if>
-		<if test="hang != null and hang != ''">
-			AND hang = #{hang}
+		<if test="isJianDing != null and isJianDing != ''">
+			AND is_jian_ding = #{isJianDing}
 		</if>
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
@@ -107,6 +121,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where dept_name=#{deptName} and parent_id = #{parentId} limit 1
 	</select>
 
+	<select id="checkDeptCodeUnique" resultMap="SysDeptResult">
+		<include refid="selectDeptVo"/>
+		where jigou_code=#{jigouCode} limit 1
+	</select>
+
     <insert id="insertDept" parameterType="SysDept">
  		insert into sys_dept(
  			<if test="deptId != null and deptId != 0">dept_id,</if>
@@ -116,22 +135,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="orderNum != null and orderNum != ''">order_num,</if>
  			<if test="leader != null and leader != ''">leader,</if>
  			<if test="phone != null and phone != ''">phone,</if>
- 			<if test="email != null and email != ''">email,</if>
  			<if test="status != null">status,</if>
  			<if test="createBy != null and createBy != ''">create_by,</if>
 		    <if test="jigouCode != null and jigouCode != ''">jigou_code,</if>
 		    <if test="jianCheng != null and jianCheng != ''">jian_cheng,</if>
 			<if test="jinDu != null and jinDu != ''" >jin_du,</if>
 			<if test="weiDu != null and weiDu != ''">wei_du,</if>
-			<if test="yinCode != null and yinCode != ''">yin_code,</if>
-			<if test="address != null and address != ''">address,</if>
-		    <if test="deptType != null and deptType != ''">dept_type,</if>
-		    <if test="wangCode != null and wangCode != ''">wang_code,</if>
-		    <if test="wangType != null and wangType != ''">wang_type,</if>
-		    <if test="sheng != null and sheng != ''">sheng,</if>
-			<if test="shi != null and shi != ''">shi,</if>
-			<if test="xian != null and xian != ''">xian,</if>
-			<if test="hang != null and hang != ''">hang,</if>
+		    <if test="proid != null ">proid,</if>
+			<if test="cid != null ">cid,</if>
+			<if test="tid != null ">tid,</if>
+		    <if test="isJianDing != null ">is_jian_ding,</if>
  			create_time
  		)values(
  			<if test="deptId != null and deptId != 0">#{deptId},</if>
@@ -141,22 +154,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="orderNum != null and orderNum != ''">#{orderNum},</if>
  			<if test="leader != null and leader != ''">#{leader},</if>
  			<if test="phone != null and phone != ''">#{phone},</if>
- 			<if test="email != null and email != ''">#{email},</if>
  			<if test="status != null">#{status},</if>
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
 		    <if test="jigouCode != null and jigouCode != ''">#{jigouCode},</if>
 		    <if test="jianCheng != null and jianCheng != ''">#{jianCheng},</if>
 			<if test="jinDu != null  and jinDu != ''">#{jinDu},</if>
 			<if test="weiDu != null and weiDu != ''">#{weiDu},</if>
-			<if test="yinCode != null and yinCode != ''">#{yinCode},</if>
-			<if test="address != null and address != ''">#{address},</if>
-		    <if test="deptType != null and deptType != ''">#{deptType},</if>
-		    <if test="wangCode != null and wangCode != ''">#{wangCode},</if>
-		    <if test="wangType != null and wangType != ''">#{wangType},</if>
-		    <if test="sheng != null and sheng != ''">#{sheng},</if>
-			<if test="shi != null and shi != ''">#{shi},</if>
-			<if test="xian != null and xian != ''">#{xian},</if>
-			<if test="hang != null and hang != ''">#{hang},</if>
+		    <if test="proid != null ">#{proid},</if>
+			<if test="cid != null ">#{cid},</if>
+			<if test="tid != null ">#{tid},</if>
+		    <if test="isJianDing != null ">#{isJianDing},</if>
  			sysdate()
  		)
 	</insert>
@@ -170,22 +177,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="orderNum != null and orderNum != ''">order_num = #{orderNum},</if>
  			<if test="leader != null">leader = #{leader},</if>
  			<if test="phone != null">phone = #{phone},</if>
- 			<if test="email != null">email = #{email},</if>
  			<if test="status != null and status != ''">status = #{status},</if>
  			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
 			<if test="jigouCode != null and jigouCode != ''">jigou_code = #{jigouCode},</if>
 			<if test="jianCheng != null and jianCheng != ''">jian_cheng = #{jianCheng},</if>
 			<if test="jinDu != null and jinDu != ''">jin_du = #{jinDu},</if>
 			<if test="weiDu != null and weiDu != ''">wei_du = #{weiDu},</if>
-			<if test="yinCode != null and yinCode != ''">yin_code = #{yinCode},</if>
-			<if test="address != null and address != ''">address = #{address},</if>
-			<if test="deptType != null and deptType != ''">dept_type = #{deptType},</if>
-			<if test="wangCode != null and wangCode != ''">wang_code = #{wangCode},</if>
-			<if test="wangType != null and wangType != ''">wang_type = #{wangType},</if>
-			<if test="sheng != null and sheng != ''">sheng = #{sheng},</if>
-			<if test="shi != null and shi != ''">shi = #{shi},</if>
-			<if test="xian != null and xian != ''">xian = #{xian},</if>
-			<if test="hang != null and hang != ''">hang = #{hang},</if>
+			<if test="proid != null ">proid = #{proid},</if>
+			<if test="cid != null ">cid = #{cid},</if>
+			<if test="tid != null ">tid = #{tid},</if>
+			<if test="isJianDing != null ">is_jian_ding = #{isJianDing},</if>
  			update_time = sysdate()
  		</set>
  		where dept_id = #{deptId}

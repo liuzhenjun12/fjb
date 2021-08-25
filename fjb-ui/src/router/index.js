@@ -93,6 +93,44 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/receiptseizure',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'addPage',
+        component: (resolve) => require(['@/views/business/receiptseizure/add'], resolve),
+        name: 'addReceiptseizure',
+        meta: { title: '新增收缴凭证', icon: '' }
+      },
+      {
+        path: 'updatePage/:id(\\d+)',
+        component: (resolve) => require(['@/views/business/receiptseizure/update'], resolve),
+        name: 'updateReceiptseizure',
+        meta: { title: '修改收缴凭证', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/expertisereport',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'addPage',
+        component: (resolve) => require(['@/views/business/expertisereport/add'], resolve),
+        name: 'addExpertisereport',
+        meta: { title: '新增鉴定证书', icon: '' }
+      },
+      {
+        path: 'updatePage/:id(\\d+)',
+        component: (resolve) => require(['@/views/business/expertisereport/update'], resolve),
+        name: 'updateExpertisereport',
+        meta: { title: '修改鉴定证书', icon: '' }
+      }
+    ]
+  },
+  {
     path: '/job',
     component: Layout,
     hidden: true,

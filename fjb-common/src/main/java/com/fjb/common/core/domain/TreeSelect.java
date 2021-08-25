@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fjb.common.core.domain.entity.SysCity;
 import com.fjb.common.core.domain.entity.SysDept;
 import com.fjb.common.core.domain.entity.SysMenu;
 
@@ -45,11 +44,6 @@ public class TreeSelect implements Serializable
         this.children = menu.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
     }
 
-    public TreeSelect(SysCity city){
-        this.id=city.getId();
-        this.label=city.getName();
-        this.children=city.getChildren().stream().map(TreeSelect::new).collect(Collectors.toList());
-    }
 
     public Long getId()
     {

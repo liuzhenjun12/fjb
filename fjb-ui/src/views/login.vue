@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <div style="position: absolute;top: 5%"><img  src="../assets/image/fjb_logo.png"></div>
+    <div style="position: absolute;top: 5%"><img  src="../assets/image/fjb_logo_5.png"></div>
     <el-row :gutter="30">
     <el-col :span="16">
     <!--动效显示-->
@@ -20,7 +20,7 @@
             </div>
             <img class="effectposition maindataspecialeffect" src="../assets/img/maindataspecialeffect.png">
             <img class="effectposition acrossremindeffecindex" src="../assets/img/maindataicon.png">
-            <span class="stagetitle">数据中心</span>
+            <span class="stagetitle">系统中心</span>
           </a>
         </div>
         <!--卫星动效-->
@@ -30,7 +30,7 @@
             <div class="acrossremindeffectin acrossremindeffectinard"></div>
           </div>
           <img class="effectposition acrossremindeffecindex" src="../assets/img/xingzhengshenpi.png">
-          <span class="stagetitle stagearoundtitle">假币印控仪</span>
+          <span class="stagetitle stagearoundtitle">假币盖章</span>
         </div>
 
         <div class="circleeffectclass aroundfunctioneffect" style="left: 190px;bottom: 89px;">
@@ -39,7 +39,7 @@
             <div class="acrossremindeffectin acrossremindeffectinard"></div>
           </div>
           <img class="effectposition acrossremindeffecindex" src="../assets/img/jianbie.png">
-          <span class="stagetitle stagearoundtitle">假币鉴定仪</span>
+          <span class="stagetitle stagearoundtitle">假币鉴定</span>
         </div>
 
         <div class="circleeffectclass aroundfunctioneffect" style="right: 405px;bottom: 53px;">
@@ -47,7 +47,7 @@
           <div class="effectposition acrossremindeffectout acrossremindeffectoutard">
             <div class="acrossremindeffectin acrossremindeffectinard"></div>
           </div>
-          <img class="effectposition acrossremindeffecindex" src="../assets/img/pengzheng.png">
+          <img class="effectposition acrossremindeffecindex" src="../assets/img/zhatuyunshu.png">
           <span class="stagetitle stagearoundtitle">采集归档</span>
         </div>
 
@@ -57,7 +57,7 @@
             <div class="acrossremindeffectin acrossremindeffectinard"></div>
           </div>
           <img class="effectposition acrossremindeffecindex" src="../assets/img/fenxi.png">
-          <span class="stagetitle stagearoundtitle">大数据分析</span>
+          <span class="stagetitle stagearoundtitle">数据分析</span>
         </div>
 
         <div class="circleeffectclass aroundfunctioneffect" style="right: 294px;top: 79px;">
@@ -65,8 +65,8 @@
           <div class="effectposition acrossremindeffectout acrossremindeffectoutard">
             <div class="acrossremindeffectin acrossremindeffectinard"></div>
           </div>
-          <img class="effectposition acrossremindeffecindex" src="../assets/img/zonghezhifa.png">
-          <span class="stagetitle stagearoundtitle">峰值预警</span>
+          <img class="effectposition acrossremindeffecindex" src="../assets/img/baixingpaiAPP.png">
+          <span class="stagetitle stagearoundtitle">假币知识</span>
         </div>
 
         <div class="circleeffectclass decarround01" style="top: 218px;left: 92px;">
