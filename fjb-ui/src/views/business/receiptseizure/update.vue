@@ -1,295 +1,260 @@
 <template>
-  <div style="margin-top: 20px">
-    <el-form ref="form" :model="form" :rules="rules"  label-width="200px" class="form_input">
-      <div class="kuand">
-        <!--左上边框-->
-        <div class="t_line_box">
-          <i class="t_l_line"></i>
-          <i class="l_t_line"></i>
-        </div>
-        <!--右上边框-->
-        <div class="t_line_box">
-          <i class="t_r_line"></i>
-          <i class="r_t_line"></i>
-        </div>
-        <!--左下边框-->
-        <div class="t_line_box">
-          <i class="l_b_line"></i>
-          <i class="b_l_line"></i>
-        </div>
-        <!--右下边框-->
-        <div class="t_line_box">
-          <i class="r_b_line"></i>
-          <i class="b_r_line"></i>
-        </div>
-        <div class="kuand_1" style="height: 166px">
-        <div class="data-title" style="position: absolute;margin-top: 5px">
-          <b class="data-title-left">[</b>
-          <span>网点信息</span>
-          <b class="data-title-right">]</b>
-        </div>
-        <el-row style="position: absolute;top: 40px;width: 100%;">
-          <el-col :span="12">
-            <el-form-item label="网点名称:"  prop="deptName">
-              <el-input v-model="form.deptName" :disabled="true" placeholder="网点名称"  clearable  size="small" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="登录账号:" prop="userName">
-              <el-input v-model="form.userName" :disabled="true" placeholder="登录账号" clearable  size="small" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="联系电话:" prop="contactNumber">
-              <el-input v-model="form.contactNumber" :disabled="true" placeholder="联系电话" clearable  size="small" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="收缴日期:" prop="receiptdate">
-              <el-date-picker clearable size="small" style="width: 60%"
-                              v-model="form.receiptdate"
-                              type="date"
-                              value-format="yyyy-MM-dd"
-                              placeholder="选择收缴日期">
-              </el-date-picker>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </div>
+  <div class="biaodan">
+    <el-form ref="form" :model="form" :rules="rules"  label-width="140px" class="form_input">
+      <el-row >
+        <el-col :span="24" style="text-align: center">
+          <h3>货币收缴凭证</h3>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>网点信息</h5>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="网点名称:"  prop="deptName">
+            <el-input v-model="form.deptName" :disabled="true" placeholder="网点名称"  clearable  size="small" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="登录账号:" prop="userName">
+            <el-input v-model="form.userName" :disabled="true" placeholder="登录账号" clearable  size="small" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="联系电话:" prop="contactNumber">
+            <el-input v-model="form.contactNumber" :disabled="true" placeholder="联系电话" clearable  size="small" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="收缴日期:" prop="receiptdate">
+            <el-date-picker clearable size="small" style="width: 60%"
+                            v-model="form.receiptdate"
+                            type="date"
+                            :disabled="disabled_date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择收缴日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>凭证信息</h5>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="单位/个人" prop="unitOrIndividual">
+            <el-radio-group v-model="form.unitOrIndividual">
+              <el-radio
+                v-for="dict in isdwOptions"
+                :key="dict.value"
+                :label="dict.value"
+                :disabled="disabled_date"
+              >{{dict.label}}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="单位名称:" prop="unitName"  style="margin-left: 10px" :rules="form.unitOrIndividual=='2'? [{required: true, message: '单位名称不能为空', trigger: 'blur'},{pattern:/^[\u4E00-\u9FA5A-Za-z]+$/,message: '单位名称不合法', trigger: 'blur'},{ min: 5, max: 20, message: '5~20个字符', trigger: 'blur'}] : [{ required: false }]">
+            <el-input v-model="form.unitName" placeholder="请输入单位名称" :disabled="form.unitOrIndividual=='1'||disabled_date" clearable   maxlength="20" size="small" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="持有人员:" prop="holderName">
+            <el-input v-model="form.holderName" placeholder="请输入假币持有人姓名" clearable :disabled="disabled_date" size="small"  maxlength="10" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="手机号码:" style="margin-left: 10px" prop="holderTelephone">
+            <el-input v-model="form.holderTelephone" placeholder="请输入假币持有人手机号码" clearable :disabled="disabled_date" size="small"  style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="证件类型:" prop="documentType">
+            <el-select v-model="form.documentType" placeholder="请选择证件类型" :disabled="disabled_date" style="width: 60%" clearable   size="small">
+              <el-option
+                v-for="dict in certificateOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="证件号码:" style="margin-left: 10px" prop="holderIdcard">
+            <el-input v-model="form.holderIdcard" placeholder="请输入假币持有人证件号" :disabled="disabled_date" clearable  maxlength="20"  size="small" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="经办人员:" prop="receiptManname">
+            <el-input v-model="form.receiptManname" placeholder="请输入经办人" clearable :disabled="disabled_date" maxlength="10" size="small" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="复合人员:" style="margin-left: 10px" prop="cheekup">
+            <el-input v-model="form.cheekup" placeholder="请输入复合人" clearable  :disabled="disabled_date" maxlength="10" size="small" style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>假币信息</h5>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="假币类型:" prop="madeway">
+            <el-radio-group v-model="form.madeway">
+              <el-radio
+                v-for="dict in madewayOptions"
+                :key="dict.dictValue"
+                :label="dict.dictValue"
+              >{{dict.dictLabel}}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="假币币种:" style="margin-left: 10px" prop="ccCurrency">
+            <el-select
+              v-model="form.ccCurrency"
+              placeholder="请选择假币币种"
+              clearable
+              size="small"
+              style="width: 60%"
+            >
+              <el-option
+                v-for="dict in ccCurrencyOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="假币劵别:" prop="ccDenomination">
+            <el-select
+              v-model="form.ccDenomination"
+              placeholder="请选择假币卷别"
+              clearable
+              size="small"
+              style="width: 60%"
+              @change="changeJuan"
+              @clear="clearJuan"
+            >
+              <el-option
+                v-for="dict in ccDenominationOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
 
-      <div class="kuand_1" style="height: 275px;">
-        <div class="data-title">
-          <b class="data-title-left">[</b>
-          <span>凭证信息</span>
-          <b class="data-title-right">]</b>
-        </div>
-        <el-row style="position: absolute;top: 30px;width: 99%;">
-          <el-col :span="12">
-            <el-form-item label="单位/个人" prop="unitOrIndividual">
-              <el-radio-group v-model="form.unitOrIndividual">
-                <el-radio
-                  v-for="dict in isdwOptions"
-                  :key="dict.value"
-                  :label="dict.value"
-                >{{dict.label}}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="单位名称:" prop="unitName"  style="margin-left: 10px" :rules="form.unitOrIndividual=='2'? [{required: true, message: '单位名称不能为空', trigger: 'blur'},{pattern:/^[\u4E00-\u9FA5A-Za-z]+$/,message: '单位名称不合法', trigger: 'blur'},{ min: 5, max: 20, message: '5~20个字符', trigger: 'blur'}] : [{ required: false }]">
-              <el-input v-model="form.unitName" placeholder="请输入单位名称" :disabled="form.unitOrIndividual=='1'" clearable   maxlength="20" size="small" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="持有人员:" prop="holderName">
-              <el-input v-model="form.holderName" placeholder="请输入假币持有人姓名" clearable  size="small"  maxlength="10" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="手机号码:" style="margin-left: 10px" prop="holderTelephone">
-              <el-input v-model="form.holderTelephone" placeholder="请输入假币持有人手机号码" clearable  size="small"  style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="证件类型:" prop="documentType">
-              <el-select v-model="form.documentType" placeholder="请选择证件类型" style="width: 60%" clearable   size="small">
-                <el-option
-                  v-for="dict in certificateOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="证件号码:" style="margin-left: 10px" prop="holderIdcard">
-              <el-input v-model="form.holderIdcard" placeholder="请输入假币持有人证件号" clearable  maxlength="20"  size="small" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="经办人员:" prop="receiptManname">
-              <el-input v-model="form.receiptManname" placeholder="请输入经办人" clearable  maxlength="10" size="small" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="复合人员:" style="margin-left: 10px" prop="cheekup">
-              <el-input v-model="form.cheekup" placeholder="请输入复合人" clearable   maxlength="10" size="small" style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </div>
 
+        <el-col :span="12">
+          <el-form-item label="假币版别:" style="margin-left: 10px" prop="ccSeries">
+            <el-select
+              v-model="form.ccSeries"
+              placeholder="请选择假币版别"
+              clearable
+              size="small"
+              style="width: 60%"
+            >
+              <el-option
+                v-for="dict in ccSeriesOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
 
-      <div class="kuand_1" style="height: 470px;">
-        <div class="data-title">
-          <b class="data-title-left">[</b>
-          <span>假币信息</span>
-          <b class="data-title-right">]</b>
-        </div>
-        <el-row style="position: absolute;top: 30px;width: 99%;">
-          <el-col :span="12">
-            <el-form-item label="假币类型:" prop="madeway">
-              <el-radio-group v-model="form.madeway">
-                <el-radio
-                  v-for="dict in madewayOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictValue"
-                >{{dict.dictLabel}}</el-radio>
-              </el-radio-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="假币币种:" style="margin-left: 10px" prop="ccCurrency">
-              <el-select
-                v-model="form.ccCurrency"
-                placeholder="请选择假币币种"
-                clearable
-                size="small"
-                style="width: 60%"
+        <el-col :span="12">
+          <el-form-item label="假币来源:" prop="source">
+            <el-select
+              v-model="form.source"
+              placeholder="请选择假币假币来源"
+              clearable
+              size="small"
+              style="width: 60%"
+            >
+              <el-option
+                v-for="dict in sourceOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
+          <el-form-item label="冠字号码:" style="margin-left: 10px" prop="serialNumber">
+            <el-input v-model="form.serialNumber" placeholder="请输入冠字号码"  maxlength="15" size="small"  style="width: 60%"/>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
+          <el-form-item label="收缴数量:" prop="amount">
+            <el-input-number v-model="form.amount" controls-position="right" :min="1" @change="changeAmount" size="small" style="width: 60%" />
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
+          <el-form-item label="收缴总额:" style="margin-left: 10px" prop="totalamount">
+            <el-input-number v-model="form.totalamount" controls-position="right" :min="1" size="small" style="width: 60%" :disabled="true" />
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="24">
+          <el-form-item label="假币特征:" prop="ccFeature"  :rules="form.madeway=='变造'? [{required: true, message: '假币特征不能为空', trigger: 'blur'}] : [{ required: false }]">
+            <el-checkbox  v-model="checkAll" @change="handleCheckAllChange" :disabled="form.madeway=='伪造'">全选 / 只有变造币可选择</el-checkbox>
+            <el-checkbox-group v-model="form.ccFeature" >
+              <el-checkbox v-for="item in ccFeatureOptions" :disabled="form.madeway=='伪造'"
+                           :label="item"
+                           :key="item">{{item}}</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24">
+          <el-form-item label="收缴备注" prop="remark">
+            <el-input v-model="form.remark" type="textarea"   maxlength="200" placeholder="请输入内容" ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>假币图片</h5><p style="color: blue">只能上传jpg/png格式图片，而且最少上传{{zhang}}张，最多上传8张，其他包括假币图片及收缴凭证图片，每张图片的大小不得超过150KB!</p>
+        </el-col>
+        <el-col :span="24">
+          <el-upload
+            action="#"
+            :headers="upload.headers"
+            list-type="picture-card"
+            :file-list="fileList"
+            :before-upload="onBeforeUpload"
+            :on-change="onFileChange"
+            :disabled="upload.isUploading"
+            :multiple="upload.multiple"
+            :on-progress="handleFileUploadProgress"
+            accept="image/jpeg,image/png"
+            :limit="8"
+            :on-exceed="exceedHandle"
+            ref="dynamic"
+            :http-request="uploadFile"
+            :auto-upload="false" class="zaopian">
+            <i slot="default" class="el-icon-plus"></i>
+            <div slot="file" slot-scope="{file}">
+              <img
+                class="el-upload-list__item-thumbnail"
+                :src="file.url" alt=""
               >
-                <el-option
-                  v-for="dict in ccCurrencyOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="假币劵别:" prop="ccDenomination">
-              <el-select
-                v-model="form.ccDenomination"
-                placeholder="请选择假币卷别"
-                clearable
-                size="small"
-                style="width: 60%"
-                @change="changeJuan"
-                @clear="clearJuan"
-              >
-                <el-option
-                  v-for="dict in ccDenominationOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-
-
-          <el-col :span="12">
-            <el-form-item label="假币版别:" style="margin-left: 10px" prop="ccSeries">
-              <el-select
-                v-model="form.ccSeries"
-                placeholder="请选择假币版别"
-                clearable
-                size="small"
-                style="width: 60%"
-              >
-                <el-option
-                  v-for="dict in ccSeriesOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="12">
-            <el-form-item label="假币来源:" prop="source">
-              <el-select
-                v-model="form.source"
-                placeholder="请选择假币假币来源"
-                clearable
-                size="small"
-                style="width: 60%"
-              >
-                <el-option
-                  v-for="dict in sourceOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="dict.dictValue"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="12">
-            <el-form-item label="冠字号码:" style="margin-left: 10px" prop="serialNumber">
-              <el-input v-model="form.serialNumber" placeholder="请输入冠字号码"  maxlength="15" size="small"  style="width: 60%"/>
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="12">
-            <el-form-item label="收缴数量:" prop="amount">
-              <el-input-number v-model="form.amount" controls-position="right" :min="1" @change="changeAmount" size="small" style="width: 60%" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="12">
-            <el-form-item label="收缴总额:" style="margin-left: 10px" prop="totalamount">
-              <el-input-number v-model="form.totalamount" controls-position="right" :min="1" size="small" style="width: 60%" :disabled="true" />
-            </el-form-item>
-          </el-col>
-
-          <el-col :span="24">
-            <el-form-item label="假币特征:" prop="ccFeature"  :rules="form.madeway=='变造'? [{required: true, message: '假币特征不能为空', trigger: 'blur'}] : [{ required: false }]">
-              <el-checkbox  v-model="checkAll" @change="handleCheckAllChange" :disabled="form.madeway=='伪造'">全选 / 只有变造币可选择</el-checkbox>
-              <el-checkbox-group v-model="form.ccFeature" >
-                <el-checkbox v-for="item in ccFeatureOptions" :disabled="form.madeway=='伪造'"
-                             :label="item"
-                             :key="item">{{item}}</el-checkbox>
-              </el-checkbox-group>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="收缴备注" prop="remark">
-              <el-input v-model="form.remark" type="textarea" class="texkuang"  maxlength="200" placeholder="请输入内容" ></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </div>
-
-      <div class="kuand_1" style="height: 162px;">
-        <div class="data-title">
-          <b class="data-title-left">[</b>
-          <span>假币照片</span>
-          <b class="data-title-right">]</b>
-        </div>
-        <div style="color: #ff4949;line-height: 40px;height: 40px;margin-left: 15px;">只能上传jpg/png格式图片，而且最多上传8张，每张图片的大小不得超过150KB!</div>
-        <el-row style="position: absolute;top: 55px;width: 99%;margin-left: 15px;">
-          <el-col :span="24">
-            <el-upload
-              action="#"
-              :headers="upload.headers"
-              list-type="picture-card"
-              :file-list="fileList"
-              :before-upload="onBeforeUpload"
-              :on-change="onFileChange"
-              :disabled="upload.isUploading"
-              :multiple="upload.multiple"
-              :on-progress="handleFileUploadProgress"
-              accept="image/jpeg,image/png"
-              :limit="8"
-              :on-exceed="exceedHandle"
-              ref="dynamic"
-              :http-request="uploadFile"
-              :auto-upload="false" class="zaopian">
-              <i slot="default" class="el-icon-plus"></i>
-              <div slot="file" slot-scope="{file}">
-                <img
-                  class="el-upload-list__item-thumbnail"
-                  :src="file.url" alt=""
-                >
-                <span class="el-upload-list__item-actions">
+              <span class="el-upload-list__item-actions">
                   <span
                     class="el-upload-list__item-preview"
                     @click="handlePictureCardPreview(file)"
                   >
                     <i class="el-icon-zoom-in"></i>
+                  </span>
+                 <span
+                   v-if="!disabled"
+                   class="el-upload-list__item-delete"
+                   @click="handleDownload(file)"
+                 >
+                    <i class="el-icon-download"></i>
                   </span>
                   <span
                     v-if="!disabled"
@@ -299,27 +264,20 @@
                     <i class="el-icon-delete"></i>
                   </span>
                 </span>
-              </div>
-            </el-upload>
-            <el-dialog :visible.sync="dialogVisible">
-              <img width="100%" :src="dialogImageUrl" alt="">
-            </el-dialog>
-          </el-col>
-        </el-row>
-      </div>
-
-      <div class="kuand_1" style="height: 102px;margin-bottom: 100px">
-        <div class="data-title">
-          <b class="data-title-left">[</b>
-          <span>信息修改</span>
-          <b class="data-title-right">]</b>
-        </div>
-        <div  style="text-align: center;margin-top: 10px;cursor: pointer">
-          <el-button type="primary" @click="submitForm">修 改</el-button>
+            </div>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>信息提交</h5>
+        </el-col>
+        <el-col :span="24" style="text-align: center">
+          <el-button type="primary" @click="submitForm">提 交</el-button>
           <el-button @click="cancel" style="margin-left: 20px;">重 置</el-button>
-        </div>
-      </div>
-      </div>
+        </el-col>
+      </el-row>
     </el-form>
   </div>
 </template>
@@ -330,7 +288,7 @@
   import {getReceiptseizure} from "@/api/business/receiptseizure";
 
   export default {
-    name: "addReceiptseizure",
+    name: "updateReceiptseizure",
     data() {
       return {
         //最少上传多少张图片
@@ -340,6 +298,8 @@
         dialogVisible: false,
         //是否禁用
         disabled: false,
+        //是否禁用日期控件
+        disabled_date:false,
         //图片集合
         fileList: [],
         //假币特征是否全选
@@ -487,6 +447,9 @@
         const id = this.$route.params && this.$route.params.id;
         getReceiptseizure(id).then(response => {
           this.form = response.data
+          if(response.data.parentId>0){
+            this.disabled_date=true;
+          }
           this.form.userName=response.data.createBy;
           this.form.deptName=response.data.dept.deptName
           this.form.contactNumber=response.data.dept.phone
@@ -543,6 +506,10 @@
           return false;
         }
       },
+      //图片下载
+      handleDownload(file){
+        window.location.href = process.env.VUE_APP_BASE_API + "/common/download/resource?name=" + encodeURI(file.url);
+      },
       //文件超出个数限制时的钩子
       exceedHandle(file,fileList){
         this.msgError('上传图片不能超过8张!')
@@ -551,13 +518,14 @@
           this.upload.formDate = new FormData();
           this.$refs['dynamic'].submit();
           this.upload.formDate.append('id', this.form.id);
+          this.upload.formDate.append('deptId', this.form.deptId);
           this.upload.formDate.append('status', "add");
         let config = {
           headers: {
             'Content-Type': 'multipart/form-data', 'Authorization': 'Bearer ' + getToken()
           }
         }
-        axios.post("/dev-api/business/receiptseizure/update", this.upload.formDate, config).then(res => {
+        axios.post(process.env.VUE_APP_BASE_API+"/business/receiptseizure/update", this.upload.formDate, config).then(res => {
           if (res.data.code === 200) {
             this.msgSuccess("上传成功");
             this.upload.isUploading = false;
@@ -579,7 +547,7 @@
             'Content-Type': 'multipart/form-data', 'Authorization': 'Bearer ' + getToken()
           }
         }
-        axios.post("/dev-api/business/receiptseizure/update", this.upload.formDate, config).then(res => {
+        axios.post(process.env.VUE_APP_BASE_API+"/business/receiptseizure/update", this.upload.formDate, config).then(res => {
           if (res.data.code === 200) {
             this.msgSuccess("删除成功");
             this.upload.isUploading = false;
@@ -645,7 +613,7 @@
                     'Content-Type': 'multipart/form-data', 'Authorization': 'Bearer ' + getToken()
                   }
                 }
-                axios.post("/dev-api/business/receiptseizure/update", this.upload.formDate, config).then(res => {
+                axios.post(process.env.VUE_APP_BASE_API+"/business/receiptseizure/update", this.upload.formDate, config).then(res => {
                   if (res.data.code === 200) {
                     this.$confirm('修改成功, 是否要关闭此页面?', '提示', {
                       confirmButtonText: '确定',
@@ -669,53 +637,3 @@
     }
   };
 </script>
-<style lang="scss" scoped>
-  .main_title{
-    width: 210px;
-    height: 35px;
-    line-height: 33px;
-    background-color: #2C58A6;
-    border-radius: 18px;
-    position: absolute;
-    top: -17px;
-    left:50%;
-    margin-left: -90px;
-    color:#fff;
-    font-size: 18px;
-    font-weight: 600;
-    box-sizing: border-box;
-    padding-left: 47px;
-    z-index: 1000;
-  }
-  .main_title img{
-    position: absolute;
-    top: 8px;
-    left: 20px;
-  }
-  .kuand_1{position: relative;}
-  .data-title {
-    width: 96px;
-    color: cyan;
-    font-size: 15px;
-    margin-left: 10px;
-  }
-  .data-title-left, .data-title-right {
-    color: cyan;
-    font-family: 微软雅黑;
-    font-size: 15px;
-  }
-  .data-title span {
-    text-align: center;
-    width: 80px;
-    display: inline-block;
-    text-align: center;
-    font-size: 14px;
-  }
-  .el-radio{
-    color: white !important;
-  }
-  .el-checkbox{
-    color: white !important;
-  }
-
-</style>

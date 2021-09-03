@@ -22,15 +22,14 @@ public class SysExpertisereport extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 鉴定书id主键 */
-    private Integer id;
+    private Long id;
 
     /** 鉴定书编号 */
     @Excel(name = "鉴定书编号")
     private String number;
 
     /** 机构id */
-    @Excel(name = "机构id")
-    private Integer deptId;
+    private Long deptId;
 
     /** 部门对象 */
     @Excels({
@@ -39,7 +38,7 @@ public class SysExpertisereport extends BaseEntity
     private SysDept dept;
 
     /** 用户id */
-    private Integer userId;
+    private Long userId;
 
     /** 鉴定假币数量 */
     @Excel(name = "假币数量")
@@ -90,18 +89,6 @@ public class SysExpertisereport extends BaseEntity
     @Excel(name = "假币版别")
     private String ccSeries;
 
-    /** 假币造假方式 */
-    @Excel(name = "造假方式")
-    private String ccMadeway;
-
-    /** 假币特征 */
-    @Excel(name = "假币特征")
-    private String ccFeature;
-
-    /** 鉴定报告文件上传服务器路径 */
-    @Excel(name = "鉴定报告文件上传服务器路径")
-    private String identifyreportFile;
-
     /** 原鉴定(鉴别)单位 */
     @Excel(name = "原鉴定(鉴别)单位")
     private String originalcffi;
@@ -119,28 +106,29 @@ public class SysExpertisereport extends BaseEntity
     private String resultdetails;
 
     /** 状态 */
-    @Excel(name = "状态")
+    @Excel(name = "复核状态",type = Excel.Type.EXPORT, readConverterExp = "Y=复核通过,N=复核拒绝")
     private String status;
+
+    /** 数据来源，鉴别仪-网页 */
+    private String dataSource;
 
     /** 删除状态（1正常2已删除0不限制） */
     private String delFlag;
 
     /** 照片路径 */
-    @Excel(name = "照片路径")
     private String imgList;
 
     /** 鉴定组编号 */
-    @Excel(name = "鉴定组编号")
-    private String groupNumber;
+    private Long parentId;
 
     private SysUser user;
 
-    public void setId(Integer id)
+    public void setId(Long id)
     {
         this.id = id;
     }
 
-    public Integer getId()
+    public Long getId()
     {
         return id;
     }
@@ -153,21 +141,21 @@ public class SysExpertisereport extends BaseEntity
     {
         return number;
     }
-    public void setDeptId(Integer deptId)
+    public void setDeptId(Long deptId)
     {
         this.deptId = deptId;
     }
 
-    public Integer getDeptId()
+    public Long getDeptId()
     {
         return deptId;
     }
-    public void setUserId(Integer userId)
+    public void setUserId(Long userId)
     {
         this.userId = userId;
     }
 
-    public Integer getUserId()
+    public Long getUserId()
     {
         return userId;
     }
@@ -270,33 +258,7 @@ public class SysExpertisereport extends BaseEntity
     {
         return ccSeries;
     }
-    public void setCcMadeway(String ccMadeway)
-    {
-        this.ccMadeway = ccMadeway;
-    }
 
-    public String getCcMadeway()
-    {
-        return ccMadeway;
-    }
-    public void setCcFeature(String ccFeature)
-    {
-        this.ccFeature = ccFeature;
-    }
-
-    public String getCcFeature()
-    {
-        return ccFeature;
-    }
-    public void setIdentifyreportFile(String identifyreportFile)
-    {
-        this.identifyreportFile = identifyreportFile;
-    }
-
-    public String getIdentifyreportFile()
-    {
-        return identifyreportFile;
-    }
     public void setOriginalcffi(String originalcffi)
     {
         this.originalcffi = originalcffi;
@@ -360,14 +322,21 @@ public class SysExpertisereport extends BaseEntity
     {
         return imgList;
     }
-    public void setGroupNumber(String groupNumber)
-    {
-        this.groupNumber = groupNumber;
+
+    public Long getParentId() {
+        return parentId;
     }
 
-    public String getGroupNumber()
-    {
-        return groupNumber;
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 
     public SysDept getDept() {
@@ -412,9 +381,6 @@ public class SysExpertisereport extends BaseEntity
             .append("ccCurrency", getCcCurrency())
             .append("ccDenomination", getCcDenomination())
             .append("ccSeries", getCcSeries())
-            .append("ccMadeway", getCcMadeway())
-            .append("ccFeature", getCcFeature())
-            .append("identifyreportFile", getIdentifyreportFile())
             .append("originalcffi", getOriginalcffi())
             .append("originalresult", getOriginalresult())
             .append("result", getResult())
@@ -427,8 +393,9 @@ public class SysExpertisereport extends BaseEntity
             .append("updateBy", getUpdateBy())
             .append("updateTime", getUpdateTime())
             .append("imgList", getImgList())
-            .append("groupNumber", getGroupNumber())
+            .append("parentId", getParentId())
             .append("serialNumber", getSerialNumber())
+            .append("dataSource", getDataSource())
             .toString();
     }
 }

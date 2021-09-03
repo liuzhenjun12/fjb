@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.DanxuanMapper">
+
+    <resultMap type="Danxuan" id="DanxuanResult">
+        <result property="id"    column="id"    />
+        <result property="level"    column="level"    />
+        <result property="title"    column="title"    />
+        <result property="answer"    column="answer"    />
+        <result property="jiexi"    column="jiexi"    />
+        <result property="titlepic"    column="titlepic"    />
+        <result property="status"    column="status"    />
+        <result property="qtype"    column="qtype"    />
+        <result property="qcategory"    column="qcategory"    />
+    </resultMap>
+
+    <sql id="selectDanxuanVo">
+        select id, level, title, answer, jiexi, titlepic, status, qtype, qcategory from danxuan
+    </sql>
+
+    <select id="selectDanxuanList" parameterType="Danxuan" resultMap="DanxuanResult">
+        <include refid="selectDanxuanVo"/>
+        <where>
+            <if test="level != null "> and level = #{level}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="answer != null  and answer != ''"> and answer = #{answer}</if>
+            <if test="jiexi != null  and jiexi != ''"> and jiexi = #{jiexi}</if>
+            <if test="titlepic != null  and titlepic != ''"> and titlepic = #{titlepic}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="qtype != null "> and qtype = #{qtype}</if>
+            <if test="qcategory != null "> and qcategory = #{qcategory}</if>
+        </where>
+        limit 200
+    </select>
+
+    <select id="selectDanxuanById" parameterType="Long" resultMap="DanxuanResult">
+        <include refid="selectDanxuanVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDanxuan" parameterType="Danxuan" useGeneratedKeys="true" keyProperty="id">
+        insert into danxuan
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="level != null">level,</if>
+            <if test="title != null">title,</if>
+            <if test="answer != null">answer,</if>
+            <if test="jiexi != null">jiexi,</if>
+            <if test="titlepic != null">titlepic,</if>
+            <if test="status != null">status,</if>
+            <if test="qtype != null">qtype,</if>
+            <if test="qcategory != null">qcategory,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="level != null">#{level},</if>
+            <if test="title != null">#{title},</if>
+            <if test="answer != null">#{answer},</if>
+            <if test="jiexi != null">#{jiexi},</if>
+            <if test="titlepic != null">#{titlepic},</if>
+            <if test="status != null">#{status},</if>
+            <if test="qtype != null">#{qtype},</if>
+            <if test="qcategory != null">#{qcategory},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDanxuan" parameterType="Danxuan">
+        update danxuan
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="level != null">level = #{level},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="answer != null">answer = #{answer},</if>
+            <if test="jiexi != null">jiexi = #{jiexi},</if>
+            <if test="titlepic != null">titlepic = #{titlepic},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="qtype != null">qtype = #{qtype},</if>
+            <if test="qcategory != null">qcategory = #{qcategory},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDanxuanById" parameterType="Long">
+        delete from danxuan where id = #{id}
+    </delete>
+
+    <delete id="deleteDanxuanByIds" parameterType="String">
+        delete from danxuan where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

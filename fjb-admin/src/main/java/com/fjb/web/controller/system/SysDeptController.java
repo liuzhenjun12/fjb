@@ -149,7 +149,6 @@ public class SysDeptController extends BaseController
     @GetMapping("/cascadeselect")
     public AjaxResult cascadeselect(SysDept dept)
     {
-        System.out.println(dept.toString());
         List<SysDept> depts = deptService.selectDeptList(dept);
         return AjaxResult.success(deptService.buildCascadeselect(depts));
     }

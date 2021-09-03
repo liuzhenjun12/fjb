@@ -1,211 +1,189 @@
 <template>
-  <div style="margin-top: 20px">
+  <div class="biaodan">
     <el-form ref="form" :model="form" :rules="rules"  label-width="140px" class="form_input">
-      <div class="kuand">
-        <!--左上边框-->
-        <div class="t_line_box">
-          <i class="t_l_line"></i>
-          <i class="l_t_line"></i>
-        </div>
-        <!--右上边框-->
-        <div class="t_line_box">
-          <i class="t_r_line"></i>
-          <i class="r_t_line"></i>
-        </div>
-        <!--左下边框-->
-        <div class="t_line_box">
-          <i class="l_b_line"></i>
-          <i class="b_l_line"></i>
-        </div>
-        <!--右下边框-->
-        <div class="t_line_box">
-          <i class="r_b_line"></i>
-          <i class="b_r_line"></i>
-        </div>
-        <div class="kuand_1" style="height: 102px">
-
-          <div class="data-title" style="position: absolute;margin-top: 5px">
-            <b class="data-title-left">[</b>
-            <span>网点信息</span>
-            <b class="data-title-right">]</b>
-          </div>
-          <el-row style="position: absolute;top: 40px;width: 100%;">
-            <el-col :span="8">
-              <el-form-item label="鉴定单位:"  prop="deptName">
-                <el-input v-model="form.deptName" :disabled="true" placeholder="网点名称"  clearable  size="small" style="width: 90%"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="登录账号:" prop="userName">
-                <el-input v-model="form.userName" :disabled="true" placeholder="登录账号" clearable  size="small" style="width: 90%"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="鉴定日期:" prop="receiptdate">
-                <el-date-picker clearable size="small" style="width: 90%"
-                                v-model="form.receiptdate"
-                                type="date"
-                                value-format="yyyy-MM-dd"
-                                placeholder="选择收缴日期">
-                </el-date-picker>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </div>
-
-        <div class="kuand_1" style="height: 150px;">
-          <div class="data-title">
-            <b class="data-title-left">[</b>
-            <span>鉴定信息</span>
-            <b class="data-title-right">]</b>
-          </div>
-          <el-row style="position: absolute;top: 30px;width: 99%;">
-            <el-col :span="8">
-              <el-form-item label="鉴定人:" prop="identifyname">
-                <el-input v-model="form.identifyname" placeholder="请输入鉴定人姓名" clearable  size="small"  maxlength="10" style="width: 90%"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="复核人:" prop="checkupname">
-                <el-input v-model="form.checkupname" placeholder="请输入复核人姓名" clearable  size="small"  maxlength="10" style="width: 90%"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="持有人:" prop="holderName">
-                <el-input v-model="form.holderName" placeholder="请输入送签单位或持有人" clearable  size="small"  maxlength="10" style="width: 90%"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="证件号码:" prop="holderIdcard">
-                <el-input v-model="form.holderIdcard" placeholder="请输入持有人证件号" clearable  size="small"  maxlength="10" style="width: 90%"/>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="联系电话:" prop="holderTelephone">
-                <el-input v-model="form.holderTelephone" placeholder="请输入送签单位或持有人联系电话" clearable  size="small"  maxlength="10" style="width: 90%"/>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </div>
-
-
-        <div class="kuand_1" style="height: 470px;">
-          <div class="data-title">
-            <b class="data-title-left">[</b>
-            <span>假币信息</span>
-            <b class="data-title-right">]</b>
-          </div>
-          <el-row style="position: absolute;top: 30px;width: 99%;">
-            <el-col :span="8">
-              <el-form-item label="假币币种:" style="margin-left: 10px" prop="ccCurrency">
-                <el-select
-                  v-model="form.ccCurrency"
-                  placeholder="请选择假币币种"
-                  clearable
-                  size="small"
-                  style="width: 90%"
-                >
-                  <el-option
-                    v-for="dict in ccCurrencyOptions"
-                    :key="dict.dictValue"
-                    :label="dict.dictLabel"
-                    :value="dict.dictValue"
-                  />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="8">
-              <el-form-item label="假币劵别:" prop="ccDenomination">
-                <el-select
-                  v-model="form.ccDenomination"
-                  placeholder="请选择假币卷别"
-                  clearable
-                  size="small"
-                  style="width: 90%"
-                  @change="changeJuan"
-                  @clear="clearJuan"
-                >
-                  <el-option
-                    v-for="dict in ccDenominationOptions"
-                    :key="dict.dictValue"
-                    :label="dict.dictLabel"
-                    :value="dict.dictValue"
-                  />
-                </el-select>
-              </el-form-item>
-            </el-col>
+      <el-row >
+        <el-col :span="24" style="text-align: center">
+          <h3>货币真伪鉴定书</h3>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>网点信息</h5>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="鉴定单位:"  prop="deptName">
+            <el-input v-model="form.deptName" :disabled="true" placeholder="网点名称"  clearable  size="small" style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="登录账号:" prop="userName">
+            <el-input v-model="form.userName" :disabled="true" placeholder="登录账号" clearable  size="small" style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="鉴定日期:" prop="identifydate">
+            <el-date-picker clearable size="small" style="width: 90%"
+                            v-model="form.identifydate"
+                            type="date"
+                            :disabled="disabled_date"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择收缴日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>来源信息</h5>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="持有人:" prop="holderName">
+            <el-input v-model="form.holderName"  :disabled="disabled_date" placeholder="请输入送签单位或持有人" clearable  size="small"  maxlength="10" style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="证件号码:" prop="holderIdcard">
+            <el-input v-model="form.holderIdcard"  :disabled="disabled_date" placeholder="请输入持有人证件号" clearable  size="small"  maxlength="10" style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="联系电话:" prop="holderTelephone">
+            <el-input v-model="form.holderTelephone"  :disabled="disabled_date" placeholder="请输入送签单位或持有人联系电话" clearable  size="small"  maxlength="11" style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="原鉴定单位:"  prop="originalcffi">
+            <el-input v-model="form.originalcffi"  :disabled="disabled_date" placeholder="请输入原鉴定单位"  maxlength="15" size="small"  style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="15">
+          <el-form-item label="原鉴定结果:"  prop="originalresult">
+            <el-input v-model="form.originalresult"  :disabled="disabled_date" placeholder="请输入原鉴定结果"  maxlength="15" size="small"  style="width: 100%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>假币信息</h5>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="假币币种:" style="margin-left: 10px" prop="ccCurrency">
+            <el-select
+              v-model="form.ccCurrency"
+              placeholder="请选择假币币种"
+              clearable
+              size="small"
+              style="width: 90%"
+            >
+              <el-option
+                v-for="dict in ccCurrencyOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="假币劵别:" prop="ccDenomination">
+            <el-select
+              v-model="form.ccDenomination"
+              placeholder="请选择假币卷别"
+              clearable
+              size="small"
+              style="width: 90%"
+              @change="changeJuan"
+              @clear="clearJuan"
+            >
+              <el-option
+                v-for="dict in ccDenominationOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
 
 
-            <el-col :span="8">
-              <el-form-item label="假币版别:" style="margin-left: 10px" prop="ccSeries">
-                <el-select
-                  v-model="form.ccSeries"
-                  placeholder="请选择假币版别"
-                  clearable
-                  size="small"
-                  style="width: 90%"
-                >
-                  <el-option
-                    v-for="dict in ccSeriesOptions"
-                    :key="dict.dictValue"
-                    :label="dict.dictLabel"
-                    :value="dict.dictValue"
-                  />
-                </el-select>
-              </el-form-item>
-            </el-col>
+        <el-col :span="8">
+          <el-form-item label="假币版别:" style="margin-left: 10px" prop="ccSeries">
+            <el-select
+              v-model="form.ccSeries"
+              placeholder="请选择假币版别"
+              clearable
+              size="small"
+              style="width: 90%"
+            >
+              <el-option
+                v-for="dict in ccSeriesOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
 
-            <el-col :span="8">
-              <el-form-item label="冠字号码:" style="margin-left: 10px" prop="serialNumber">
-                <el-input v-model="form.serialNumber" placeholder="请输入冠字号码"  maxlength="15" size="small"  style="width: 90%"/>
-              </el-form-item>
-            </el-col>
+        <el-col :span="8">
+          <el-form-item label="冠字号码:" style="margin-left: 10px" prop="serialNumber">
+            <el-input v-model="form.serialNumber" placeholder="请输入冠字号码"  maxlength="15" size="small"  style="width: 90%"/>
+          </el-form-item>
+        </el-col>
 
-            <el-col :span="8">
-              <el-form-item label="收缴数量:" prop="amount">
-                <el-input-number v-model="form.amount" controls-position="right" :min="1" @change="changeAmount" size="small" style="width: 90%" />
-              </el-form-item>
-            </el-col>
+        <el-col :span="8">
+          <el-form-item label="收缴数量:" prop="amount">
+            <el-input-number v-model="form.amount" controls-position="right" :min="1" @change="changeAmount" size="small" style="width: 90%" />
+          </el-form-item>
+        </el-col>
 
-            <el-col :span="8">
-              <el-form-item label="收缴总额:" style="margin-left: 10px" prop="totalamount">
-                <el-input-number v-model="form.totalamount" controls-position="right" :min="1" size="small" style="width: 90%" :disabled="true" />
-              </el-form-item>
-            </el-col>
+        <el-col :span="8">
+          <el-form-item label="收缴总额:" style="margin-left: 10px" prop="totalamount">
+            <el-input-number v-model="form.totalamount" controls-position="right" :min="1" size="small" style="width: 90%" :disabled="true" />
+          </el-form-item>
+        </el-col>
 
-          </el-row>
-        </div>
+        <el-col :span="24" style="text-align: left">
+          <h5>鉴定结果</h5>
+        </el-col>
 
-        <div class="kuand_1" style="height: 162px;">
-          <div class="data-title">
-            <b class="data-title-left">[</b>
-            <span>假币照片</span>
-            <b class="data-title-right">]</b>
-          </div>
-          <div style="color: #ff4949;line-height: 40px;height: 40px;margin-left: 15px;">只能上传jpg/png格式图片，而且最多上传8张，每张图片的大小不得超过150KB!</div>
-          <el-row style="position: absolute;top: 55px;width: 99%;margin-left: 15px;">
-            <el-col :span="24">
-              <el-upload
-                action="#"
-                :headers="upload.headers"
-                list-type="picture-card"
-                :before-upload="onBeforeUpload"
-                :disabled="upload.isUploading"
-                :multiple="upload.multiple"
-                :on-progress="handleFileUploadProgress"
-                accept="image/jpeg,image/png"
-                :limit="8"
-                :on-exceed="exceedHandle"
-                ref="dynamic"
-                :http-request="uploadFile"
-                :auto-upload="false" class="zaopian">
-                <i slot="default" class="el-icon-plus"></i>
-                <div slot="file" slot-scope="{file}">
-                  <img
-                    class="el-upload-list__item-thumbnail"
-                    :src="file.url" alt=""
-                  >
-                  <span class="el-upload-list__item-actions">
+        <el-col :span="23" >
+          <el-form-item label="鉴定结果:" prop="result">
+            <el-input v-model="form.result" placeholder="请输入鉴定结果" clearable  size="small"  maxlength="10" style="width: 100%"/>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="23" >
+          <el-form-item label="详细结果" prop="resultdetails">
+            <el-input v-model="form.resultdetails" type="textarea"   maxlength="200" placeholder="请输入详细结果" ></el-input>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="23" >
+          <el-form-item label="其他备注" prop="remark">
+            <el-input v-model="form.remark" type="textarea"   maxlength="200" placeholder="请输入备注" ></el-input>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="24" style="text-align: left">
+          <h5>鉴定图片</h5><p style="color: blue">只能上传jpg/png格式图片，而且最少上传{{zhang}}张，最多上传8张，其他包括鉴定图片及鉴定证书图片，每张图片的大小不得超过150KB!</p>
+        </el-col>
+        <el-col :span="24">
+          <el-upload
+            action="#"
+            :headers="upload.headers"
+            list-type="picture-card"
+            :before-upload="onBeforeUpload"
+            :disabled="upload.isUploading"
+            :multiple="upload.multiple"
+            :on-progress="handleFileUploadProgress"
+            accept="image/jpeg,image/png"
+            :limit="8"
+            :on-exceed="exceedHandle"
+            ref="dynamic"
+            :http-request="uploadFile"
+            :auto-upload="false" class="zaopian">
+            <i slot="default" class="el-icon-plus"></i>
+            <div slot="file" slot-scope="{file}">
+              <img
+                class="el-upload-list__item-thumbnail"
+                :src="file.url" alt=""
+              >
+              <span class="el-upload-list__item-actions">
                   <span
                     class="el-upload-list__item-preview"
                     @click="handlePictureCardPreview(file)"
@@ -220,27 +198,34 @@
                     <i class="el-icon-delete"></i>
                   </span>
                 </span>
-                </div>
-              </el-upload>
-              <el-dialog :visible.sync="dialogVisible">
-                <img width="100%" :src="dialogImageUrl" alt="">
-              </el-dialog>
-            </el-col>
-          </el-row>
-        </div>
-
-        <div class="kuand_1" style="height: 102px;margin-bottom: 100px">
-          <div class="data-title">
-            <b class="data-title-left">[</b>
-            <span>信息提交</span>
-            <b class="data-title-right">]</b>
-          </div>
-          <div  style="text-align: center;margin-top: 10px;cursor: pointer">
+            </div>
+          </el-upload>
+          <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+          </el-dialog>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>鉴定人员</h5>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="鉴定人:" prop="identifyname">
+            <el-input v-model="form.identifyname" :disabled="disabled_date" placeholder="请输入鉴定人姓名" clearable  size="small"  maxlength="10" style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="复核人:" prop="checkupname">
+            <el-input v-model="form.checkupname" :disabled="disabled_date" placeholder="请输入复核人姓名" clearable  size="small"  maxlength="10" style="width: 90%"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="24" style="text-align: left">
+          <h5>信息提交</h5>
+        </el-col>
+        <el-col :span="24" style="text-align: center">
             <el-button type="primary" @click="submitForm">提 交</el-button>
             <el-button @click="cancel" style="margin-left: 20px;">重 置</el-button>
-          </div>
-        </div>
-      </div>
+        </el-col>
+      </el-row>
+
     </el-form>
   </div>
 </template>
@@ -248,8 +233,9 @@
 <script>
   import axios from 'axios'
   import { getToken } from "@/utils/auth";
+  import {getExpertisereport} from "@/api/business/expertisereport";
   export default {
-    name: "addReceiptseizure",
+    name: "addExpertisereport",
     data() {
       return {
         //最少上传多少张图片
@@ -259,6 +245,8 @@
         dialogVisible: false,
         //是否禁用
         disabled: false,
+        //是否禁用日期控件
+        disabled_date:false,
         //图片集合
         fileList: [],
         //假币特征是否全选
@@ -271,18 +259,8 @@
         ccDenominationOptions:[],
         //版别
         ccSeriesOptions:[],
-        //复核状态
-        statusOptions:[],
         //证件类型
         certificateOptions:[],
-        //假币来源
-        sourceOptions:[],
-        //造假方式
-        madewayOptions:[],
-        //假币特征
-        ccFeatureOptions:[],
-        //是单位还是个人
-        isdwOptions:[{value: '1', label: '个人'}, {value: '2', label: '单位'}],
         // 上传图片参数
         upload: {
           //上传多个
@@ -294,46 +272,58 @@
           // 设置上传的请求头部
           headers: { Authorization: "Bearer " + getToken() },
           // 上传的地址
-          url: process.env.VUE_APP_BASE_API + "/business/receiptseizure/add"
+          url: process.env.VUE_APP_BASE_API + "/business/expertisereport/add"
         },
+        serialNumber_yuan:'',//原冠字号
+        ccCurrency_yuan:'',//原假币币种
+        ccDenomination_yuan:'',//原假币劵别
+        ccSeries_yuan:'',//原假币版别
         // 表单参数
         form: {
           userId: this.$store.state.user.userId,
-          ccFeature:[],
           deptName:this.$store.state.user.deptName,
           userName:this.$store.state.user.name,
-          receiptManname:this.$store.state.user.name,
-          unitOrIndividual:'1',
-          documentType:'身份证',
           ccCurrency:'人民币',
           ccDenomination:'100',
           ccSeries:'2015',
-          source:'金融机构柜面收缴',
-          contactNumber:this.$store.state.user.contactNumber,
-          madeway:'伪造',
-          ccFeature:[],
           totalamount:100,
           amount:1,
-          receiptdate:new Date(),
+          identifydate:new Date(),
           holderTelephone:'',
           remark:''
         },
         // 表单校验
         rules: {
-          receiptdate: [
-            { required: true, message: "收缴日期不能为空", trigger: "blur" }
+          identifydate: [
+            { required: true, message: "鉴定日期不能为空", trigger: "blur" }
           ],
-          holderName: [
-            { required: true, message: "持有人姓名不能为空", trigger: "blur" },
+          identifyname: [
+            { required: true, message: "鉴定人姓名不能为空", trigger: "blur" },
             { min: 2, max: 5, message: '2~5个字符', trigger: 'blur'}
           ],
-          receiptManname: [
-            { required: true, message: "经办人姓名不能为空", trigger: "blur" },
-            { min: 2, max: 5, message: '2~5个字符', trigger: 'blur'}
-          ],
-          cheekup: [
+          checkupname: [
             { required: true, message: "复核人姓名不能为空", trigger: "blur" },
             { min: 2, max: 5, message: '2~5个字符', trigger: 'blur'}
+          ],
+          holderName: [
+            { required: true, message: "送签单位或持有人姓名不能为空", trigger: "blur" },
+            { min: 2, max: 5, message: '2~5个字符', trigger: 'blur'}
+          ],
+          originalcffi: [
+            { required: true, message: "原鉴定单位名称不能为空", trigger: "blur" },
+            { min: 4, max: 20, message: '4~20个字符', trigger: 'blur'}
+          ],
+          originalresult: [
+            { required: true, message: "原鉴定结果不能为空", trigger: "blur" },
+            { min: 4, max: 50, message: '4~50个字符', trigger: 'blur'}
+          ],
+          result: [
+            { required: true, message: "现鉴定结果不能为空", trigger: "blur" },
+            { min: 4, max: 50, message: '4~50个字符', trigger: 'blur'}
+          ],
+          resultdetails: [
+            { required: true, message: "现鉴定详细结果不能为空", trigger: "blur" },
+            { min: 4, max: 200, message: '4~200个字符', trigger: 'blur'}
           ],
           ccCurrency: [
             { required: true, message: "币种不能为空", trigger: "blur" }
@@ -344,11 +334,9 @@
           ccSeries: [
             { required: true, message: "版别不能为空", trigger: "blur" }
           ],
-          source: [
-            { required: true, message: "假币来源不能为空", trigger: "blur" }
-          ],
           serialNumber: [
             { required: true, message: "假币冠字号码不能为空", trigger: "blur" },
+            { min: 8, max: 12, message: '8~12个字符', trigger: 'blur'},
             {pattern: /^[A-Za-z0-9]+$/, message: "请输入字母+数字的冠字号码", trigger: "blur"}
           ],
           amount: [
@@ -363,21 +351,13 @@
           userName: [
             { required: true, message: "登录账号不能为空", trigger: "blur" }
           ],
-          documentType: [
-            { required: true, message: "持有人证件类型不能为空", trigger: "blur" }
-          ],
           holderIdcard: [
             { required: true, message: "持有人证件号码不能为空", trigger: "blur" },
             {pattern: /^[A-Za-z0-9]+$/, message: "请输入字母+数字的证件号码", trigger: "blur"},
-            { min: 5, max: 20, message: '5~20个数字或字母', trigger: 'blur'}
-          ],
-          unitOrIndividual: [
-            { required: true, message: "单位或个人不能为空", trigger: "blur" }
-          ],
-          madeway: [
-            { required: true, message: "假币类型不能为空", trigger: "blur" }
+            { min: 8, max: 20, message: '5~20个数字或字母', trigger: 'blur'}
           ],
           holderTelephone: [
+            { required: true, message: "持有人手机号码不能为空", trigger: "blur" },
             {
               pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
               message: "请输入正确的手机号码",
@@ -388,6 +368,10 @@
       }
     },
     created() {
+      const id = this.$route.params && this.$route.params.id;
+      if(id!=0){
+        this.getExpertisereport(id);
+      }
       this.getDicts("sys_money_type").then(response => {
         this.ccCurrencyOptions = response.data;
       });
@@ -397,22 +381,8 @@
       this.getDicts("sys_money_version").then(response => {
         this.ccSeriesOptions = response.data;
       });
-      this.getDicts("sys_money_status").then(response => {
-        this.statusOptions = response.data;
-      });
       this.getDicts("sys_certificate_type").then(response => {
         this.certificateOptions = response.data;
-      });
-      this.getDicts("sys_money_source").then(response => {
-        this.sourceOptions = response.data;
-      });
-      this.getDicts("sys_false_type").then(response => {
-        this.madewayOptions = response.data;
-      });
-      this.getDicts("sys_false_way").then(response => {
-        response.data.forEach((item, index) => {
-          this.ccFeatureOptions.push(item.dictLabel)
-        })
       });
       this.getConfigKey("sys_shou_number").then(response => {
         if(response.msg) {
@@ -421,9 +391,18 @@
       })
     },
     methods: {
-      /** 假币特征选择全部时 */
-      handleCheckAllChange(val) {
-        this.form.ccFeature = val ? this.ccFeatureOptions : [];
+      getExpertisereport(id){
+        getExpertisereport(id).then(response => {
+          this.form = response.data
+          this.form.userName=response.data.createBy;
+          this.form.deptName=response.data.dept.deptName
+          this.serialNumber_yuan=response.data.serialNumber;
+          this.ccCurrency_yuan=response.data.ccCurrency;
+          this.ccDenomination_yuan=response.data.ccDenomination;
+          this.ccSeries_yuan=response.data.ccSeries;
+          this.disabled_date=true;
+          this.form.imgList='';
+        });
       },
       // 取消按钮
       cancel() {
@@ -435,35 +414,17 @@
           userId: this.$store.state.user.userId,
           deptName:this.$store.state.user.deptName,
           userName:this.$store.state.user.name,
-          contactNumber:this.$store.state.user.contactNumber,
-          receiptdate: new Date(),
+          identifydate: new Date(),
           amount: 1,
           totalamount: 100,
-          receiptManname: this.$store.state.user.name,
-          unitOrIndividual: '1',
-          unitName: null,
           holderName: null,
-          documentType: '身份证',
           holderIdcard: null,
           holderTelephone: null,
           ccCurrency: '人民币',
           ccDenomination: '100',
           ccSeries:'2015',
-          source: '金融机构柜面收缴',
-          madeway: '伪造',
-          ccFeature: [],
-          newtypedetail: null,
-          cheekup: null,
           remark: null,
-          delFlag: null,
-          status: "0",
-          reportReason: null,
           serialNumber: null,
-          createBy: null,
-          createTime: null,
-          updateBy: null,
-          updateTime: null,
-          groupNumber: null,
         };
         this.resetForm("form");
       },
@@ -521,6 +482,14 @@
       submitForm: function(){
         this.$refs["form"].validate(valid => {
           if (valid) {
+            const id = this.$route.params && this.$route.params.id;
+            if(id!=0){
+              if(this.serialNumber_yuan==this.form.serialNumber&&this.ccCurrency_yuan==this.form.ccCurrency
+              &&this.ccDenomination_yuan==this.form.ccDenomination&&this.ccSeries_yuan==this.form.ccSeries){
+                this.msgError('请在(币种、冠字号、卷别、版本)任意项中进行改动!')
+                return;
+              }
+            }
             let arr=this.$refs['dynamic'].uploadFiles
             if(arr.length>=this.zhang) {
               this.upload.formDate = new FormData();
@@ -534,52 +503,50 @@
               if(count<this.zhang){
                 this.msgError('请上传150KB以内的图片!，超过大小的图片会剔除，请重新上传')
               }else {
+                if(id!=0){
+                  this.upload.formDate.append('parentId', id);
+                }else {
+                  this.upload.formDate.append('parentId', 0);
+                }
                 this.upload.formDate.append('userId', this.form.userId);
                 this.upload.formDate.append('deptId', this.$store.state.user.deptId);
-                if(this.form.receiptdate instanceof Date){
+                if(this.form.identifydate instanceof Date){
                   let date = new Date()
                   var defalutEndTime = date.getFullYear() + '-' + ((date.getMonth() + 1) >= 10 ? (date.getMonth() + 1) : '0' + (date.getMonth() + 1)) + '-' + (date.getDate() >= 10 ? date.getDate() : '0' + date.getDate())
-                  this.upload.formDate.append('receiptdate', defalutEndTime);
+                  this.upload.formDate.append('identifydate', defalutEndTime);
                 }else {
-                  this.upload.formDate.append('receiptdate', this.form.receiptdate);
+                  this.upload.formDate.append('identifydate', this.form.identifydate);
                 }
                 this.upload.formDate.append('amount', this.form.amount);
                 this.upload.formDate.append('totalamount', this.form.totalamount);
-                this.upload.formDate.append('receiptManname', this.form.receiptManname);
-                this.upload.formDate.append('unitOrIndividual', this.form.unitOrIndividual);
-                this.upload.formDate.append('unitName', this.form.unitOrIndividual == '1' ? '' : this.form.unitName);
                 this.upload.formDate.append('holderName', this.form.holderName);
-                this.upload.formDate.append('documentType', this.form.documentType);
                 this.upload.formDate.append('holderIdcard', this.form.holderIdcard);
                 this.upload.formDate.append('holderTelephone', this.form.holderTelephone);
                 this.upload.formDate.append('ccCurrency', this.form.ccCurrency);
                 this.upload.formDate.append('ccDenomination', this.form.ccDenomination);
                 this.upload.formDate.append('ccSeries', this.form.ccSeries);
-                this.upload.formDate.append('source', this.form.source);
-                this.upload.formDate.append('madeway', this.form.madeway);
-                this.upload.formDate.append('ccFeature', this.form.madeway == '变造' ? this.form.ccFeature.toString() : '');
-                this.upload.formDate.append('cheekup', this.form.cheekup);
+                this.upload.formDate.append('identifyname', this.form.identifyname);
+                this.upload.formDate.append('checkupname', this.form.checkupname);
                 this.upload.formDate.append('remark', this.form.remark);
                 this.upload.formDate.append('serialNumber', this.form.serialNumber);
                 this.upload.formDate.append('createBy', this.$store.state.user.name);
+                this.upload.formDate.append('result',this.form.result);
+                this.upload.formDate.append('resultdetails', this.form.resultdetails);
+                this.upload.formDate.append('originalcffi',this.form.originalcffi);
+                this.upload.formDate.append('originalresult', this.form.originalresult);
+                this.upload.formDate.append('dataSource', '网页');
                 let config = {
                   headers: {
                     'Content-Type': 'multipart/form-data', 'Authorization': 'Bearer ' + getToken()
                   }
                 }
-                axios.post("/dev-api/business/receiptseizure/add", this.upload.formDate, config).then(res => {
+                axios.post(process.env.VUE_APP_BASE_API+"/business/expertisereport/add", this.upload.formDate, config).then(res => {
                   if (res.data.code === 200) {
                     this.upload.isUploading = false;
                     this.$refs['dynamic'].clearFiles();
-                    this.$confirm('新增成功, 是否要关闭此页面?', '提示', {
-                      confirmButtonText: '确定',
-                      cancelButtonText: '取消',
-                      type: 'warning'
-                    }).then(() => {
-                      this.$store.state.tagsView.visitedViews.splice(this.$store.state.tagsView.visitedViews.findIndex(item => item.path === this.$route.path), 1)
-                      this.$router.push(this.$store.state.tagsView.visitedViews[this.$store.state.tagsView.visitedViews.length-1].path)
-                    }).catch(() => {
-                    });
+                    this.msgSuccess('新增成功')
+                    this.$store.state.tagsView.visitedViews.splice(this.$store.state.tagsView.visitedViews.findIndex(item => item.path === this.$route.path), 1)
+                    this.$router.push(this.$store.state.tagsView.visitedViews[this.$store.state.tagsView.visitedViews.length-1].path)
                   }
                 }).catch(res => {
                   this.msgError('网络异常请重新提交!')
@@ -588,6 +555,8 @@
             }else {
               this.msgError('最少上传"'+this.zhang+'"张假币图片!')
             }
+          }else {
+            this.msgError('请完善表单数据!')
           }
         });
       }
@@ -595,52 +564,6 @@
   };
 </script>
 <style lang="scss" scoped>
-  .main_title{
-    width: 210px;
-    height: 35px;
-    line-height: 33px;
-    background-color: #2C58A6;
-    border-radius: 18px;
-    position: absolute;
-    top: -17px;
-    left:50%;
-    margin-left: -90px;
-    color:#fff;
-    font-size: 18px;
-    font-weight: 600;
-    box-sizing: border-box;
-    padding-left: 47px;
-    z-index: 1000;
-  }
-  .main_title img{
-    position: absolute;
-    top: 8px;
-    left: 20px;
-  }
-  .kuand_1{position: relative;}
-  .data-title {
-    width: 96px;
-    color: cyan;
-    font-size: 15px;
-    margin-left: 10px;
-  }
-  .data-title-left, .data-title-right {
-    color: cyan;
-    font-family: 微软雅黑;
-    font-size: 15px;
-  }
-  .data-title span {
-    text-align: center;
-    width: 80px;
-    display: inline-block;
-    text-align: center;
-    font-size: 14px;
-  }
-  .el-radio{
-    color: white !important;
-  }
-  .el-checkbox{
-    color: white !important;
-  }
+
 
 </style>

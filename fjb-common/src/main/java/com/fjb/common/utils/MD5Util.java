@@ -1,5 +1,6 @@
 package com.fjb.common.utils;
 
+import com.fjb.common.config.FjbConfig;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.File;
@@ -100,10 +101,14 @@ public class MD5Util implements PasswordEncoder {
 	}
 
 	public static void main(String[] args) {
+		String localPath = FjbConfig.getProfile();
 //		System.out.println(new MD5Util().encode("123456"));
-		String S="/profile/avatar/2021/08/20/4a21f9cd-7e19-477f-814a-e7e9aa10de19.jpeg";
-		System.out.println(S.substring(S.lastIndexOf("/")+1,S.length()));
-		System.out.println(StringUtils.substringAfter(S,"/profile"));
+//		String S="/profile/avatar/2021/08/20/4a21f9cd-7e19-477f-814a-e7e9aa10de19.jpeg";
+//		System.out.println(S.substring(S.lastIndexOf("/")+1,S.length()));
+//		System.out.println(StringUtils.substringAfter(S,"profile"));
+		String SS="http://localhost:8010/profile/upload/2021/09/01/d0903f33-adf1-4ac5-874f-558c10a83bae.png";
+		String filePath = localPath + StringUtils.substringAfter(SS, "/profile");
+		System.out.println(SS.substring(SS.indexOf("/"),SS.length()));
 	}
 
 }

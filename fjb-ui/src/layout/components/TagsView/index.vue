@@ -148,7 +148,6 @@ export default {
       })
     },
     closeSelectedTag(view) {
-      console.log(view)
       this.$store.dispatch('tagsView/delView', view).then(({ visitedViews }) => {
         if (this.isActive(view)) {
           this.toLastView(visitedViews, view)
@@ -241,7 +240,7 @@ export default {
         /*border-color: #42b983;*/
         &::before {
           content: '';
-          background: #fff;
+          background: aquamarine;
           display: inline-block;
           width: 8px;
           height: 8px;

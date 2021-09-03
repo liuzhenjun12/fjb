@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.PanduanAnMapper">
+    
+    <resultMap type="PanduanAn" id="PanduanAnResult">
+        <result property="id"    column="id"    />
+        <result property="qid"    column="qid"    />
+        <result property="qind"    column="qind"    />
+        <result property="qdetail"    column="qdetail"    />
+        <result property="qpic"    column="qpic"    />
+    </resultMap>
+
+    <sql id="selectPanduanAnVo">
+        select id, qid, qind, qdetail, qpic from panduan_an
+    </sql>
+
+    <select id="selectPanduanAnList" parameterType="PanduanAn" resultMap="PanduanAnResult">
+        <include refid="selectPanduanAnVo"/>
+        <where>  
+            <if test="qid != null "> and qid = #{qid}</if>
+            <if test="qind != null  and qind != ''"> and qind = #{qind}</if>
+            <if test="qdetail != null  and qdetail != ''"> and qdetail = #{qdetail}</if>
+            <if test="qpic != null  and qpic != ''"> and qpic = #{qpic}</if>
+        </where>
+    </select>
+    
+    <select id="selectPanduanAnById" parameterType="Long" resultMap="PanduanAnResult">
+        <include refid="selectPanduanAnVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertPanduanAn" parameterType="PanduanAn" useGeneratedKeys="true" keyProperty="id">
+        insert into panduan_an
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="qid != null">qid,</if>
+            <if test="qind != null">qind,</if>
+            <if test="qdetail != null">qdetail,</if>
+            <if test="qpic != null">qpic,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="qid != null">#{qid},</if>
+            <if test="qind != null">#{qind},</if>
+            <if test="qdetail != null">#{qdetail},</if>
+            <if test="qpic != null">#{qpic},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePanduanAn" parameterType="PanduanAn">
+        update panduan_an
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="qid != null">qid = #{qid},</if>
+            <if test="qind != null">qind = #{qind},</if>
+            <if test="qdetail != null">qdetail = #{qdetail},</if>
+            <if test="qpic != null">qpic = #{qpic},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePanduanAnById" parameterType="Long">
+        delete from panduan_an where id = #{id}
+    </delete>
+
+    <delete id="deletePanduanAnByIds" parameterType="String">
+        delete from panduan_an where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

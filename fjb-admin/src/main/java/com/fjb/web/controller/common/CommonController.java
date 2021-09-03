@@ -69,6 +69,8 @@ public class CommonController
         }
     }
 
+
+
     /**
      * IE7下载浏览器离线安装包
      *
@@ -147,7 +149,24 @@ public class CommonController
             return AjaxResult.error(e.getMessage());
         }
     }
-
+    /**
+     * 通用卸载文件
+     */
+    @PostMapping("/common/unin")
+    public AjaxResult uninstall(String filePath) throws Exception
+    {
+        try
+        {
+            String localPath = FjbConfig.getProfile();
+            String fath = localPath + StringUtils.substringAfter(filePath, "/profile");
+            FileUtils.deleteFile(fath);
+            return AjaxResult.success();
+        }
+        catch (Exception e)
+        {
+            return AjaxResult.error(e.getMessage());
+        }
+    }
     /**
      * 本地资源通用下载
      */

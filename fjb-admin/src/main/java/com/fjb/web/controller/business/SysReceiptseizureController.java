@@ -63,7 +63,7 @@ public class SysReceiptseizureController extends BaseController
      * 导出假币收缴凭证列表
      */
     @PreAuthorize("@ss.hasPermi('business:receiptseizure:export')")
-    @Log(title = "假币收缴凭证", businessType = BusinessType.EXPORT)
+    @Log(title = "收缴凭证", businessType = BusinessType.EXPORT)
     @GetMapping("/export")
     public AjaxResult export(SysReceiptseizure sysReceiptseizure)
     {
@@ -86,12 +86,15 @@ public class SysReceiptseizureController extends BaseController
      * 新增假币收缴凭证
      */
     @PreAuthorize("@ss.hasPermi('business:receiptseizure:add')")
+    @Log(title = "收缴凭证", businessType = BusinessType.INSERT)
     @PostMapping(value = "/add")
     public AjaxResult add(@RequestParam("file") MultipartFile[] file, SysReceiptseizure sysReceiptseizure) throws IOException {
         if(StringUtils.isNotEmpty(file)) {
+            Long id= Long.valueOf(sysReceiptseizure.getDeptId());
+            SysDept dept=deptService.selectDeptById(id);
             List<FilePathVo> filePathVos = new ArrayList<>();
             for (MultipartFile s : file) {
-                String avatar = FileUploadUtils.upload(FjbConfig.getUploadPath(), s);
+                String avatar = FileUploadUtils.upload(FjbConfig.getUploadPath()+"/收缴/"+dept.getJianCheng(), s);
                 FilePathVo f = new FilePathVo();
                 f.setName(avatar.substring(avatar.lastIndexOf("/") + 1, avatar.length()));
                 f.setUrl(avatar);
@@ -100,8 +103,6 @@ public class SysReceiptseizureController extends BaseController
             if (!filePathVos.isEmpty()) {
                 sysReceiptseizure.setImgList(JSON.toJSONString(filePathVos));
                 String bh=sysReceiptseizureService.selectNumberByDeptid(sysReceiptseizure.getDeptId());
-                Long id= Long.valueOf(sysReceiptseizure.getDeptId());
-                SysDept dept=deptService.selectDeptById(id);
                 if(StringUtils.isNotEmpty(bh)){
                     int parseInt = Integer.parseInt(bh.substring(bh.length() - 5));
                     DecimalFormat decimalFormat = new DecimalFormat("000000");
@@ -109,6 +110,14 @@ public class SysReceiptseizureController extends BaseController
                     sysReceiptseizure.setNumber(dept.getJigouCode()+numFormat);
                 }else {
                     sysReceiptseizure.setNumber(dept.getJigouCode()+"000001");
+                }
+                if(!"网页".equals(sysReceiptseizure.getDataSource())){
+                    SysReceiptseizure zu=sysReceiptseizureService.selectParentId(sysReceiptseizure);
+                    if(StringUtils.isNotNull(zu)){
+                        sysReceiptseizure.setParentId(zu.getId());
+                    }else {
+                        sysReceiptseizure.setParentId((long) 0);
+                    }
                 }
                 return toAjax(sysReceiptseizureService.insertSysReceiptseizure(sysReceiptseizure));
             } else {
@@ -123,13 +132,15 @@ public class SysReceiptseizureController extends BaseController
      * 修改假币收缴凭证
      */
     @PreAuthorize("@ss.hasPermi('business:receiptseizure:edit')")
-    @Log(title = "假币收缴凭证", businessType = BusinessType.UPDATE)
+    @Log(title = "收缴凭证", businessType = BusinessType.UPDATE)
     @PostMapping(value = "/update")
     public AjaxResult edit(@RequestParam("file") MultipartFile[] file,  SysReceiptseizure sysReceiptseizure) throws IOException {
         SysReceiptseizure re = sysReceiptseizureService.selectSysReceiptseizureById(sysReceiptseizure.getId());
         if (file.length > 0) {
             if ("add".equals(sysReceiptseizure.getStatus())) {
-                String avatar = FileUploadUtils.upload(FjbConfig.getUploadPath(), file[0]);
+                Long id= Long.valueOf(sysReceiptseizure.getDeptId());
+                SysDept dept=deptService.selectDeptById(id);
+                String avatar = FileUploadUtils.upload(FjbConfig.getUploadPath()+"/收缴/"+dept.getJianCheng(), file[0]);
                 List<FilePathVo> filePathVos=new ArrayList<>();
                 if(StringUtils.isNotEmpty(re.getImgList())&&!"[]".equals(re.getImgList())) {
                     filePathVos = JSON.parseArray(re.getImgList(), FilePathVo.class);
@@ -158,7 +169,26 @@ public class SysReceiptseizureController extends BaseController
                 re.setImgList(JSON.toJSONString(filePathVos));
                 return toAjax(sysReceiptseizureService.updateSysReceiptseizure(re));
             } else {
-                System.out.println(sysReceiptseizure.toString());
+                int row=sysReceiptseizureService.getParentNum(sysReceiptseizure.getId());
+                if(row>0){
+                    SysReceiptseizure r=new SysReceiptseizure();
+                    r.setParentId(sysReceiptseizure.getId());
+                    List<SysReceiptseizure> rs=sysReceiptseizureService.selectSysReceiptseizureList(r);
+                    if(!rs.isEmpty()){
+                        for(SysReceiptseizure y:rs){
+                            y.setReceiptdate(sysReceiptseizure.getReceiptdate());
+                            y.setUnitOrIndividual(sysReceiptseizure.getUnitOrIndividual());
+                            y.setUnitName(sysReceiptseizure.getUnitName());
+                            y.setReceiptManname(sysReceiptseizure.getReceiptManname());
+                            y.setHolderTelephone(sysReceiptseizure.getHolderTelephone());
+                            y.setHolderName(sysReceiptseizure.getHolderName());
+                            y.setHolderIdcard(sysReceiptseizure.getHolderIdcard());
+                            y.setDocumentType(sysReceiptseizure.getDocumentType());
+                            y.setCheekup(sysReceiptseizure.getCheekup());
+                            sysReceiptseizureService.updateSysReceiptseizure(y);
+                        }
+                    }
+                }
                 return toAjax(sysReceiptseizureService.updateSysReceiptseizure(sysReceiptseizure));
             }
         }
@@ -169,22 +199,38 @@ public class SysReceiptseizureController extends BaseController
      * 删除假币收缴凭证
      */
     @PreAuthorize("@ss.hasPermi('business:receiptseizure:remove')")
-    @Log(title = "假币收缴凭证", businessType = BusinessType.DELETE)
-	@DeleteMapping("/{ids}")
-    public AjaxResult remove(@PathVariable Long[] ids)
+    @Log(title = "收缴凭证", businessType = BusinessType.DELETE)
+	@DeleteMapping("/{id}")
+    public AjaxResult remove(@PathVariable Long id)
     {
-        return toAjax(sysReceiptseizureService.deleteSysReceiptseizureByIds(ids));
+        int row=sysReceiptseizureService.getParentNum(id);
+        if(row>0){
+            return AjaxResult.error("请先删除关联的数据");
+        }
+        return toAjax(sysReceiptseizureService.deleteSysReceiptseizureById(id));
     }
 
     /**
      * 状态修改
      */
     @PreAuthorize("@ss.hasPermi('business:receiptseizure:edit')")
-    @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @Log(title = "收缴凭证", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public AjaxResult changeStatus(@RequestBody SysReceiptseizure sysReceiptseizure)
     {
         sysReceiptseizure.setUpdateBy(SecurityUtils.getUsername());
         return toAjax(sysReceiptseizureService.updateReceiptseizureStatus(sysReceiptseizure));
     }
+
+    /**
+     * 获取绑定个数
+     */
+    @PreAuthorize("@ss.hasPermi('business:receiptseizure:query')")
+    @GetMapping(value = "/parentNum/{id}")
+    public AjaxResult getParentNum(@PathVariable("id") Long id)
+    {
+        int row=sysReceiptseizureService.getParentNum(id);
+        return AjaxResult.success(row);
+    }
+
 }

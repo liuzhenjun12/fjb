@@ -72,25 +72,50 @@
      word-break: break-all;
    }
  }
+ .biaodan{
+   background-color: white;
+   width: 80%;
+   min-height: 500px;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 100px;
+   padding: 30px 15px 50px 15px;
+   .el-form .el-input--small .el-input__inner {
+     border-color:#DCDFE6;
+     background-color: #FFFFFF;
+     color: #606266;
+   }
+   .el-form  .el-input.is-disabled .el-input__inner{
+     color: #ccc;
+   }
+   .el-form-item__label {
+     color: #606266;
+   }
+ }
+ .demo-table-expand{
+   .el-form-item__label {
+     color: #606266;
+   }
+ }
  .texkuang .el-textarea__inner{
    border-color: #4b8df8 !important;
    background-color: #cccccc4f;
    color: aqua;
    width: 85%;
  }
- .zaopian  .el-upload--picture-card{
-   border-color: #4b8df8 !important;
-   background-color: #cccccc4f;
-   width: 80px;
-   height: 80px;
-   line-height: 86px;
-   margin-top: 8px;
- }
- .zaopian .el-upload-list--picture-card .el-upload-list__item{
-   width: 80px;
-   height: 80px;
-   margin-top: 8px;
- }
+ //.zaopian  .el-upload--picture-card{
+ //  border-color: #4b8df8 !important;
+ //  background-color: #cccccc4f;
+ //  width: 80px;
+ //  height: 80px;
+ //  line-height: 86px;
+ //  margin-top: 8px;
+ //}
+ //.zaopian .el-upload-list--picture-card .el-upload-list__item{
+ //  width: 80px;
+ //  height: 80px;
+ //  margin-top: 8px;
+ //}
 //.el-table {
 //  background-color:#030829;
 //  color: white;
@@ -103,16 +128,19 @@
 //  td{
 //    border-bottom: 1px solid #053A98 !important;
 //  }
-	.el-table__header-wrapper, .el-table__fixed-header-wrapper {
-    th {
-      background-color: #030829;
-      word-break: break-word;
-      height: 40px;
-      color: white;
-    }
-  }
+//	.el-table__header-wrapper, .el-table__fixed-header-wrapper {
+//    th {
+//      background-color: #030829;
+//      word-break: break-word;
+//      height: 40px;
+//      color: white;
+//    }
+//  }
  .el-table--medium th, .el-table--medium td{
    padding: 10px 0;
+ }
+ .el-table thead{
+   color: #2b2f3a;font-weight: bold;
  }
 //    th:hover{
 //      color: white
@@ -363,11 +391,11 @@
   border-color: #20B2AA;
   color: #FFFFFF;
 }
- .el-button.is-disabled, .el-button.is-disabled:hover, .el-button.is-disabled:focus{
-   background-color: #c0ccda;
-   border-color: #c0ccda;
-   color: #FFFFFF;
- }
+ //.el-button.is-disabled, .el-button.is-disabled:hover, .el-button.is-disabled:focus{
+ //  background-color: #c0ccda;
+ //  border-color: #c0ccda;
+ //  color: #FFFFFF;
+ //}
 /* text color */
 .text-navy {
 	color: #1ab394;

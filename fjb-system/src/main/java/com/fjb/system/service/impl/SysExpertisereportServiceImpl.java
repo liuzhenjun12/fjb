@@ -29,7 +29,7 @@ public class SysExpertisereportServiceImpl implements ISysExpertisereportService
      * @return 假币鉴定
      */
     @Override
-    public SysExpertisereport selectSysExpertisereportById(Integer id)
+    public SysExpertisereport selectSysExpertisereportById(Long id)
     {
         return sysExpertisereportMapper.selectSysExpertisereportById(id);
     }
@@ -80,7 +80,7 @@ public class SysExpertisereportServiceImpl implements ISysExpertisereportService
      * @return 结果
      */
     @Override
-    public int deleteSysExpertisereportByIds(Integer[] ids)
+    public int deleteSysExpertisereportByIds(Long[] ids)
     {
         return sysExpertisereportMapper.deleteSysExpertisereportByIds(ids);
     }
@@ -92,8 +92,28 @@ public class SysExpertisereportServiceImpl implements ISysExpertisereportService
      * @return 结果
      */
     @Override
-    public int deleteSysExpertisereportById(Integer id)
+    public int deleteSysExpertisereportById(Long id)
     {
         return sysExpertisereportMapper.deleteSysExpertisereportById(id);
+    }
+
+    @Override
+    public String selectNumberByDeptid(Long deptId) {
+        return sysExpertisereportMapper.selectNumberByDeptid(deptId);
+    }
+
+    @Override
+    public int updateExpertisereportStatus(SysExpertisereport sysExpertisereport) {
+        return sysExpertisereportMapper.updateSysExpertisereport(sysExpertisereport);
+    }
+
+    @Override
+    public int getParentNum(Long id) {
+        return sysExpertisereportMapper.getParentNum(id);
+    }
+
+    @Override
+    public SysExpertisereport selectParentId(SysExpertisereport sysExpertisereport) {
+        return sysExpertisereportMapper.selectParentId(sysExpertisereport);
     }
 }

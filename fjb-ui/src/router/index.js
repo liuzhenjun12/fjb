@@ -93,12 +93,25 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/tiku',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'an/:id(\\d+)',
+        component: (resolve) => require(['@/views/fake/tiku/an'], resolve),
+        name: 'An',
+        meta: { title: '问题答案', icon: '' }
+      }
+    ]
+  },
+  {
     path: '/receiptseizure',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: 'addPage',
+        path: 'addPage/:id(\\d+)',
         component: (resolve) => require(['@/views/business/receiptseizure/add'], resolve),
         name: 'addReceiptseizure',
         meta: { title: '新增收缴凭证', icon: '' }
@@ -117,7 +130,7 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: 'addPage',
+        path: 'addPage/:id(\\d+)',
         component: (resolve) => require(['@/views/business/expertisereport/add'], resolve),
         name: 'addExpertisereport',
         meta: { title: '新增鉴定证书', icon: '' }
@@ -127,6 +140,25 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/business/expertisereport/update'], resolve),
         name: 'updateExpertisereport',
         meta: { title: '修改鉴定证书', icon: '' }
+      }
+    ]
+  },
+  {
+    path: '/confiscation',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: 'addPage/:id(\\d+)',
+        component: (resolve) => require(['@/views/business/confiscation/add'], resolve),
+        name: 'addConfiscation',
+        meta: { title: '新增没收凭证', icon: '' }
+      },
+      {
+        path: 'updatePage/:id(\\d+)',
+        component: (resolve) => require(['@/views/business/confiscation/update'], resolve),
+        name: 'updateConfiscation',
+        meta: { title: '修改没收凭证', icon: '' }
       }
     ]
   },

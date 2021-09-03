@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.SysMoneyMapper">
+    
+    <resultMap type="SysMoney" id="SysMoneyResult">
+        <result property="id"    column="id"    />
+        <result property="ccCurrency"    column="cc_currency"    />
+        <result property="ccDenomination"    column="cc_denomination"    />
+        <result property="ccSeries"    column="cc_series"    />
+        <result property="zhengImgPath"    column="zheng_img_path"    />
+        <result property="fanImgPath"    column="fan_img_path"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectSysMoneyVo">
+        select id, cc_currency, cc_denomination, cc_series, zheng_img_path, fan_img_path, status, del_flag, create_by, create_time, update_by, update_time, remark from sys_money
+    </sql>
+
+    <select id="selectSysMoneyList" parameterType="SysMoney" resultMap="SysMoneyResult">
+        <include refid="selectSysMoneyVo"/>
+        <where>  
+            <if test="ccCurrency != null  and ccCurrency != ''"> and cc_currency = #{ccCurrency}</if>
+            <if test="ccDenomination != null  and ccDenomination != ''"> and cc_denomination = #{ccDenomination}</if>
+            <if test="ccSeries != null  and ccSeries != ''"> and cc_series = #{ccSeries}</if>
+            <if test="zhengImgPath != null  and zhengImgPath != ''"> and zheng_img_path = #{zhengImgPath}</if>
+            <if test="fanImgPath != null  and fanImgPath != ''"> and fan_img_path = #{fanImgPath}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysMoneyById" parameterType="Integer" resultMap="SysMoneyResult">
+        <include refid="selectSysMoneyVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysMoney" parameterType="SysMoney" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_money
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="ccCurrency != null">cc_currency,</if>
+            <if test="ccDenomination != null">cc_denomination,</if>
+            <if test="ccSeries != null">cc_series,</if>
+            <if test="zhengImgPath != null">zheng_img_path,</if>
+            <if test="fanImgPath != null">fan_img_path,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="ccCurrency != null">#{ccCurrency},</if>
+            <if test="ccDenomination != null">#{ccDenomination},</if>
+            <if test="ccSeries != null">#{ccSeries},</if>
+            <if test="zhengImgPath != null">#{zhengImgPath},</if>
+            <if test="fanImgPath != null">#{fanImgPath},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysMoney" parameterType="SysMoney">
+        update sys_money
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ccCurrency != null">cc_currency = #{ccCurrency},</if>
+            <if test="ccDenomination != null">cc_denomination = #{ccDenomination},</if>
+            <if test="ccSeries != null">cc_series = #{ccSeries},</if>
+            <if test="zhengImgPath != null">zheng_img_path = #{zhengImgPath},</if>
+            <if test="fanImgPath != null">fan_img_path = #{fanImgPath},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysMoneyById" parameterType="Integer">
+        delete from sys_money where id = #{id}
+    </delete>
+
+    <delete id="deleteSysMoneyByIds" parameterType="String">
+        delete from sys_money where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

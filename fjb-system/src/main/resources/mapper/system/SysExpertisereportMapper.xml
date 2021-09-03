@@ -20,9 +20,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="ccCurrency"    column="cc_currency"    />
         <result property="ccDenomination"    column="cc_denomination"    />
         <result property="ccSeries"    column="cc_series"    />
-        <result property="ccMadeway"    column="cc_madeway"    />
-        <result property="ccFeature"    column="cc_feature"    />
-        <result property="identifyreportFile"    column="identifyreport_file"    />
         <result property="originalcffi"    column="originalcffi"    />
         <result property="originalresult"    column="originalresult"    />
         <result property="result"    column="result"    />
@@ -35,8 +32,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
         <result property="imgList"    column="img_list"    />
-        <result property="groupNumber"    column="group_number"    />
+        <result property="parentId"    column="parent_id"    />
         <result property="serialNumber"    column="serial_number"    />
+        <result property="dataSource"    column="data_source"    />
         <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
         <association property="user"    column="user_id" javaType="SysUser" resultMap="SysUserResult" />
     </resultMap>
@@ -59,9 +57,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectSysExpertisereportVo">
         select r.id, r.number, r.dept_id, r.user_id, r.amount, r.totalamount, r.identifyname, r.checkupname,
          r.identifydate, r.holder_name, r.holder_telephone, r.holder_IDCard, r.cc_currency,r.serial_number,
-         r.cc_denomination, r.cc_series, r.cc_madeway, r.cc_feature, r.identifyreport_file,
+         r.cc_denomination, r.cc_series,r.data_source,
          r.originalcffi, r.originalresult, r.result, r.resultdetails, r.status, r.remark,
-         r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.img_list, r.group_number
+         r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.img_list, r.parent_id
          ,u.user_id, u.dept_id, u.nick_name, u.user_name,d.dept_name, d.dept_id,d.jian_cheng,d.parent_id
          from sys_expertisereport r
          left join sys_user u on r.user_id = u.user_id
@@ -71,16 +69,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectSysExpertisereportList" parameterType="SysExpertisereport" resultMap="SysExpertisereportResult">
         select r.id, r.number, r.dept_id, r.user_id, r.amount, r.totalamount, r.identifyname, r.checkupname,
         r.identifydate, r.holder_name, r.holder_telephone, r.holder_IDCard, r.cc_currency,r.serial_number,
-        r.cc_denomination, r.cc_series, r.cc_madeway, r.cc_feature, r.identifyreport_file,
+        r.cc_denomination, r.cc_series,r.data_source,
         r.originalcffi, r.originalresult, r.result, r.resultdetails, r.status, r.remark,
-        r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.img_list, r.group_number
+        r.del_flag, r.create_by, r.create_time, r.update_by, r.update_time, r.img_list, r.parent_id
         ,u.user_id, u.dept_id, u.nick_name, u.user_name,d.dept_name, d.dept_id,d.jian_cheng,d.parent_id
         from sys_expertisereport r
         left join sys_user u on r.user_id = u.user_id
         left join sys_dept d on r.dept_id = d.dept_id
         where r.del_flag = '0'
         <if test="deptId != null and deptId != 0">
-            AND (r.dept_id = #{deptId} OR r.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
+            AND r.dept_id = #{deptId}
         </if>
         <if test="number != null  and number != ''"> and r.number = #{number}</if>
         <if test="deptId != null "> and r.dept_id = #{deptId}</if>
@@ -88,10 +86,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="ccCurrency != null  and ccCurrency != ''"> and r.cc_currency = #{ccCurrency}</if>
         <if test="ccDenomination != null  and ccDenomination != ''"> and r.cc_denomination = #{ccDenomination}</if>
         <if test="ccSeries != null  and ccSeries != ''"> and r.cc_series = #{ccSeries}</if>
-        <if test="ccMadeway != null  and ccMadeway != ''"> and r.cc_madeway = #{ccMadeway}</if>
         <if test="status != null  and status != ''"> and r.status = #{status}</if>
         <if test="serialNumber != null  and serialNumber != ''"> and r.serial_number like concat('%', #{serialNumber}, '%')</if>
-        <if test="groupNumber != null  and groupNumber != ''"> and r.group_number = #{groupNumber}</if>
+        <if test="parentId != null  "> and r.parent_id = #{parentId}</if>
         <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
             and date_format(r.identifydate,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
         </if>
@@ -102,7 +99,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ${params.dataScope}
     </select>
 
-    <select id="selectSysExpertisereportById" parameterType="Integer" resultMap="SysExpertisereportResult">
+    <select id="selectSysExpertisereportById" parameterType="Long" resultMap="SysExpertisereportResult">
         <include refid="selectSysExpertisereportVo"/>
         where id = #{id}
     </select>
@@ -124,9 +121,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="ccCurrency != null">cc_currency,</if>
             <if test="ccDenomination != null">cc_denomination,</if>
             <if test="ccSeries != null">cc_series,</if>
-            <if test="ccMadeway != null">cc_madeway,</if>
-            <if test="ccFeature != null">cc_feature,</if>
-            <if test="identifyreportFile != null">identifyreport_file,</if>
             <if test="originalcffi != null">originalcffi,</if>
             <if test="originalresult != null">originalresult,</if>
             <if test="result != null">result,</if>
@@ -139,8 +133,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="imgList != null">img_list,</if>
-            <if test="groupNumber != null">group_number,</if>
+            <if test="parentId != null">parent_id,</if>
             <if test="serialNumber != null">serial_number,</if>
+            <if test="dataSource != null">data_source,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="number != null">#{number},</if>
@@ -157,9 +152,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="ccCurrency != null">#{ccCurrency},</if>
             <if test="ccDenomination != null">#{ccDenomination},</if>
             <if test="ccSeries != null">#{ccSeries},</if>
-            <if test="ccMadeway != null">#{ccMadeway},</if>
-            <if test="ccFeature != null">#{ccFeature},</if>
-            <if test="identifyreportFile != null">#{identifyreportFile},</if>
             <if test="originalcffi != null">#{originalcffi},</if>
             <if test="originalresult != null">#{originalresult},</if>
             <if test="result != null">#{result},</if>
@@ -172,8 +164,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="imgList != null">#{imgList},</if>
-            <if test="groupNumber != null">#{groupNumber},</if>
+            <if test="parentId != null">#{parentId},</if>
             <if test="serialNumber != null">#{serialNumber},</if>
+            <if test="dataSource != null">#{dataSource},</if>
          </trim>
     </insert>
 
@@ -194,9 +187,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="ccCurrency != null">cc_currency = #{ccCurrency},</if>
             <if test="ccDenomination != null">cc_denomination = #{ccDenomination},</if>
             <if test="ccSeries != null">cc_series = #{ccSeries},</if>
-            <if test="ccMadeway != null">cc_madeway = #{ccMadeway},</if>
-            <if test="ccFeature != null">cc_feature = #{ccFeature},</if>
-            <if test="identifyreportFile != null">identifyreport_file = #{identifyreportFile},</if>
             <if test="originalcffi != null">originalcffi = #{originalcffi},</if>
             <if test="originalresult != null">originalresult = #{originalresult},</if>
             <if test="result != null">result = #{result},</if>
@@ -209,15 +199,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="imgList != null">img_list = #{imgList},</if>
-            <if test="groupNumber != null">group_number = #{groupNumber},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
             <if test="serialNumber != null">serial_number = #{serialNumber},</if>
+            <if test="dataSource != null">data_source = #{dataSource},</if>
         </trim>
         where id = #{id}
     </update>
 
-    <delete id="deleteSysExpertisereportById" parameterType="Integer">
+    <select id="selectNumberByDeptid" parameterType="Long" resultType="String">
+        select number from sys_expertisereport where dept_id = #{deptId} order by id desc  limit 1
+    </select>
+
+    <select id="getParentNum" parameterType="Long" resultType="Integer">
+        select count(*) from sys_expertisereport where parent_id = #{id}
+    </select>
+
+    <delete id="deleteSysExpertisereportById" parameterType="Long">
         delete from sys_expertisereport where id = #{id}
     </delete>
+
+    <select id="selectParentId" parameterType="SysExpertisereport" resultMap="SysExpertisereportResult">
+        select * from sys_expertisereport where del_flag = '0'
+        and date_format(identifydate,'%y%m%d') = date_format(#{identifydate},'%y%m%d')
+        and identifyname=#{identifyname}
+        and dept_id=#{deptId}
+        and user_id=#{userId}
+        and checkupname=#{checkupname}
+        and holder_name=#{holderName}
+        and holder_IDCard=#{holderIdcard}
+        and originalcffi=#{originalcffi}
+        and parent_id=0 limit 1
+    </select>
 
     <delete id="deleteSysExpertisereportByIds" parameterType="String">
         delete from sys_expertisereport where id in

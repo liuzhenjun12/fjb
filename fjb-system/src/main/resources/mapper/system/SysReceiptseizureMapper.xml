@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fjb.system.mapper.SysReceiptseizureMapper">
+
+    <resultMap type="SysReceiptseizure" id="SysReceiptseizureResult">
+        <result property="id"    column="id"    />
+        <result property="number"    column="number"    />
+        <result property="userId"    column="user_id"    />
+        <result property="deptId"   column="dept_id"     />
+        <result property="receiptdate"    column="receiptdate"    />
+        <result property="amount"    column="amount"    />
+        <result property="totalamount"    column="totalamount"    />
+        <result property="receiptManname"    column="receipt_manname"    />
+        <result property="unitOrIndividual"    column="unit_or_individual"    />
+        <result property="unitName"    column="unit_name"    />
+        <result property="holderName"    column="holder_name"    />
+        <result property="documentType"    column="document_type"    />
+        <result property="holderIdcard"    column="holder_IDCard"    />
+        <result property="holderTelephone"    column="holder_telephone"    />
+        <result property="ccCurrency"    column="cc_currency"    />
+        <result property="ccDenomination"    column="cc_denomination"    />
+        <result property="ccSeries"    column="cc_series"    />
+        <result property="source"    column="source"    />
+        <result property="madeway"    column="madeway"    />
+        <result property="ccFeature"    column="cc_feature"    />
+        <result property="newtypedetail"    column="newtypedetail"    />
+        <result property="cheekup"    column="cheekup"    />
+        <result property="remark"    column="remark"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="status"    column="status"    />
+        <result property="reportReason"    column="report_reason"    />
+        <result property="serialNumber"    column="serial_number"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="imgList"    column="img_list"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="dataSource"    column="data_source"    />
+        <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+        <association property="user"    column="user_id" javaType="SysUser" resultMap="SysUserResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="SysDept">
+        <id     property="deptId"   column="dept_id"     />
+        <result property="parentId" column="parent_id"   />
+        <result property="deptName" column="dept_name"   />
+        <result property="jianCheng" column="jian_cheng" />
+    </resultMap>
+
+    <resultMap type="SysUser" id="SysUserResult">
+        <id     property="userId"       column="user_id"      />
+        <result property="deptId"       column="dept_id"      />
+        <result property="userName"     column="user_name"    />
+        <result property="nickName"     column="nick_name"    />
+    </resultMap>
+
+    <sql id="selectSysReceiptseizureVo">
+        select r.id, r.number, r.user_id,r.dept_id, r.receiptdate, r.amount, r.totalamount, r.receipt_manname,
+        r.unit_or_individual, r.unit_name, r.holder_name, r.document_type, r.holder_IDCard, r.holder_telephone,
+        r.cc_currency, r.cc_denomination, r.cc_series, r.source, r.madeway, r.cc_feature, r.newtypedetail,  r.cheekup,
+        r.remark, r.del_flag, r.status, r.report_reason, r.serial_number, r.create_by, r.create_time, r.update_by,
+        r.update_time, r.img_list, r.parent_id,r.data_source,r.document_type,u.user_id, u.dept_id, u.nick_name, u.user_name,
+        d.dept_name, d.dept_id,d.jian_cheng,d.parent_id
+        from sys_receiptseizure r
+        left join sys_user u on r.user_id = u.user_id
+        left join sys_dept d on r.dept_id = d.dept_id
+    </sql>
+
+    <select id="selectSysReceiptseizureList" parameterType="SysReceiptseizure" resultMap="SysReceiptseizureResult">
+        select r.id, r.number, r.user_id,r.dept_id, r.receiptdate, r.amount, r.totalamount, r.receipt_manname,
+        r.unit_or_individual, r.unit_name, r.holder_name, r.document_type, r.holder_IDCard, r.holder_telephone,
+        r.cc_currency, r.cc_denomination, r.cc_series, r.source, r.madeway, r.cc_feature, r.newtypedetail,  r.cheekup,
+        r.remark, r.del_flag, r.status, r.report_reason, r.serial_number, r.create_by, r.create_time, r.update_by,
+        r.update_time, r.img_list, r.parent_id,r.data_source,u.user_id, u.dept_id, u.nick_name, u.user_name,
+        d.dept_name, d.dept_id,d.jian_cheng,d.parent_id
+        from sys_receiptseizure r
+        left join sys_user u on r.user_id = u.user_id
+        left join sys_dept d on r.dept_id = d.dept_id
+        where r.del_flag = '0'
+            <if test="deptId != null and deptId != 0">
+                AND r.dept_id = #{deptId}
+            </if>
+            <if test="receiptManname != null "> and r.receipt_manname like concat('%', #{receiptManname}, '%')</if>
+            <if test="ccCurrency != null  and ccCurrency != ''"> and r.cc_currency = #{ccCurrency}</if>
+            <if test="ccDenomination != null  and ccDenomination != ''"> and r.cc_denomination = #{ccDenomination}</if>
+            <if test="ccSeries != null  and ccSeries != ''"> and r.cc_series = #{ccSeries}</if>
+            <if test="source != null  and source != ''"> and r.source = #{source}</if>
+            <if test="madeway != null  and madeway != ''"> and r.madeway = #{madeway}</if>
+            <if test="ccFeature != null  and ccFeature != ''"> and r.cc_feature = #{ccFeature}</if>
+            <if test="status != null  and status != ''"> and r.status = #{status}</if>
+            <if test="serialNumber != null  and serialNumber != ''"> and r.serial_number like concat('%', #{serialNumber}, '%')</if>
+            <if test="imgList != null  and imgList != ''"> and r.img_list = #{imgList}</if>
+            <if test="parentId != null  "> and r.parent_id = #{parentId}</if>
+            <if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(r.receiptdate,'%y%m%d') &gt;= date_format(#{beginTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                and date_format(r.receiptdate,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+
+    <select id="selectSysReceiptseizureById" parameterType="Long" resultMap="SysReceiptseizureResult">
+        <include refid="selectSysReceiptseizureVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectNumberByDeptid" parameterType="Integer" resultType="String">
+        select number from sys_receiptseizure where dept_id = #{deptId} order by id desc  limit 1
+    </select>
+
+    <select id="getParentNum" parameterType="Long" resultType="Integer">
+        select count(*) from sys_receiptseizure where parent_id = #{id}
+    </select>
+
+    <select id="selectParentId" parameterType="SysReceiptseizure" resultMap="SysReceiptseizureResult">
+        select * from sys_receiptseizure where del_flag = '0'
+        and date_format(receiptdate,'%y%m%d') = date_format(#{receiptdate},'%y%m%d')
+        and receipt_manname=#{receiptManname}
+        and dept_id=#{deptId}
+        and user_id=#{userId}
+        and cheekup=#{cheekup}
+        and holder_name=#{holderName}
+        and unit_or_individual=#{unitOrIndividual}
+        and document_type=#{documentType}
+        and holder_IDCard=#{holderIdcard}
+        and parent_id=0 limit 1
+    </select>
+
+
+
+    <insert id="insertSysReceiptseizure" parameterType="SysReceiptseizure" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_receiptseizure
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number != null">number,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="receiptdate != null">receiptdate,</if>
+            <if test="amount != null">amount,</if>
+            <if test="totalamount != null">totalamount,</if>
+            <if test="receiptManname != null">receipt_manname,</if>
+            <if test="unitOrIndividual != null">unit_or_individual,</if>
+            <if test="unitName != null">unit_name,</if>
+            <if test="holderName != null">holder_name,</if>
+            <if test="documentType != null">document_type,</if>
+            <if test="holderIdcard != null">holder_IDCard,</if>
+            <if test="holderTelephone != null">holder_telephone,</if>
+            <if test="ccCurrency != null">cc_currency,</if>
+            <if test="ccDenomination != null">cc_denomination,</if>
+            <if test="ccSeries != null">cc_series,</if>
+            <if test="source != null">source,</if>
+            <if test="madeway != null">madeway,</if>
+            <if test="ccFeature != null">cc_feature,</if>
+            <if test="newtypedetail != null">newtypedetail,</if>
+            <if test="cheekup != null">cheekup,</if>
+            <if test="remark != null">remark,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="status != null">status,</if>
+            <if test="reportReason != null">report_reason,</if>
+            <if test="serialNumber != null">serial_number,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="imgList != null">img_list,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="dataSource != null">data_source,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="number != null">#{number},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="receiptdate != null">#{receiptdate},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="totalamount != null">#{totalamount},</if>
+            <if test="receiptManname != null">#{receiptManname},</if>
+            <if test="unitOrIndividual != null">#{unitOrIndividual},</if>
+            <if test="unitName != null">#{unitName},</if>
+            <if test="holderName != null">#{holderName},</if>
+            <if test="documentType != null">#{documentType},</if>
+            <if test="holderIdcard != null">#{holderIdcard},</if>
+            <if test="holderTelephone != null">#{holderTelephone},</if>
+            <if test="ccCurrency != null">#{ccCurrency},</if>
+            <if test="ccDenomination != null">#{ccDenomination},</if>
+            <if test="ccSeries != null">#{ccSeries},</if>
+            <if test="source != null">#{source},</if>
+            <if test="madeway != null">#{madeway},</if>
+            <if test="ccFeature != null">#{ccFeature},</if>
+            <if test="newtypedetail != null">#{newtypedetail},</if>
+            <if test="cheekup != null">#{cheekup},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="status != null">#{status},</if>
+            <if test="reportReason != null">#{reportReason},</if>
+            <if test="serialNumber != null">#{serialNumber},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="imgList != null">#{imgList},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="dataSource != null">#{dataSource},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysReceiptseizure" parameterType="SysReceiptseizure">
+        update sys_receiptseizure
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="number != null">number = #{number},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="deptId != null">user_id = #{deptId},</if>
+            <if test="receiptdate != null">receiptdate = #{receiptdate},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="totalamount != null">totalamount = #{totalamount},</if>
+            <if test="receiptManname != null">receipt_manname = #{receiptManname},</if>
+            <if test="unitOrIndividual != null">unit_or_individual = #{unitOrIndividual},</if>
+            <if test="unitName != null">unit_name = #{unitName},</if>
+            <if test="holderName != null">holder_name = #{holderName},</if>
+            <if test="documentType != null">document_type = #{documentType},</if>
+            <if test="holderIdcard != null">holder_IDCard = #{holderIdcard},</if>
+            <if test="holderTelephone != null">holder_telephone = #{holderTelephone},</if>
+            <if test="ccCurrency != null">cc_currency = #{ccCurrency},</if>
+            <if test="ccDenomination != null">cc_denomination = #{ccDenomination},</if>
+            <if test="ccSeries != null">cc_series = #{ccSeries},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="madeway != null">madeway = #{madeway},</if>
+            <if test="ccFeature != null">cc_feature = #{ccFeature},</if>
+            <if test="newtypedetail != null">newtypedetail = #{newtypedetail},</if>
+            <if test="cheekup != null">cheekup = #{cheekup},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="reportReason != null">report_reason = #{reportReason},</if>
+            <if test="serialNumber != null">serial_number = #{serialNumber},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="imgList != null and imgList !='' ">img_list = #{imgList},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="dataSource != null">data_source = #{dataSource},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysReceiptseizureById" parameterType="Long">
+        delete from sys_receiptseizure where id = #{id}
+    </delete>
+
+    <delete id="deleteSysReceiptseizureByIds" parameterType="String">
+        delete from sys_receiptseizure where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

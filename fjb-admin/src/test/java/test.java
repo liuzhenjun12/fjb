@@ -4,12 +4,10 @@ import com.fjb.common.core.domain.entity.SysDept;
 import com.fjb.common.core.domain.entity.SysTown;
 import com.fjb.common.core.domain.entity.SysUser;
 import com.fjb.common.utils.StringUtils;
-import com.fjb.system.domain.FjbBanktype;
-import com.fjb.system.domain.FjbTown;
-import com.fjb.system.domain.FjbUserinfo;
-import com.fjb.system.domain.SysGps;
+import com.fjb.system.domain.*;
 import com.fjb.system.mapper.*;
 import com.fjb.system.service.impl.SysUserServiceImpl;
+import org.apache.poi.ss.formula.functions.T;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +34,22 @@ public class test {
     private SysUserServiceImpl userService;
     @Autowired
     private SysGpsMapper gpsMapper;
+    @Autowired
+    private TiDanxuanMapper danxuanMapper;
+    @Autowired
+    private TiDanxuanAnMapper tiDanxuanAnMapper;
+    @Autowired
+    private DanxuanMapper danMapper;
+    @Autowired
+    private DanxuanAnMapper anMapper;
+    @Autowired
+    private DuoxuanMapper duoxuanMapper;
+    @Autowired
+    private DuoxuanAnMapper duoxuanAnMapper;
+    @Autowired
+    private PanduanMapper panduanMapper;
+    @Autowired
+    private PanduanAnMapper panduanAnMapper;
 
 
 
@@ -157,5 +171,195 @@ public class test {
             }
             deptMapper.updateDept(D);
         }
+    }
+
+    /**
+     * 添加题目
+     */
+    @Test
+    public void test7(){
+        Danxuan danxuan=new Danxuan();
+        danxuan.setStatus(0);
+        List<Danxuan> danxuans=danMapper.selectDanxuanList(danxuan);
+        for(Danxuan D:danxuans){
+            TiDanxuan t=new TiDanxuan();
+            if(D.getLevel().toString().equals("1")){
+                t.setLevel("困难");
+            }else if(D.getLevel().toString().equals("2")){
+                t.setLevel("普通");
+            }else {
+                t.setLevel("简单");
+            }
+            t.setAnswer(D.getAnswer());
+            t.setJiexi(D.getJiexi());
+            t.setTitle(D.getTitle());
+            t.setTitlepic(D.getTitlepic());
+            t.setStatus("Y");
+            t.setQtype("单选");
+            if(D.getQcategory().toString().equals("1")){
+                t.setQcategory("基础知识");
+            }else if(D.getQcategory().toString().equals("2")||D.getQcategory().toString().equals("3")){
+                t.setQcategory("人民币知识");
+            }else if(D.getQcategory().toString().equals("6")||D.getQcategory().toString().equals("7")){
+                t.setQcategory("其他货币知识");
+            }
+            t.setCreateBy("admin");
+            t.setRemark(D.getId().toString());
+            danxuanMapper.insertTiDanxuan(t);
+        }
+    }
+
+    @Test
+    public void test8() {
+        TiDanxuan t=new TiDanxuan();
+        t.setQtype("单选");
+        List<TiDanxuan> ts=danxuanMapper.selectTiDanxuanList(t);
+        for(TiDanxuan T:ts){
+            DanxuanAn an=new DanxuanAn();
+            an.setQid(Long.valueOf(T.getRemark()));
+            List<DanxuanAn> ans=anMapper.selectDanxuanAnList(an);
+            if(!ans.isEmpty()){
+                for(DanxuanAn D:ans){
+                    TiDanxuanAn da=new TiDanxuanAn();
+                    da.setQid(T.getId());
+                    da.setQind(D.getQind());
+                    da.setQdetail(D.getQdetail());
+                    da.setQpic(D.getQpic());
+                    da.setCreateBy("admin");
+                    tiDanxuanAnMapper.insertTiDanxuanAn(da);
+                }
+            }
+        }
+    }
+
+    /**
+     * 添加题目多选
+     */
+    @Test
+    public void test9(){
+        Duoxuan danxuan=new Duoxuan();
+        danxuan.setStatus(0);
+        List<Duoxuan> danxuans=duoxuanMapper.selectDuoxuanList(danxuan);
+        for(Duoxuan D:danxuans){
+            TiDanxuan t=new TiDanxuan();
+            if(D.getLevel().toString().equals("1")){
+                t.setLevel("困难");
+            }else if(D.getLevel().toString().equals("2")){
+                t.setLevel("普通");
+            }else {
+                t.setLevel("简单");
+            }
+            t.setAnswer(D.getAnswer());
+            t.setJiexi(D.getJiexi());
+            t.setTitle(D.getTitle());
+            t.setTitlepic(D.getTitlepic());
+            t.setStatus("Y");
+            t.setQtype("多选");
+            if(D.getQcategory().toString().equals("1")){
+                t.setQcategory("基础知识");
+            }else if(D.getQcategory().toString().equals("2")||D.getQcategory().toString().equals("3")){
+                t.setQcategory("人民币知识");
+            }else if(D.getQcategory().toString().equals("6")||D.getQcategory().toString().equals("7")){
+                t.setQcategory("其他货币知识");
+            }
+            t.setCreateBy("admin");
+            t.setRemark(D.getId().toString());
+            danxuanMapper.insertTiDanxuan(t);
+        }
+    }
+    //多选答案
+    @Test
+    public void test10() {
+        TiDanxuan t=new TiDanxuan();
+        t.setQtype("多选");
+        List<TiDanxuan> ts=danxuanMapper.selectTiDanxuanList(t);
+        for(TiDanxuan T:ts){
+            DuoxuanAn an=new DuoxuanAn();
+            an.setQid(Long.valueOf(T.getRemark()));
+            List<DuoxuanAn> ans=duoxuanAnMapper.selectDuoxuanAnList(an);
+            if(!ans.isEmpty()){
+                for(DuoxuanAn D:ans){
+                    TiDanxuanAn da=new TiDanxuanAn();
+                    da.setQid(T.getId());
+                    da.setQind(D.getQind());
+                    da.setQdetail(D.getQdetail());
+                    da.setQpic(D.getQpic());
+                    da.setCreateBy("admin");
+                    tiDanxuanAnMapper.insertTiDanxuanAn(da);
+                }
+            }
+        }
+    }
+
+    /**
+     * 添加题目判断
+     */
+    @Test
+    public void test11(){
+        Panduan danxuan=new Panduan();
+        danxuan.setStatus(0);
+        List<Panduan> danxuans=panduanMapper.selectPanduanList(danxuan);
+        for(Panduan D:danxuans){
+            TiDanxuan t=new TiDanxuan();
+            if(D.getLevel().toString().equals("1")){
+                t.setLevel("困难");
+            }else if(D.getLevel().toString().equals("2")){
+                t.setLevel("普通");
+            }else {
+                t.setLevel("简单");
+            }
+            t.setAnswer(D.getAnswer());
+            t.setJiexi(D.getJiexi());
+            t.setTitle(D.getTitle());
+            t.setTitlepic(D.getTitlepic());
+            t.setStatus("Y");
+            t.setQtype("判断");
+            if(D.getQcategory().toString().equals("1")){
+                t.setQcategory("基础知识");
+            }else if(D.getQcategory().toString().equals("2")||D.getQcategory().toString().equals("3")){
+                t.setQcategory("人民币知识");
+            }else if(D.getQcategory().toString().equals("6")||D.getQcategory().toString().equals("7")){
+                t.setQcategory("其他货币知识");
+            }
+            t.setCreateBy("admin");
+            t.setRemark(D.getId().toString());
+            danxuanMapper.insertTiDanxuan(t);
+        }
+    }
+
+    //判断答案
+    @Test
+    public void test12() {
+        TiDanxuan t=new TiDanxuan();
+        t.setQtype("判断");
+        List<TiDanxuan> ts=danxuanMapper.selectTiDanxuanList(t);
+        for(TiDanxuan T:ts){
+            PanduanAn an=new PanduanAn();
+            an.setQid(Long.valueOf(T.getRemark()));
+            List<PanduanAn> ans=panduanAnMapper.selectPanduanAnList(an);
+            if(!ans.isEmpty()){
+                for(PanduanAn D:ans){
+                    TiDanxuanAn da=new TiDanxuanAn();
+                    da.setQid(T.getId());
+                    da.setQind(D.getQind());
+                    da.setQdetail(D.getQdetail());
+                    da.setQpic(D.getQpic());
+                    da.setCreateBy("admin");
+                    tiDanxuanAnMapper.insertTiDanxuanAn(da);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void test13(){
+        TiDanxuan t=new TiDanxuan();
+        t.setQtype("判断");
+        t.setLevel("简单");
+        t.setQcategory("基础知识");
+        t.setAnswer("A");
+        int i= danxuanMapper.insertTiDanxuan(t);
+        System.out.println(i);
+        System.out.println(t.getId());
     }
 }

@@ -126,28 +126,8 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:expertisereport:add']"
+          v-hasPermi="['business:expertisereport:add']"
         >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:expertisereport:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:expertisereport:remove']"
-        >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -155,39 +135,68 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:expertisereport:export']"
+          v-hasPermi="['business:expertisereport:export']"
         >导出</el-button>
       </el-col>
 	  <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
     </div>
-    <el-table v-loading="loading" :data="expertisereportList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="鉴定编号" align="center" prop="number" />
-      <el-table-column label="机构id" align="center" prop="deptId" />
-      <el-table-column label="假币数量" align="center" prop="amount" />
-      <el-table-column label="假币总额" align="center" prop="totalamount" />
-      <el-table-column label="鉴定日期" align="center" prop="identifydate" />
-      <el-table-column label="币种id" align="center" prop="ccCurrency" />
-      <el-table-column label="假币劵别" align="center" prop="ccDenomination" />
-      <el-table-column label="假币版别" align="center" prop="ccSeries" />
-      <el-table-column label="鉴定结果" align="center" prop="result" />
-      <el-table-column label="状态" align="center" prop="status" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+    <el-table ref="table"
+              v-loading="loading"
+              row-key="id"
+              :data="expertisereportList"
+              :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+    >
+      <el-table-column label="鉴定日期" width="130" align="center" prop="identifydate" />
+      <el-table-column label="鉴定单位" width="150" align="center" prop="dept.jianCheng" :show-overflow-tooltip="true" />
+      <el-table-column label="鉴定人员" align="center" prop="identifyname" />
+      <el-table-column label="货币种类" align="center" prop="ccCurrency" />
+      <el-table-column label="货币数量" align="center" prop="amount" />
+      <el-table-column label="面额合计" align="center" prop="totalamount" />
+      <el-table-column label="专家复核" align="center"  >
         <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.status"
+            active-value="Y"
+            inactive-value="N"
+            @change="handleStatusChange(scope.row)"
+            :disabled="disabled"
+          ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="冠字号码" align="center" prop="serialNumber" :show-overflow-tooltip="true" />
+      <el-table-column label="数据来源" align="center" prop="dataSource" :show-overflow-tooltip="true" />
+      <el-table-column label="操作" align="center" width="220" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+            <el-tooltip class="item" effect="dark" content="在此新增会绑定为同一批次" placement="bottom">
+              <el-button
+                size="mini"
+                type="text"
+                icon="el-icon-plus"
+                @click="handleAdd(scope.row)"
+                v-hasPermi="['business:expertisereport:add']"
+              >新增</el-button>
+            </el-tooltip>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleYulan(scope.row)"
+            v-hasPermi="['business:expertisereport:query']"
+          >预览</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:expertisereport:edit']"
+            v-hasPermi="['business:expertisereport:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:expertisereport:remove']"
+            v-hasPermi="['business:expertisereport:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -200,17 +209,140 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+    <el-dialog  :visible.sync="open" width="800px" append-to-body>
+      <el-form ref="form" :model="form" label-width="80px">
+        <!--startprint-->
+        <el-row>
+          <div id="printMe">
+            <el-col :span="24" style="text-align: center">
+              <h2>货币真伪鉴定书</h2>
+            </el-col>
+            <el-col :span="24" style="text-align: center">
+              <h5>鉴定日期：{{form.identifydate}}</h5>
+            </el-col>
+          <el-col :span="12" style="text-align: left;margin-bottom:10px">
+            <span style="line-height: 30px">鉴定单位：</span><span >{{form.deptName}}</span>
+          </el-col>
+          <el-col :span="12" style="text-align: right;margin-bottom: 10px">
+            <span style="line-height: 30px">鉴定编号：</span><span >{{form.number}}</span>
+          </el-col>
+          <el-col :span="24" >
+            <table class="tab">
+              <tbody><tr>
+                <td colspan="3">送鉴单位或持有人：{{form.holderName}}</td>
+                <td colspan="3">原鉴定(鉴别)单位：{{form.originalcffi}}</td>
+              </tr>
+              <tr>
+                <td colspan="3">持有人联系电话：{{form.holderTelephone}}</td>
+                <td colspan="3">持有人证件号码：{{form.holderIdcard}}</td>
+              </tr>
+              <tr align="center">
+                <td width="14%">币种</td>
+                <td width="16%">券别</td>
+                <td width="20%">版别</td>
+                <td width="22%">冠字号码</td>
+                <td width="16%">数量（张、枚）</td>
+                <td width="12%">金额（元）</td>
+              </tr>
+              <tr align="center" v-for="v in form_obj">
+                <td>{{v.ccCurrency}}</td>
+                <td>{{v.ccDenomination}}</td>
+                <td>{{v.ccSeries}}</td>
+                <td>{{v.serialNumber}}</td>
+                <td>{{v.amount}}</td>
+                <td>{{v.totalamount}}</td>
+              </tr>
+
+              <tr align="center">
+                <td colspan="4">合计</td>
+                <td colspan="1">{{form.amount}}</td>
+                <td colspan="1">{{form.totalamount}}</td>
+              </tr>
+              <tr>
+                <td colspan="6">原鉴定（鉴别）结果：{{form.originalresult}}</td>
+              </tr>
+              <tr>
+                <td colspan="6" rowspan="10">
+                  <div style="margin-top: 6px;margin-bottom: 10px;">鉴定结果：{{form.result}}</div>
+                  <div>详细鉴定结果：{{form.resultdetails}}</div>
+                  <br>
+                  <br>
+                </td>
+              </tr>
+              </tbody></table>
+          </el-col>
+          <el-col :span="12" style="text-align: left;margin-top: 10px;margin-bottom: 50px">
+            <span style="line-height: 30px">鉴定人：</span><span >{{form.identifyname}}</span>
+          </el-col>
+          <el-col :span="12" style="text-align: right;margin-top: 10px;margin-bottom: 50px">
+            <span style="line-height: 30px">复核人员：</span><span >{{form.checkupname}}</span>
+          </el-col>
+          </div>
+        </el-row>
+        <!--endprint-->
+        <el-row>
+          <el-col :span="24" >
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :file-list="fileList"
+              :disabled="true"
+              ref="dynamic"
+              :auto-upload="false" class="zaopian">
+              <i slot="default" class="el-icon-plus"></i>
+              <div slot="file" slot-scope="{file}">
+                <img
+                  class="el-upload-list__item-thumbnail"
+                  :src="file.url" alt=""
+                >
+                <span class="el-upload-list__item-actions">
+                  <span
+                    class="el-upload-list__item-preview"
+                    @click="handlePictureCardPreview(file)"
+                  >
+                    <i class="el-icon-zoom-in"></i>
+                  </span>
+                  <span
+                    v-if="!disabled"
+                    class="el-upload-list__item-delete"
+                    @click="handleDownload(file)"
+                  >
+                    <i class="el-icon-download"></i>
+                  </span>
+                </span>
+              </div>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible" append-to-body>
+              <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="doPrint" type="primary" v-print="'#printMe'">打 印</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listExpertisereport, getExpertisereport, delExpertisereport, addExpertisereport, updateExpertisereport, exportExpertisereport } from "@/api/business/expertisereport";
+import { listExpertisereport, getParentNum,delExpertisereport, exportExpertisereport,changeExpertisereportStatus } from "@/api/business/expertisereport";
 import { Cascadeselect } from "@/api/system/dept";
 
 export default {
   name: "Expertisereport",
   data() {
     return {
+      // 是否显示弹出预览层
+      open: false,
+      //图片集合
+      fileList: [],
+      form_obj:[],
+      dialogImageUrl: '',
+      //动态窗口是否显示
+      dialogVisible: false,
+      //是否禁用开关
+      disabled:true,
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -252,22 +384,14 @@ export default {
       deptidOptions:undefined,
       // 遮罩层
       loading: true,
-      // 选中数组
-      ids: [],
-      // 非单个禁用
-      single: true,
-      // 非多个禁用
-      multiple: true,
       // 显示搜索条件
       showSearch: true,
       // 总条数
       total: 0,
       // 假币鉴定表格数据
       expertisereportList: [],
-      // 弹出层标题
-      title: "",
-      // 是否显示弹出层
-      open: false,
+      //预览
+      expertisereportList_1:[],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -283,14 +407,23 @@ export default {
       },
       // 表单参数
       form: {},
-      // 表单校验
-      rules: {
-      }
+      form_1:{}
     };
   },
   created() {
     this.getList();
     this.getCascadeselect();
+    let permissions=this.$store.state.user.permissions
+    if(permissions.length>1){
+      for (var value of permissions) {
+        if(value=='business:expertisereport:edit'){
+          this.disabled=false;
+          continue;
+        }
+      }
+    }else {
+      this.disabled=false;
+    }
     this.getDicts("sys_money_type").then(response => {
       this.ccCurrencyOptions = response.data;
     });
@@ -304,12 +437,16 @@ export default {
       this.statusOptions = response.data;
     });
   },
+  activated () {
+    this.getList()
+  },
   methods: {
     /** 查询假币鉴定列表 */
     getList() {
       this.loading = true;
       listExpertisereport(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-        this.expertisereportList = response.rows;
+        this.expertisereportList_1 = response.rows;
+        this.expertisereportList = this.handleTree(response.rows, "id");
         this.total = response.total;
         this.loading = false;
       });
@@ -329,47 +466,20 @@ export default {
         this.queryParams.deptId = null;
       }
     },
-    // 取消按钮
-    cancel() {
-      this.open = false;
-      this.reset();
-    },
-    // 表单重置
-    reset() {
-      this.form = {
-        id: null,
-        number: null,
-        deptId: null,
-        userId: null,
-        amount: null,
-        totalamount: null,
-        identifyname: null,
-        checkupname: null,
-        identifydate: null,
-        holderName: null,
-        holderTelephone: null,
-        holderIdcard: null,
-        ccCurrency: null,
-        ccDenomination: null,
-        ccSeries: null,
-        ccMadeway: null,
-        ccFeature: null,
-        identifyreportFile: null,
-        originalcffi: null,
-        originalresult: null,
-        result: null,
-        resultdetails: null,
-        status: "0",
-        remark: null,
-        delFlag: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null,
-        imgList: null,
-        groupNumber: null
-      };
-      this.resetForm("form");
+    // 状态修改
+    handleStatusChange(row) {
+      let text = row.status === "Y" ? "最终复核通过" : "最终复核拒绝";
+      this.$confirm('确认要"' + text + '""' + row.identifyname + '"经办的鉴定凭证吗?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return changeExpertisereportStatus(row.id, row.status);
+      }).then(() => {
+        this.msgSuccess(text + "成功");
+      }).catch(function() {
+        row.status = row.status === "Y" ? "N" : "Y";
+      });
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -381,54 +491,32 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
-    // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
-      this.multiple = !selection.length
-    },
     /** 新增按钮操作 */
-    handleAdd() {
-      this.$router.push("/expertisereport/addPage");
+    handleAdd(row) {
+      if (row != null && row.id) {
+        getParentNum(row.id).then(response => {
+          if(response.data<4){
+            this.$router.push("/expertisereport/addPage/"+row.id);
+          }else {
+            this.msgError('一批最多5条数据')
+          }
+        });
+      }else {
+        this.$router.push("/expertisereport/addPage/0");
+      }
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
-      const id = row.id || this.ids
-      this.$router.push("/expertisereport/updatePage/"+id);
-    },
-    /** 提交按钮 */
-    submitForm() {
-      this.$refs["form"].validate(valid => {
-        if (valid) {
-          if (this.form.id != null) {
-            updateExpertisereport(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess("修改成功");
-                this.open = false;
-                this.getList();
-              }
-            });
-          } else {
-            addExpertisereport(this.form).then(response => {
-              if (response.code === 200) {
-                this.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
-              }
-            });
-          }
-        }
-      });
+      this.$router.push("/expertisereport/updatePage/"+row.id );
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
-      this.$confirm('是否确认删除假币鉴定编号为"' + ids + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除假币鉴定的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delExpertisereport(ids);
+          return delExpertisereport(row.id);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
@@ -446,7 +534,79 @@ export default {
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
-    }
+    },
+    /** 预览按钮操作 */
+    handleYulan(row) {
+      this.form_obj=[]
+      for(var i=0;i<this.expertisereportList_1.length;i++){
+        var sub=this.expertisereportList_1[i]
+        if(sub.id==row.id){
+          this.form=sub;
+          this.form.userName=sub.createBy;
+          this.form.deptName=sub.dept.deptName
+          var obj={amount:sub.amount,totalamount:sub.totalamount,ccCurrency:sub.ccCurrency,
+            ccDenomination:sub.ccDenomination,ccSeries:sub.ccSeries,serialNumber:sub.serialNumber};
+          this.form_obj.push(obj);
+          if(sub.imgList!=''&&sub.imgList!=null){
+            this.fileList=JSON.parse(sub.imgList);
+            for(var j=0;j<this.fileList.length;j++){
+              this.fileList[j].url=process.env.VUE_APP_BASE_API+this.fileList[j].url;
+            }
+          }
+          continue;
+        }
+      }
+      if(row.parentId==0){
+        for(var i=0;i<this.expertisereportList_1.length;i++){
+          var sub=this.expertisereportList_1[i]
+          if(sub.parentId==row.id ){
+            this.form.amount=parseInt(this.form.amount)+parseInt(sub.amount)
+            this.form.totalamount=parseInt(this.form.totalamount)+parseInt(sub.totalamount)
+            let obj={amount:sub.amount,totalamount:sub.totalamount,
+              ccCurrency:sub.ccCurrency, ccDenomination:sub.ccDenomination,
+              ccSeries:sub.ccSeries,serialNumber:sub.serialNumber};
+            this.form_obj.push(obj);
+          }
+        }
+      }
+      if(this.form_obj.length<5){
+        for(var i=this.form_obj.length;i<5;i++){
+          let obj={amount:'',totalamount:'', ccCurrency:'', ccDenomination:'', ccSeries:'',serialNumber:''};
+          this.form_obj.push(obj)
+        }
+      }
+      this.open = true;
+    },
+    /** 图片预览 */
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    getnow(){
+      var nowDate = new Date();
+      var year = nowDate.getFullYear();
+      var month = nowDate.getMonth() + 1 < 10 ? "0" + (nowDate.getMonth() + 1)
+        : nowDate.getMonth() + 1;
+      var day = nowDate.getDate() < 10 ? "0" + nowDate.getDate() : nowDate
+        .getDate();
+      var dateStr = year + "年" + month + "月" + day+"日";
+      return dateStr;
+    },
+    /** 打印 */
+    doPrint(){}
   }
 };
 </script>
+
+<style lang="scss" scoped>
+  .tab {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .tab td {
+    border: 1px solid #000;
+    height: 32px;
+    padding-left: 10px;
+    width: 16.67%;
+  }
+</style>
